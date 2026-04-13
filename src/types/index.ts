@@ -1,0 +1,96 @@
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  color: string
+  icon?: string
+}
+
+export interface Region {
+  id: string
+  name: string
+  slug: string
+  description?: string
+}
+
+export interface Author {
+  id: string
+  name: string
+  slug: string
+  bio?: string
+  avatar?: MediaItem
+  role?: string
+  twitter?: string
+  email?: string
+}
+
+export interface MediaItem {
+  id: string
+  filename: string
+  url: string
+  alt: string
+  caption?: string
+  width?: number
+  height?: number
+  sizes?: {
+    thumbnail?: { url: string; width: number; height: number }
+    card?: { url: string; width: number; height: number }
+    hero?: { url: string; width: number; height: number }
+  }
+  source?: 'local' | 'external'
+  externalUrl?: string
+}
+
+export interface Tag {
+  tag: string
+}
+
+export interface Article {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  content?: any
+  coverImage: MediaItem
+  category?: Category
+  region?: Region
+  author?: Author
+  tags?: Tag[]
+  status: 'draft' | 'published' | 'archived'
+  isBreaking: boolean
+  isFeatured: boolean
+  language: 'all' | 'en' | 'km'
+  publishedAt?: string
+  readTime?: number
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    ogImage?: MediaItem
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PaginatedArticles {
+  docs: Article[]
+  totalDocs: number
+  limit: number
+  totalPages: number
+  page: number
+  pagingCounter: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
+  prevPage: number | null
+  nextPage: number | null
+}
+
+export interface LiveUpdate {
+  id: string
+  timestamp: string
+  headline: string
+  body: string
+  category?: string
+  isBreaking: boolean
+  image?: string
+}

@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: tribune
+      POSTGRES_PASSWORD: tribune123
+      POSTGRES_DB: tribune
+    ports:
+      - '5433:5432'
+    volumes:
+      - tribune_db_data:/var/lib/postgresql/data
+
+volumes:
+  tribune_db_data:
