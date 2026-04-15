@@ -3,17 +3,19 @@ import '@/app/globals.css'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { BreakingTicker } from '@/components/layout/BreakingTicker'
-import { getCategories, getBreakingArticles, getRegions } from '@/lib/api'
+import { getCategories, getBreakingArticles, getRegions } from '@/lib/api-server'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import { NavigationProgress } from '@/components/layout/NavigationProgress'
 
 export const metadata: Metadata = {
   title: {
-    default: 'The Tribune — Independent Political Reporting',
-    template: '%s — The Tribune',
+    default: 'Asian Dot — Independent Political Reporting',
+    template: '%s — Asian Dot',
   },
-  description: 'The Tribune delivers sharp, independent political news coverage. Parliament, elections, international affairs, and more.',
-  keywords: ['politics', 'news', 'parliament', 'elections', 'tribune'],
+  description: 'Asian Dot delivers sharp, independent political news coverage. Parliament, elections, international affairs, and more.',
+  keywords: ['politics', 'news', 'parliament', 'elections', 'asiandot'],
   openGraph: {
-    siteName: 'The Tribune',
+    siteName: 'Asian Dot',
     type: 'website',
   },
 }
@@ -31,19 +33,22 @@ export default async function FrontendLayout({
     getBreakingArticles(locale),
     getRegions(locale),
   ])
-  console.log(categories)
 
   return (
     <html lang={locale}>
       <body>
+        <NavigationProgress />
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <BreakingTicker articles={breakingArticles as any} />
-          <Header categories={categories as any} locale={locale} />
+          <BreakingTicker articles={breakingArticles} />
+          <Header categories={categories} locale={locale} />
           <main style={{ flex: 1 }}>
             {children}
           </main>
-          <Footer locale={locale} categories={categories as any} regions={regions as any} />
+          <Footer locale={locale} categories={categories} regions={regions} />
         </div>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   )

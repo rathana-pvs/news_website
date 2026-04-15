@@ -17,7 +17,7 @@ const seed = async () => {
   })
   
   console.log('--- Seeding Categories ---')
-  const categoryMap: Record<string, string> = {}
+  const categoryMap: Record<string, string | number> = {}
   for (const cat of mockCategories) {
     const existing = await payload.find({
       collection: 'categories',
@@ -26,17 +26,18 @@ const seed = async () => {
     })
 
     const data = {
-      name: cat.name,
-      slug: cat.slug,
-      description: cat.description,
-      color: cat.color,
-      icon: cat.icon,
+      name: cat.name || '',
+      slug: cat.slug || '',
+      description: cat.description || '',
+      color: cat.color || '#000000',
+      icon: cat.icon || '',
     }
 
     if (existing.docs.length === 0) {
       const created = await payload.create({
         collection: 'categories',
         data,
+        draft: false,
       })
       categoryMap[cat.slug!] = created.id
       console.log(`Created category: ${cat.name}`)
@@ -45,6 +46,7 @@ const seed = async () => {
         collection: 'categories',
         id: existing.docs[0].id,
         data,
+        draft: false,
       })
       categoryMap[cat.slug!] = updated.id
       console.log(`Updated category: ${cat.name}`)
@@ -52,7 +54,7 @@ const seed = async () => {
   }
 
   console.log('--- Seeding Regions ---')
-  const regionMap: Record<string, string> = {}
+  const regionMap: Record<string, string | number> = {}
   for (const reg of mockRegions) {
     const existing = await payload.find({
       collection: 'regions',
@@ -61,15 +63,16 @@ const seed = async () => {
     })
 
     const data = {
-      name: reg.name,
-      slug: reg.slug,
-      description: reg.description,
+      name: reg.name || '',
+      slug: reg.slug || '',
+      description: reg.description || '',
     }
 
     if (existing.docs.length === 0) {
       const created = await payload.create({
         collection: 'regions',
         data,
+        draft: false,
       })
       regionMap[reg.slug!] = created.id
       console.log(`Created region: ${reg.name}`)
@@ -78,6 +81,7 @@ const seed = async () => {
         collection: 'regions',
         id: existing.docs[0].id,
         data,
+        draft: false,
       })
       regionMap[reg.slug!] = updated.id
       console.log(`Updated region: ${reg.name}`)
@@ -85,7 +89,7 @@ const seed = async () => {
   }
 
   console.log('--- Seeding Authors ---')
-  const authorMap: Record<string, string> = {}
+  const authorMap: Record<string, string | number> = {}
   for (const author of mockAuthors) {
     const existing = await payload.find({
       collection: 'authors',
@@ -94,17 +98,18 @@ const seed = async () => {
     })
 
     const data = {
-      name: author.name,
-      slug: author.slug,
-      bio: author.bio,
-      role: author.role,
-      twitter: author.twitter,
+      name: author.name || '',
+      slug: author.slug || '',
+      bio: author.bio || '',
+      role: author.role || '',
+      twitter: author.twitter || '',
     }
 
     if (existing.docs.length === 0) {
       const created = await payload.create({
         collection: 'authors',
         data,
+        draft: false,
       })
       authorMap[author.slug!] = created.id
       console.log(`Created author: ${author.name}`)
@@ -113,6 +118,7 @@ const seed = async () => {
         collection: 'authors',
         id: existing.docs[0].id,
         data,
+        draft: false,
       })
       authorMap[author.slug!] = updated.id
       console.log(`Updated author: ${author.name}`)
@@ -186,6 +192,7 @@ const seed = async () => {
       await payload.create({
         collection: 'articles',
         data: articleData,
+        draft: false,
       })
       console.log(`Created article: ${article.title}`)
     } else {
@@ -212,6 +219,7 @@ const seed = async () => {
         collection: 'articles',
         id: doc.id,
         data: articleData,
+        draft: false,
       })
       console.log(`Updated article record: ${article.title}`)
     }
@@ -220,20 +228,20 @@ const seed = async () => {
   console.log('--- Creating Admin User ---')
   const existingAdmin = await payload.find({
     collection: 'users',
-    where: { email: { equals: 'admin@thetribune.com' } },
+    where: { email: { equals: 'admin@asiandot.com' } },
   })
 
   if (existingAdmin.docs.length === 0) {
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@thetribune.com',
+        email: 'admin@asiandot.com',
         password: 'adminpassword123',
-        name: 'Tribune Admin',
+        name: 'Asian Dot Admin',
         role: 'admin',
       },
     })
-    console.log('Created admin user: admin@thetribune.com / adminpassword123')
+    console.log('Created admin user: admin@asiandot.com / adminpassword123')
   }
 
   console.log('Seed completed successfully!')

@@ -30,7 +30,8 @@ export const i18nStrings = {
     interviews: 'Interviews',
     // New UI Labels
     tagline: 'Independent Political Reporting',
-    footerTagline: 'Independent political reporting you can trust. Since 2010.',
+    organization: 'Asian Dot',
+    footerTagline: 'Independent political reporting you can trust. Asia-focused news delivered with integrity.',
     copyright: 'All rights reserved.',
     viewAll: 'View All',
     editorsPicks: "Editor's Picks",
@@ -50,6 +51,16 @@ export const i18nStrings = {
     thisWeek: 'This Week',
     thisMonth: 'This Month',
     resultsFor: 'results for',
+    // About & Contact
+    aboutUs: 'About Us',
+    contactUs: 'Contact Us',
+    ourMission: 'Our Mission',
+    missionText: 'To provide independent, data-driven political reporting that empowers citizens and strengthens democracy.',
+    editorialStandards: 'Editorial Standards',
+    getInTouch: 'Get in Touch',
+    privacyPolicy: 'Privacy Policy',
+    dataCollection: 'Data Collection & Analytics',
+    privacyText: 'We use Google Analytics and cookies to understand our audience and improve the delivery of high-quality political reporting.',
     // Regions
     asia: 'Asia',
     europe: 'Europe',
@@ -94,7 +105,8 @@ export const i18nStrings = {
     'us-canada': 'អាមេរិក និង កាណាដា',
     // New UI Labels
     tagline: 'ការរាយការណ៍ព័ត៌មាននយោបាយឯករាជ្យ',
-    footerTagline: 'ការរាយការណ៍ព័ត៌មាននយោបាយឯករាជ្យដែលអ្នកអាចទុកចិត្តបាន។ តាំងពីឆ្នាំ ២០០១០។',
+    organization: 'Asian Dot',
+    footerTagline: 'ការរាយការណ៍ព័ត៌មាននយោបាយឯករាជ្យដែលអ្នកអាចទុកចិត្តបាន។ ផ្តោតលើតំបន់អាស៊ីដោយសុចរិតភាព។',
     copyright: 'រក្សាសិទ្ធិគ្រប់យ៉ាង។',
     viewAll: 'មើលទាំងអស់',
     editorsPicks: 'ជម្រើសនិពន្ធនាយក',
@@ -114,5 +126,15 @@ export const i18nStrings = {
     thisWeek: 'សប្តាហ៍នេះ',
     thisMonth: 'ខែនេះ',
     resultsFor: 'លទ្ធផលសម្រាប់',
+    // About & Contact
+    aboutUs: 'អំពីយើង',
+    contactUs: 'ទាក់ទងយើង',
+    ourMission: 'បេសកកម្មរបស់យើង',
+    missionText: 'ដើម្បីផ្តល់ការរាយការណ៍នយោបាយឯករាជ្យ និងផ្អែកលើទិន្នន័យ ដែលពង្រឹងអំណាចពលរដ្ឋ និងលទ្ធិប្រជាធិបតេយ្យ។',
+    editorialStandards: 'ស្តង់ដារវិចារណកថា',
+    getInTouch: 'ទាក់ទងមកយើង',
+    privacyPolicy: 'គោលការណ៍ឯកជនភាព',
+    dataCollection: 'ការប្រមូលទិន្នន័យ និងការវិភាគ',
+    privacyText: 'យើងប្រើប្រាស់ Google Analytics និង cookies ដើម្បីស្វែងយល់ពីមិត្តអ្នកអាន និងកែលម្អការផ្តល់ជូននូវការរាយការណ៍នយោបាយដែលមានគុណភាពខ្ពស់។',
   },
 } as const

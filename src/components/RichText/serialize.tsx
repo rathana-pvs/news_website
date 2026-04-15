@@ -1,4 +1,4 @@
-import React, { Fragment, JSX } from 'react'
+import { Fragment, JSX } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -8,7 +8,7 @@ type Node = {
   text?: string
   children?: Node[]
   tag?: string
-  format?: number | string
+  format?: number
   metadata?: any
   [key: string]: any
 }
@@ -18,19 +18,19 @@ export function serializeLexical(nodes: Node[]): JSX.Element[] {
     if (node.type === 'text') {
       let text = <Fragment key={i}>{node.text}</Fragment>
 
-      if (node.format & 1) {
+      if ((node.format || 0) & 1) {
         text = <strong key={i}>{text}</strong>
       }
-      if (node.format & 2) {
+      if ((node.format || 0) & 2) {
         text = <em key={i}>{text}</em>
       }
-      if (node.format & 4) {
+      if ((node.format || 0) & 4) {
         text = <u key={i}>{text}</u>
       }
-      if (node.format & 8) {
-        text = <strike key={i}>{text}</strike>
+      if ((node.format || 0) & 8) {
+        text = <s key={i}>{text}</s>
       }
-      if (node.format & 16) {
+      if ((node.format || 0) & 16) {
         text = <code key={i}>{text}</code>
       }
 

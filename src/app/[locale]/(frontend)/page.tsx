@@ -5,17 +5,18 @@ import { RegionSection } from '@/components/sections/RegionSection'
 import { OpinionSection } from '@/components/sections/OpinionSection'
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
-import { getArticles, getCategories, getFeatured, getRegions } from '@/lib/api'
+import { AdBanner } from '@/components/ads/AdBanner'
+import { getArticles, getCategories, getFeatured, getRegions } from '@/lib/api-server'
 import { Article, Category, Region } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
 export const metadata: Metadata = {
-  title: 'The Tribune — Independent Political Reporting',
-  description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from The Tribune.',
+  title: 'Asian Dot — Independent Political Reporting',
+  description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
 }
 
-export const revalidate = 5
+export const revalidate = 10
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -58,6 +59,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* Hero */}
       <HeroSection hero={hero} secondary={secondary} />
 
+      {/* Ad Spot */}
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <AdBanner format="728x90" label="Sponsor Spotlight" />
+      </div>
+
       {/* Latest News Divider */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center gap-4 py-8">
@@ -69,6 +75,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </div>
 
       <LatestNewsGrid articles={articles.slice(0, 8)} />
+
+      {/* Second Ad Spot */}
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <AdBanner format="728x90" label="Global News Sponsor" />
+      </div>
 
       {/* Category Rows */}
       {cats.slice(0, 2).map((cat) => (

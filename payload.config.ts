@@ -50,7 +50,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: '— The Tribune CMS',
+      titleSuffix: '— Asian Dot CMS',
     },
   },
   collections: [Articles, Categories, Authors, Media, Users, Regions],
@@ -78,7 +78,7 @@ export default buildConfig({
     seoPlugin({
       collections: ['articles'],
       uploadsCollection: 'media',
-      generateTitle: ({ doc }: { doc: any }) => `${doc?.title?.value} — The Tribune`,
+      generateTitle: ({ doc }: { doc: any }) => `${doc?.title?.value} — Asian Dot`,
       generateDescription: ({ doc }: { doc: any }) => doc?.excerpt?.value,
     }),
   ],

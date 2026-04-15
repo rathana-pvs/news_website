@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Category } from '@/types'
+import { LocaleSwitcher } from './LocaleSwitcher'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
@@ -11,8 +12,6 @@ interface HeaderProps {
   categories: Category[]
   locale: string
 }
-
-import { LocaleSwitcher } from './LocaleSwitcher'
 
 export function Header({ categories, locale }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
@@ -56,7 +55,7 @@ export function Header({ categories, locale }: HeaderProps) {
                 className="font-display font-bold text-2xl italic group-hover:text-[var(--accent-gold)] transition-colors"
                 style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em' }}
               >
-                The Tribune
+                asiandot.com
               </span>
               <span
                 className="label-caps hidden sm:block"
@@ -169,7 +168,7 @@ export function Header({ categories, locale }: HeaderProps) {
             {/* Mobile Nav Header */}
             <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
               <span className="font-display font-bold text-xl italic" style={{ color: 'var(--text-primary)' }}>
-                The Tribune
+                asiandot.com
               </span>
               <button
                 onClick={() => setMobileOpen(false)}

@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticle, getArticles, getRelatedArticles } from '@/lib/api'
+import { getArticle, getArticles, getRelatedArticles } from '@/lib/api-server'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { BreakingBadge } from '@/components/ui/BreakingBadge'
 import { ReadingBar } from '@/components/ui/ReadingBar'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { RichText } from '@/components/RichText'
+import { AdBanner } from '@/components/ads/AdBanner'
 import { formatDate } from '@/lib/utils'
 import { Article } from '@/types'
 
@@ -19,12 +20,9 @@ interface PageProps {
 import { i18n, Locale } from '@/i18n-config'
 import { i18nStrings } from '@/lib/i18n'
 
-export async function generateStaticParams() {
-  const { docs } = await getArticles({ limit: 100 })
-  return i18n.locales.flatMap((locale) => 
-    docs.map((article) => ({ slug: article.slug, locale }))
-  )
-}
+// Use dynamic rendering — do NOT pre-generate static paths at startup.
+// This prevents connection spam to Supabase when the server starts.
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params
@@ -118,6 +116,11 @@ export default async function ArticlePage({ params }: PageProps) {
             >
               {article.excerpt}
             </p>
+
+            {/* Mobile-Only Ad (inserted after intro) */}
+            <div className="lg:hidden">
+              <AdBanner format="300x250" label="Trending Story Sponsor" />
+            </div>
 
             {/* Article Body */}
             <div className="article-body">
@@ -268,9 +271,15 @@ export default async function ArticlePage({ params }: PageProps) {
                   )}
                 </div>
               </div>
+
+              {/* Sidebar Ad */}
+              <AdBanner format="300x250" />
             </div>
           </aside>
         </div>
+
+        {/* Bottom Ad */}
+        <AdBanner format="728x90" />
 
         {/* Related Articles */}
         {related && related.length > 0 && (

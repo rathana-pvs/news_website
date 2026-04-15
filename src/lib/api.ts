@@ -16,24 +16,17 @@ export async function getArticles(params?: {
     if (params?.page) searchParams.set('page', String(params.page))
     searchParams.set('where[status][equals]', 'published')
     
-    // Language filtering
     if (params?.locale) {
       searchParams.set('where[or][0][language][equals]', params.locale)
       searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', params.locale)
     }
 
-    if (params?.category) {
-      searchParams.set('where[category.slug][equals]', params.category)
-    }
-    if (params?.region) {
-      searchParams.set('where[region.slug][equals]', params.region)
-    }
+    if (params?.category) searchParams.set('where[category.slug][equals]', params.category)
+    if (params?.region) searchParams.set('where[region.slug][equals]', params.region)
     searchParams.set('depth', '2')
 
-    const res = await fetch(`${SITE_URL}/api/articles?${searchParams}`, {
-      next: { revalidate: 10 },
-    })
+    const res = await fetch(`/api/articles?${searchParams}`)
     if (!res.ok) throw new Error('Failed to fetch articles')
     return res.json()
   } catch (e) {
@@ -55,10 +48,7 @@ export async function getArticles(params?: {
 
 export async function getArticle(slug: string, locale?: string): Promise<Article | null> {
   try {
-    const res = await fetch(
-      `${SITE_URL}/api/articles?where[slug][equals]=${slug}&depth=2&limit=1${locale ? `&locale=${locale}` : ''}`,
-      { next: { revalidate: 10 } },
-    )
+    const res = await fetch(`/api/articles?where[slug][equals]=${slug}&depth=2&limit=1${locale ? `&locale=${locale}` : ''}`)
     if (!res.ok) return null
     const data = await res.json()
     return data.docs[0] || null
@@ -69,9 +59,7 @@ export async function getArticle(slug: string, locale?: string): Promise<Article
 
 export async function getCategories(locale?: string): Promise<Category[]> {
   try {
-    const res = await fetch(`${SITE_URL}/api/categories?limit=20${locale ? `&locale=${locale}` : ''}`, {
-      next: { revalidate: 3600 },
-    })
+    const res = await fetch(`/api/categories?limit=20${locale ? `&locale=${locale}` : ''}`)
     if (!res.ok) return []
     const data = await res.json()
     return data.docs || []
@@ -82,9 +70,7 @@ export async function getCategories(locale?: string): Promise<Category[]> {
 
 export async function getRegions(locale?: string): Promise<Region[]> {
   try {
-    const res = await fetch(`${SITE_URL}/api/regions?limit=20${locale ? `&locale=${locale}` : ''}`, {
-      next: { revalidate: 3600 },
-    })
+    const res = await fetch(`/api/regions?limit=20${locale ? `&locale=${locale}` : ''}`)
     if (!res.ok) return []
     const data = await res.json()
     return data.docs || []
@@ -102,20 +88,14 @@ export async function getFeatured(locale?: string): Promise<{ hero: Article | nu
       depth: '2',
       sort: '-publishedAt'
     })
-
     if (locale) {
       searchParams.set('where[or][0][language][equals]', locale)
       searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', locale)
     }
-
-    const res = await fetch(
-      `${SITE_URL}/api/articles?${searchParams}`,
-      { next: { revalidate: 10 } },
-    )
-    if (!res.ok) throw new Error()
+    const res = await fetch(`/api/articles?${searchParams}`)
     const data = await res.json()
-    const docs: Article[] = data.docs || []
+    const docs = data.docs || []
     return { hero: docs[0] || null, secondary: docs.slice(1, 3) }
   } catch {
     return { hero: null, secondary: [] }
@@ -130,18 +110,12 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
       limit: '5',
       depth: '1'
     })
-
     if (locale) {
       searchParams.set('where[or][0][language][equals]', locale)
       searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', locale)
     }
-
-    const res = await fetch(
-      `${SITE_URL}/api/articles?${searchParams}`,
-      { next: { revalidate: 5 } },
-    )
-    if (!res.ok) return []
+    const res = await fetch(`/api/articles?${searchParams}`)
     const data = await res.json()
     return data.docs || []
   } catch {
@@ -158,17 +132,12 @@ export async function getRelatedArticles(articleId: string, categoryId?: string,
       depth: '2',
     })
     if (categoryId) params.set('where[category][equals]', categoryId)
-
     if (locale) {
       params.set('where[or][0][language][equals]', locale)
       params.set('where[or][1][language][equals]', 'all')
       params.set('locale', locale)
     }
-
-    const res = await fetch(`${SITE_URL}/api/articles?${params}`, {
-      next: { revalidate: 60 },
-    })
-    if (!res.ok) return []
+    const res = await fetch(`/api/articles?${params}`)
     const data = await res.json()
     return data.docs || []
   } catch {

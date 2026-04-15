@@ -56,12 +56,12 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
             <div>
               <h1
                 className="font-display font-bold"
-                style={{ fontSize: 'clamp(36px, 5vw, 64px)', color: 'var(--text-primary)', lineHeight: 1.1 }}
+                style={{ fontSize: 'clamp(36px, 5vw, 64px)', color: 'var(--text-primary)', lineHeight: 1.3 }}
               >
                 {category.name}
               </h1>
               {category.description && (
-                <p className="mt-2 text-base max-w-xl" style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}>
+                <p className="mt-4 text-base max-w-xl" style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}>
                   {category.description}
                 </p>
               )}

@@ -9,7 +9,7 @@ export const Articles: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'author', 'status', 'publishedAt'],
-    description: 'News articles published on The Tribune.',
+    description: 'News articles published on Asian Dot.',
   },
   access: {
     read: ({ req }) => {
@@ -50,12 +50,18 @@ export const Articles: CollectionConfig = {
     ],
     afterChange: [
       ({ doc, req }) => {
-        // Revalidate the home page (for all locales)
-        revalidatePath('/', 'layout')
-        
-        // Revalidate the specific article if it's published
-        if (doc.status === 'published') {
-          revalidatePath(`/[locale]/(frontend)/article/[slug]`, 'page')
+        // Only revalidate if we are in a request context (prevents error during seeding)
+        try {
+          // Revalidate the home page (for all locales)
+          revalidatePath('/', 'layout')
+          
+          // Revalidate the specific article if it's published
+          if (doc.status === 'published') {
+            revalidatePath(`/en/article/${doc.slug}`)
+            revalidatePath(`/km/article/${doc.slug}`)
+          }
+        } catch (e) {
+          // Ignore revalidation errors during seeding/CLI
         }
         
         return doc

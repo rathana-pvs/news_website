@@ -126,7 +126,7 @@ export interface UserAuthOperations {
   };
 }
 /**
- * News articles published on The Tribune.
+ * News articles published on Asian Dot.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".

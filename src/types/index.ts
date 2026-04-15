@@ -1,5 +1,5 @@
 export interface Category {
-  id: string
+  id: string | number
   name: string
   slug: string
   description?: string
@@ -8,14 +8,14 @@ export interface Category {
 }
 
 export interface Region {
-  id: string
+  id: string | number
   name: string
   slug: string
   description?: string
 }
 
 export interface Author {
-  id: string
+  id: string | number
   name: string
   slug: string
   bio?: string
@@ -26,7 +26,7 @@ export interface Author {
 }
 
 export interface MediaItem {
-  id: string
+  id: string | number
   filename: string
   url: string
   alt: string
@@ -47,7 +47,7 @@ export interface Tag {
 }
 
 export interface Article {
-  id: string
+  id: string | number
   title: string
   slug: string
   excerpt: string

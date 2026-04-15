@@ -49,6 +49,8 @@ export default function SearchPage() {
     return true
   }
 
+  const [visibleCount, setVisibleCount] = useState(12)
+
   const results = articles.filter((article) => {
     const q = query.toLowerCase()
     const matchesQuery = !q ||
@@ -59,6 +61,9 @@ export default function SearchPage() {
     const matchesDate = filterByDate(article, dateRange)
     return matchesQuery && matchesCategory && matchesDate
   })
+
+  // Display only part of the results based on visibleCount
+  const displayedResults = results.slice(0, visibleCount)
 
   const DATE_FILTERS: { label: string; value: DateRange }[] = [
     { label: dict.allTime, value: 'all' },
@@ -102,7 +107,10 @@ export default function SearchPage() {
             type="text"
             placeholder={dict.searchPlaceholder}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setVisibleCount(12) // Reset visible count on search
+            }}
             className="w-full pl-14 pr-5 py-4 rounded-xl text-lg outline-none transition-all"
             style={{
               background: 'var(--bg-card)',
@@ -115,7 +123,10 @@ export default function SearchPage() {
           />
           {query && (
             <button
-              onClick={() => setQuery('')}
+              onClick={() => {
+                setQuery('')
+                setVisibleCount(12)
+              }}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               style={{ color: 'var(--text-muted)' }}
             >
@@ -130,7 +141,10 @@ export default function SearchPage() {
         {/* Category Filters */}
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setSelectedCategory(null)}
+            onClick={() => {
+              setSelectedCategory(null)
+              setVisibleCount(12)
+            }}
             className="label-caps text-sm px-3 py-1.5 rounded-full transition-all"
             style={{
               background: !selectedCategory ? 'var(--accent-gold)' : 'var(--bg-card)',
@@ -143,7 +157,11 @@ export default function SearchPage() {
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.slug === selectedCategory ? null : cat.slug!)}
+              onClick={() => {
+                const newCat = cat.slug === selectedCategory ? null : cat.slug!
+                setSelectedCategory(newCat)
+                setVisibleCount(12)
+              }}
               className="label-caps text-sm px-3 py-1.5 rounded-full transition-all flex items-center gap-1"
               style={{
                 background: selectedCategory === cat.slug ? `${cat.color}20` : 'var(--bg-card)',
@@ -161,7 +179,10 @@ export default function SearchPage() {
           {DATE_FILTERS.map((f) => (
             <button
               key={f.value}
-              onClick={() => setDateRange(f.value)}
+              onClick={() => {
+                setDateRange(f.value)
+                setVisibleCount(12)
+              }}
               className="label-caps text-sm px-3 py-1.5 rounded-full transition-all"
               style={{
                 background: dateRange === f.value ? 'var(--bg-hover)' : 'transparent',
@@ -206,46 +227,69 @@ export default function SearchPage() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
-          {results.map((article) => (
-            <Link
-              key={article.id}
-              href={`/${locale}/article/${article.slug}`}
-              className="group flex gap-5 p-4 rounded-xl transition-all hover:bg-white/5 border border-transparent hover:border-[var(--accent-gold)]"
-              style={{ background: 'var(--bg-card)' }}
-            >
-              {/* Thumbnail */}
-              <div className="relative w-40 h-28 rounded-lg overflow-hidden flex-shrink-0">
-                <Image
-                  src={article.coverImage?.url || 'https://picsum.photos/seed/result/400/300'}
-                  alt={article.coverImage?.alt || article.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+        <>
+          <div className="flex flex-col gap-5">
+            {displayedResults.map((article) => (
+              <Link
+                key={article.id}
+                href={`/${locale}/article/${article.slug}`}
+                className="group flex gap-5 p-4 rounded-xl transition-all hover:bg-white/5 border border-transparent hover:border-[var(--accent-gold)]"
+                style={{ background: 'var(--bg-card)' }}
+              >
+                {/* Thumbnail */}
+                <div className="relative w-40 h-28 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={article.coverImage?.url || 'https://picsum.photos/seed/result/400/300'}
+                    alt={article.coverImage?.alt || article.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
 
-              {/* Content */}
-              <div className="flex flex-col justify-center min-w-0">
-                {article.category && (
-                  <CategoryBadge name={article.category.name} color={article.category.color} size="sm" className="mb-2 self-start" />
-                )}
-                <h2
-                  className="font-display font-bold text-lg leading-snug mb-1.5 line-clamp-2 group-hover:text-[var(--accent-gold)] transition-colors"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {article.title}
-                </h2>
-                <p
-                  className="text-sm leading-relaxed line-clamp-2 mb-3"
-                  style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
-                >
-                  {article.excerpt}
-                </p>
-                <AuthorChip author={article.author || null} date={article.publishedAt} readTime={article.readTime} size="sm" />
-              </div>
-            </Link>
-          ))}
-        </div>
+                {/* Content */}
+                <div className="flex flex-col justify-center min-w-0">
+                  {article.category && (
+                    <CategoryBadge name={article.category.name} color={article.category.color} size="sm" className="mb-2 self-start" />
+                  )}
+                  <h2
+                    className="font-display font-bold text-lg leading-snug mb-1.5 line-clamp-2 group-hover:text-[var(--accent-gold)] transition-colors"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {article.title}
+                  </h2>
+                  <p
+                    className="text-sm leading-relaxed line-clamp-2 mb-3"
+                    style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
+                  >
+                    {article.excerpt}
+                  </p>
+                  <AuthorChip author={article.author || null} date={article.publishedAt} readTime={article.readTime} size="sm" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {results.length > visibleCount && (
+            <div className="mt-12 text-center">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 12)}
+                className="px-8 py-3 rounded-full label-caps font-bold transition-all hover:scale-105 active:scale-95"
+                style={{
+                  background: 'var(--bg-card)',
+                  color: 'var(--accent-gold)',
+                  border: '1px solid var(--accent-gold)',
+                  boxShadow: '0 4px 20px rgba(201,168,76,0.1)'
+                }}
+              >
+                {dict.viewAll || 'Load More'}
+              </button>
+              <p className="mt-4 text-sm" style={{ color: 'var(--text-muted)' }}>
+                Showing {visibleCount} of {results.length} articles
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

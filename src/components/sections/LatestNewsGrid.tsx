@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { Article } from '@/types'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { i18nStrings } from '@/lib/i18n'
@@ -32,10 +33,13 @@ export function LatestNewsGrid({ articles }: LatestNewsGridProps) {
           ))}
         </div>
         
-        <div className="mt-12 flex justify-center">
-          <button className="px-8 py-3 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] text-sm label-caps transition-all hover:bg-[#c9a84c]/10">
+        <div className="mt-12 flex justify-center relative z-10">
+          <Link 
+            href={`/${locale}/search`}
+            className="inline-block px-8 py-3 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] text-sm label-caps transition-all hover:bg-[#c9a84c]/10 hover:border-[#c9a84c] active:scale-95"
+          >
             {dict.viewAll}
-          </button>
+          </Link>
         </div>
       </div>
     </section>

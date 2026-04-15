@@ -25,7 +25,7 @@ export function Footer({
                 className="font-display text-2xl font-bold italic mb-2"
                 style={{ color: 'var(--text-primary)' }}
               >
-                The Tribune
+                asiandot.com
               </h2>
             </Link>
             <p
@@ -38,7 +38,7 @@ export function Footer({
               className="label-caps text-xs"
               style={{ color: 'var(--text-muted)' }}
             >
-              © {new Date().getFullYear()} The Tribune. {dict.copyright}
+              © {new Date().getFullYear()} Asian Dot. {dict.copyright}
             </div>
           </div>
 
@@ -86,7 +86,40 @@ export function Footer({
             </div>
           </div>
 
-          {/* Col 4: Social Links */}
+          {/* Col 4: Organization */}
+          <div>
+            <h3
+              className="label-caps mb-4"
+              style={{ color: 'var(--accent-gold)', fontSize: 13, letterSpacing: '0.12em' }}
+            >
+              {dict.organization || 'Organization'}
+            </h3>
+            <div className="flex flex-col gap-1.5">
+              <Link
+                href={`/${locale}/about`}
+                className="text-sm py-1 hover:text-[var(--accent-gold)] transition-colors"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {dict.aboutUs}
+              </Link>
+              <Link
+                href={`/${locale}/contact`}
+                className="text-sm py-1 hover:text-[var(--accent-gold)] transition-colors"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {dict.contactUs}
+              </Link>
+              <Link
+                href={`/${locale}/privacy`}
+                className="text-sm py-1 hover:text-[var(--accent-gold)] transition-colors"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {dict.privacyPolicy || 'Privacy Policy'}
+              </Link>
+            </div>
+          </div>
+
+          {/* Col 5: Social Links */}
           <div className="col-span-2 md:col-span-1">
             <h3
               className="label-caps mb-4"

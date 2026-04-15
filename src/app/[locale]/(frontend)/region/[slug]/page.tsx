@@ -1,21 +1,12 @@
 import { notFound } from 'next/navigation'
-import { getArticles, getRegions } from '@/lib/api'
+import { getArticles, getRegions } from '@/lib/api-server'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { Article } from '@/types'
 
-export const revalidate = 60
+// Use dynamic rendering — do NOT pre-generate static paths at startup.
+// This prevents connection spam to Supabase when the server starts.
+export const dynamic = 'force-dynamic'
 
-import { i18n } from '@/i18n-config'
-
-export async function generateStaticParams() {
-  const regions = await getRegions()
-  return i18n.locales.flatMap((locale) => 
-    regions.map((reg) => ({
-      slug: reg.slug,
-      locale,
-    }))
-  )
-}
 
 export default async function RegionPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
   const { slug, locale } = await params
@@ -35,7 +26,7 @@ export default async function RegionPage({ params }: { params: Promise<{ slug: s
           <span className="w-2 h-2 rounded-full bg-[#c9a84c]" />
           <span className="label-caps tracking-widest text-[#c9a84c]">Region</span>
         </div>
-        <h1 className="text-5xl font-display font-bold text-white mb-4">{region.name}</h1>
+        <h1 className="text-5xl leading-tight font-display font-bold text-white mb-6">{region.name}</h1>
         {region.description && (
           <p className="text-xl text-white/60 max-w-2xl leading-relaxed">
             {region.description}

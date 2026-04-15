@@ -1,5 +1,36 @@
 {
   "pages": {
+    "/[locale]/(frontend)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/[locale]/(frontend)/layout.css",
+      "static/chunks/app/[locale]/(frontend)/layout.js"
+    ],
+    "/[locale]/(frontend)/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[locale]/(frontend)/loading.js"
+    ],
+    "/[locale]/(frontend)/category/[slug]/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[locale]/(frontend)/category/[slug]/loading.js"
+    ],
+    "/[locale]/(frontend)/category/[slug]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[locale]/(frontend)/category/[slug]/page.js"
+    ],
+    "/[locale]/(frontend)/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[locale]/(frontend)/page.js"
+    ],
+    "/(payload)/api/[...slug]/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(payload)/api/[...slug]/route.js"
+    ],
     "/(payload)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -12,61 +43,20 @@
       "static/css/app/(payload)/admin/[[...segments]]/page.css",
       "static/chunks/app/(payload)/admin/[[...segments]]/page.js"
     ],
-    "/(payload)/api/[...slug]/route": [
+    "/[locale]/(frontend)/about/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(payload)/api/[...slug]/route.js"
+      "static/chunks/app/[locale]/(frontend)/about/page.js"
     ],
-    "/[locale]/(frontend)/layout": [
+    "/[locale]/(frontend)/search/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/[locale]/(frontend)/layout.css",
-      "static/chunks/app/[locale]/(frontend)/layout.js"
+      "static/chunks/app/[locale]/(frontend)/search/loading.js"
     ],
-    "/[locale]/(frontend)/loading": [
+    "/[locale]/(frontend)/search/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/loading.js"
-    ],
-    "/[locale]/(frontend)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/page.js"
-    ],
-    "/[locale]/(frontend)/category/[slug]/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/category/[slug]/loading.js"
-    ],
-    "/[locale]/(frontend)/category/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/category/[slug]/page.js"
-    ],
-    "/[locale]/(frontend)/article/[slug]/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/article/[slug]/loading.js"
-    ],
-    "/[locale]/(frontend)/article/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/article/[slug]/page.js"
-    ],
-    "/[locale]/(frontend)/region/[slug]/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/region/[slug]/loading.js"
-    ],
-    "/[locale]/(frontend)/region/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[locale]/(frontend)/region/[slug]/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/[locale]/(frontend)/search/page.js"
     ]
   }
 }

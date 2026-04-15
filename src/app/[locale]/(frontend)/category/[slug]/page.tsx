@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getArticles, getCategories } from '@/lib/api'
+import { getArticles, getCategories } from '@/lib/api-server'
 import { Article, Category } from '@/types'
 import { CategoryPageClient } from './CategoryPageClient'
 
@@ -10,13 +10,6 @@ interface PageProps {
 
 import { i18n } from '@/i18n-config'
 
-export async function generateStaticParams() {
-  const categories = await getCategories()
-  return i18n.locales.flatMap((locale) => 
-    (categories as Category[]).map((cat) => ({ slug: cat.slug, locale }))
-  )
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params
   const categories = await getCategories(locale)
@@ -24,12 +17,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!category) return { title: 'Category Not Found' }
 
   return {
-    title: `${category.name} — The Tribune`,
-    description: category.description || `All ${category.name} articles from The Tribune.`,
+    title: `${category.name} — Asian Dot`,
+    description: category.description || `All ${category.name} articles from Asian Dot.`,
   }
 }
 
-export const revalidate = 60
+// Use dynamic rendering — do NOT pre-generate static paths at startup.
+// This prevents connection spam to Supabase when the server starts.
+export const dynamic = 'force-dynamic'
 
 export default async function CategoryPage({ params }: PageProps) {
   const { slug, locale } = await params
