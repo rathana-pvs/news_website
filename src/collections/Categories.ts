@@ -5,7 +5,7 @@ export const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
     useAsTitle: 'name',
-    description: 'Article categories for The Tribune.',
+    description: 'Article categories for Asian Dot.',
   },
   access: {
     read: () => true,
@@ -54,6 +54,14 @@ export const Categories: CollectionConfig = {
       admin: {
         description: 'Emoji icon for this category',
       },
+    },
+    {
+      name: 'seo',
+      type: 'group',
+      fields: [
+        { name: 'metaTitle', type: 'text', localized: true },
+        { name: 'metaDescription', type: 'textarea', localized: true },
+      ],
     },
   ],
 }

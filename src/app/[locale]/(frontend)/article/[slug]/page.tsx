@@ -29,6 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const article = await getArticle(slug, locale)
   if (!article) return { title: 'Article Not Found' }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+
   return {
     title: article.seo?.metaTitle || article.title,
     description: article.seo?.metaDescription || article.excerpt,
@@ -37,6 +39,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: article.excerpt,
       images: article.coverImage?.url ? [article.coverImage.url] : [],
       type: 'article',
+      url: `${siteUrl}/${locale}/article/${slug}`,
+      publishedTime: article.publishedAt,
+      authors: [article.author?.name || 'Asian Dot Staff'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.excerpt,
+      images: article.coverImage?.url ? [article.coverImage.url] : [],
     },
   }
 }
@@ -46,6 +57,7 @@ export const revalidate = 5
 export default async function ArticlePage({ params }: PageProps) {
   const { slug, locale } = await params
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
   
   const article = await getArticle(slug, locale)
   if (!article) notFound()
@@ -54,8 +66,35 @@ export default async function ArticlePage({ params }: PageProps) {
 
   const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: article.title,
+    description: article.excerpt,
+    image: [heroImage],
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt,
+    author: [{
+      '@type': 'Person',
+      name: article.author?.name || 'Asian Dot Staff',
+      url: `${siteUrl}/${locale}/about`,
+    }],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Asian Dot',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.png`, // Update this with your real logo URL
+      },
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ReadingBar />
 
       {/* Hero Image */}
