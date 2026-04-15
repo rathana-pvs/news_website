@@ -43,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
 
     // Add category pages
-    categories.forEach((cat) => {
+    categories.forEach((cat: any) => {
       sitemapEntries.push({
         url: `${siteUrl}/${locale}/category/${cat.slug}`,
         changeFrequency: 'weekly',
@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
 
     // Add article pages
-    articles.forEach((article) => {
+    articles.forEach((article: any) => {
       sitemapEntries.push({
         url: `${siteUrl}/${locale}/article/${article.slug}`,
         lastModified: new Date(article.updatedAt),
