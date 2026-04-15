@@ -1,10 +1,14 @@
 import type { CollectionConfig } from 'payload'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
 
 export const Media: CollectionConfig = {
   slug: 'media',
   upload: {
-    staticDir: 'public/media',
-    staticURL: '/media',
+    staticDir: path.resolve(dirname, '../../../public/media'),
     mimeTypes: ['image/*', 'video/*'],
     imageSizes: [
       {
@@ -44,10 +48,6 @@ export const Media: CollectionConfig = {
         if (data.source === 'external' && data.externalUrl) {
           data.url = data.externalUrl
         } 
-        // If it's local but we only have a filename/relative path
-        else if (data.filename) {
-          data.url = `/media/${data.filename}`
-        }
         return data
       },
     ],
@@ -55,8 +55,6 @@ export const Media: CollectionConfig = {
       ({ doc }) => {
         if (doc.source === 'external' && doc.externalUrl) {
           doc.url = doc.externalUrl
-        } else if (doc.filename && (!doc.url || doc.url.includes('/api/media/file/'))) {
-          doc.url = `/media/${doc.filename}`
         }
         return doc
       },

@@ -14,6 +14,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from './src/blocks/VideoEmbed'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { cloudinaryStorage } from 'payload-cloudinary'
 import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -57,7 +58,7 @@ export default buildConfig({
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
-      HeadingFeature({ enabledHeadingTypes: ['h1', 'h2', 'h3', 'h4'] }),
+      HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
       FixedToolbarFeature(),
       HorizontalRuleFeature(),
       BlocksFeature({
@@ -80,6 +81,17 @@ export default buildConfig({
       uploadsCollection: 'media',
       generateTitle: ({ doc }: { doc: any }) => `${doc?.title?.value} — Asian Dot`,
       generateDescription: ({ doc }: { doc: any }) => doc?.excerpt?.value,
+    }),
+    cloudinaryStorage({
+      collections: {
+        media: true,
+      },
+      disableLocalStorage: true,
+      config: {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
+        api_key: process.env.CLOUDINARY_API_KEY || '',
+        api_secret: process.env.CLOUDINARY_API_SECRET || '',
+      },
     }),
   ],
   serverURL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',

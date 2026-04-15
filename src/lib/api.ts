@@ -123,15 +123,15 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
   }
 }
 
-export async function getRelatedArticles(articleId: string, categoryId?: string, locale?: string): Promise<Article[]> {
+export async function getRelatedArticles(articleId: string | number, categoryId?: string | number, locale?: string): Promise<Article[]> {
   try {
-    const params = new URLSearchParams({
-      'where[status][equals]': 'published',
-      'where[id][not_equals]': articleId,
-      limit: '3',
-      depth: '2',
-    })
-    if (categoryId) params.set('where[category][equals]', categoryId)
+    const params = new URLSearchParams()
+    params.set('where[status][equals]', 'published')
+    params.set('where[id][not_equals]', String(articleId))
+    params.set('limit', '3')
+    params.set('depth', '2')
+    
+    if (categoryId) params.set('where[category][equals]', String(categoryId))
     if (locale) {
       params.set('where[or][0][language][equals]', locale)
       params.set('where[or][1][language][equals]', 'all')

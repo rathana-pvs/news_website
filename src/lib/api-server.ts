@@ -116,7 +116,7 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
   return result.docs as unknown as Article[]
 }
 
-export async function getRelatedArticles(articleId: string, categoryId?: string, locale?: string): Promise<Article[]> {
+export async function getRelatedArticles(articleId: string | number, categoryId?: string | number, locale?: string): Promise<Article[]> {
   const payload = await getPayloadClient()
   const where: any = {
     status: { equals: 'published' },
