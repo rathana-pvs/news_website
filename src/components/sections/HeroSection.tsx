@@ -55,17 +55,10 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: 'linear-gradient(to top, var(--hero-overlay) 40%, rgba(var(--hero-overlay-rgba), 0.4) 70%, transparent)',
+                    background: 'linear-gradient(to top, var(--hero-overlay) 0%, rgba(var(--hero-overlay-rgba), 0.7) 20%, rgba(var(--hero-overlay-rgba), 0) 60%)',
                   }}
                 />
-                {/* Dot Matrix — top right */}
-                <div
-                  className="absolute top-0 right-0 w-48 h-32 pointer-events-none"
-                  style={{
-                    backgroundImage: 'radial-gradient(rgba(232,0,45,0.5) 1px, transparent 1px)',
-                    backgroundSize: '8px 8px',
-                  }}
-                />
+
               </div>
 
               {/* Content overlaid */}
@@ -122,10 +115,10 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   transition={{ delay: 0.4, duration: 0.4, transformOrigin: 'left' }}
                 />
 
-                {/* Excerpt — muted Syne */}
+                {/* Excerpt — high contrast */}
                 <motion.p
                   className="text-base leading-relaxed mb-4 line-clamp-2 max-w-xl"
-                  style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
+                  style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45, duration: 0.4 }}
@@ -138,7 +131,12 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.4 }}
                 >
-                  <AuthorChip author={hero.author || null} date={hero.publishedAt} readTime={hero.readTime} />
+                  <AuthorChip 
+                    author={hero.author || null} 
+                    date={hero.publishedAt} 
+                    readTime={hero.readTime}
+                    className="hero-author-chip"
+                  />
                 </motion.div>
               </div>
             </Link>

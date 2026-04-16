@@ -28,8 +28,8 @@ export function AuthorChip({ author, date, readTime, size = 'md', className }: A
   return (
     <div className={`flex items-center gap-2.5 ${className || ''}`}>
       <div
-        className="relative rounded-full overflow-hidden flex-shrink-0 border border-white/10"
-        style={{ width: avatarSize, height: avatarSize }}
+        className="relative rounded-full overflow-hidden flex-shrink-0 border"
+        style={{ width: avatarSize, height: avatarSize, borderColor: 'var(--border)' }}
       >
         {author.avatar?.url ? (
           <Image

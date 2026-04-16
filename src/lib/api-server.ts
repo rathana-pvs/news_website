@@ -9,7 +9,7 @@ export async function getArticles(params?: {
   where?: Record<string, any>
   locale?: string
 }): Promise<PaginatedArticles> {
-  const currentLocale = params?.locale || 'en'
+  const currentLocale = (params?.locale && ['en', 'km'].includes(params.locale)) ? params.locale : 'en'
   const payload = await getPayloadClient()
   
   const whereClause: any = {
@@ -44,7 +44,8 @@ export async function getArticles(params?: {
   return result as unknown as PaginatedArticles
 }
 
-export async function getArticle(slug: string, locale?: string): Promise<Article | null> {
+export async function getArticle(slug: string, localeProp?: string): Promise<Article | null> {
+  const locale = (localeProp && ['en', 'km'].includes(localeProp)) ? localeProp : 'en'
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'articles',
@@ -81,7 +82,8 @@ export async function getRegions(locale?: string): Promise<Region[]> {
   return result.docs as unknown as Region[]
 }
 
-export async function getFeatured(locale?: string): Promise<{ hero: Article | null; secondary: Article[] }> {
+export async function getFeatured(localeProp?: string): Promise<{ hero: Article | null; secondary: Article[] }> {
+  const locale = (localeProp && ['en', 'km'].includes(localeProp)) ? localeProp : 'en'
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'articles',
@@ -102,7 +104,8 @@ export async function getFeatured(locale?: string): Promise<{ hero: Article | nu
   return { hero: docs[0] || null, secondary: docs.slice(1, 3) }
 }
 
-export async function getBreakingArticles(locale?: string): Promise<Article[]> {
+export async function getBreakingArticles(localeProp?: string): Promise<Article[]> {
+  const locale = (localeProp && ['en', 'km'].includes(localeProp)) ? localeProp : 'en'
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'articles',
@@ -121,7 +124,8 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
   return result.docs as unknown as Article[]
 }
 
-export async function getRelatedArticles(articleId: string | number, categoryId?: string | number, locale?: string): Promise<Article[]> {
+export async function getRelatedArticles(articleId: string | number, categoryId?: string | number, localeProp?: string): Promise<Article[]> {
+  const locale = (localeProp && ['en', 'km'].includes(localeProp)) ? localeProp : 'en'
   const payload = await getPayloadClient()
   const where: any = {
     status: { equals: 'published' },
