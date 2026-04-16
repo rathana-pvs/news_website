@@ -21,7 +21,7 @@ export const i18nStrings = {
     noArticlesRegion: 'No articles found in this region yet.',
     latest: 'Latest',
     opinionOnly: 'Opinion Only',
-    record: 'Record',
+    databaseRecord: 'Database Record',
     loadMore: 'Load More Articles',
     noArticlesFound: 'No articles found',
     // Categories
@@ -96,7 +96,7 @@ export const i18nStrings = {
     noArticlesRegion: 'មិនទាន់មានអត្ថបទក្នុងតំបន់នេះនៅឡើយទេ។',
     latest: 'ចុងក្រោយ',
     opinionOnly: 'តែមតិយោបល់',
-    record: 'កំណត់ត្រា',
+    databaseRecord: 'កំណត់ត្រាទិន្នន័យ',
     loadMore: 'មើលអត្ថបទបន្ថែមទៀត',
     noArticlesFound: 'រកមិនឃើញអត្ថបទ',
     // Categories
