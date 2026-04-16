@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { useParams } from 'next/navigation'
 import { LiveUpdate } from '@/types'
 import { formatDate } from '@/lib/utils'
+import { i18nStrings } from '@/lib/i18n'
+import { Locale } from '@/i18n-config'
 
 interface LiveTimelineProps {
   updates: LiveUpdate[]
@@ -12,6 +14,7 @@ interface LiveTimelineProps {
 export function LiveTimeline({ updates }: LiveTimelineProps) {
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
+  const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   return (
     <div className="flex flex-col gap-0">
