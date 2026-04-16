@@ -64,7 +64,8 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      required: true,
+      required: false,
+      defaultValue: 'Asian Dot',
       admin: {
         description: 'Alt text for accessibility and SEO',
       },
