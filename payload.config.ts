@@ -95,6 +95,14 @@ export default buildConfig({
     }),
   ],
   serverURL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  cors: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
-  csrf: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
+  cors: [
+    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    'https://asiandot.com',
+    'https://www.asiandot.com',
+  ],
+  csrf: [
+    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    'https://asiandot.com',
+    'https://www.asiandot.com',
+  ],
 })
