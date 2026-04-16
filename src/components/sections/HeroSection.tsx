@@ -51,11 +51,11 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 />
-                {/* Dark gradient overlay */}
+                {/* Theme-aware gradient overlay */}
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: 'linear-gradient(to top, rgba(10,10,10,1) 40%, rgba(10,10,10,0.4) 70%, transparent)',
+                    background: 'linear-gradient(to top, var(--hero-overlay) 40%, rgba(var(--hero-overlay-rgba), 0.4) 70%, transparent)',
                   }}
                 />
                 {/* Dot Matrix — top right */}
@@ -104,8 +104,8 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
 
                 {/* Headline — large bold serif */}
                 <motion.h1
-                  className="font-display font-bold leading-none mb-4"
-                  style={{ fontSize: 'clamp(32px, 4vw, 56px)', color: 'var(--text-primary)', lineHeight: 1.05 }}
+                  className="font-display font-bold leading-tight mb-4"
+                  style={{ fontSize: 'clamp(22px, 3.2vw, 34px)', color: 'var(--text-primary)', lineHeight: 1.15 }}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}

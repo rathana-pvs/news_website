@@ -47,6 +47,7 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
       <section
         className="relative w-full py-20 overflow-hidden"
         style={{
+          background: 'var(--bg-surface)',
           borderBottom: '1px solid var(--border)',
         }}
       >
@@ -63,7 +64,7 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
                  <div className="absolute -left-6 top-0 bottom-0 w-[4px]" style={{ background: 'var(--accent-red)' }} />
                  <h1
                    className="font-display font-black tracking-tighter uppercase"
-                   style={{ fontSize: 'clamp(40px, 6vw, 64px)', color: 'var(--text-primary)', lineHeight: 0.9 }}
+                   style={{ fontSize: 'clamp(32px, 5vw, 48px)', color: 'var(--text-primary)', lineHeight: 1 }}
                  >
                    {category.name}
                  </h1>

@@ -16,6 +16,8 @@
   --text-muted: #888888;
   --accent-red: #e8002d;
   --accent-red-dim: rgba(232, 0, 45, 0.1);
+  --hero-overlay: #0a0a0a;
+  --hero-overlay-rgba: 10, 10, 10;
   --border: #1f1f1f;
   --border-subtle: #141414;
   --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
@@ -31,8 +33,29 @@
   --text-muted: #777777;
   --accent-red: #e8002d;
   --accent-red-dim: rgba(232, 0, 45, 0.05);
+  --hero-overlay: #ffffff;
+  --hero-overlay-rgba: 255, 255, 255;
   --border: #e5e5e5;
   --border-subtle: #f7f7f7;
+}
+
+/* System Preference Fallback */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg-primary: #ffffff;
+    --bg-surface: #f7f7f7;
+    --bg-card: #ffffff;
+    --bg-hover: #f0f0f0;
+    --text-primary: #0a0a0a;
+    --text-secondary: #444444;
+    --text-muted: #777777;
+    --accent-red: #e8002d;
+    --accent-red-dim: rgba(232, 0, 45, 0.05);
+    --hero-overlay: #ffffff;
+    --hero-overlay-rgba: 255, 255, 255;
+    --border: #e5e5e5;
+    --border-subtle: #f7f7f7;
+  }
 }
 
 /* ─── Global Transitions ───────────────────────────────────────── */

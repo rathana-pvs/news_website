@@ -46,6 +46,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'media-cldnry.s-nbcnews.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'asiandot.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.asiandot.com',
+      },
     ],
   },
 }

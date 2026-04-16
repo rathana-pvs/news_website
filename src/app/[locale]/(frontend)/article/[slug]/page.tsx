@@ -139,8 +139,8 @@ export default async function ArticlePage({ params }: PageProps) {
                 )}
               </div>
               <h1
-                className="font-display font-black leading-[1.1] mb-6 tracking-tighter"
-                style={{ fontSize: 'clamp(32px, 6vw, 76px)', color: 'var(--text-primary)' }}
+                className="font-display font-black leading-tight mb-6 tracking-tighter"
+                style={{ fontSize: 'clamp(28px, 5vw, 48px)', color: 'var(--text-primary)' }}
               >
                 {article.title}
               </h1>
@@ -166,7 +166,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <div className="relative mb-12">
                <div className="absolute -left-6 top-0 bottom-0 w-[2px]" style={{ background: 'var(--accent-red)' }} />
                <p
-                className="text-2xl leading-[1.4] italic"
+                className="text-xl leading-[1.5] italic"
                 style={{ color: 'var(--text-primary)', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.01em' }}
               >
                 {article.excerpt}
