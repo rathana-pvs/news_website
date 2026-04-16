@@ -18,6 +18,11 @@ export const metadata: Metadata = {
     siteName: 'Asian Dot',
     type: 'website',
   },
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 }
 
 export default async function FrontendLayout({

@@ -6,6 +6,7 @@
 
 /* ─── Design System Variables ─────────────────────────────────── */
 :root {
+  /* Dark Mode (Default) */
   --bg-primary: #0d1117;
   --bg-surface: #161b22;
   --bg-card: #1c2128;
@@ -19,7 +20,28 @@
   --accent-red-bright: #e74c3c;
   --border: #30363d;
   --border-subtle: #21262d;
+  --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-surface: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f2f5;
+  --text-primary: #1a1a1a;
+  --text-secondary: #444444;
+  --text-muted: #6a737d;
+  --accent-gold: #a3822e; /* Richer gold for light mode contrast */
+  --accent-gold-dim: #a3822e15;
+  --border: #e1e4e8;
+  --border-subtle: #f0f2f5;
+}
+
+/* ─── Global Transitions ───────────────────────────────────────── */
+* {
+  transition: var(--theme-transition);
+}
+
 
 /* ─── Base Styles ─────────────────────────────────────────────── */
 * {

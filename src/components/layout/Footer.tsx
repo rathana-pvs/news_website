@@ -22,24 +22,18 @@ export function Footer({
           <div className="col-span-2 md:col-span-4 lg:col-span-2">
             <Link href={`/${locale}`}>
               <h2
-                className="font-display text-2xl font-bold italic mb-2"
+                className="font-display text-2xl font-bold italic mb-4"
                 style={{ color: 'var(--text-primary)' }}
               >
-                asiandot.com
+                asiandot
               </h2>
             </Link>
             <p
-              className="text-sm leading-relaxed mb-4"
+              className="text-sm leading-relaxed"
               style={{ color: 'var(--text-muted)', fontFamily: 'Source Serif 4, serif' }}
             >
               {dict.footerTagline}
             </p>
-            <div
-              className="label-caps text-xs"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              © {new Date().getFullYear()} Asian Dot. {dict.copyright}
-            </div>
           </div>
 
           {/* Col 2: Category Links */}
@@ -159,6 +153,28 @@ export function Footer({
             >
               <span className="live-dot w-2 h-2 rounded-full bg-current" />
               <span className="label-caps" style={{ fontSize: 10 }}>{dict.live}</span>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Bottom Bar: Copyright */}
+        <div 
+          className="mt-12 md:mt-16 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div
+            className="label-caps text-[10px] tracking-widest"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            © {new Date().getFullYear()} ASIANDOT — {dict.copyright}
+          </div>
+          
+          <div className="flex gap-6 text-[10px] label-caps tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            <Link href={`/${locale}/privacy`} className="hover:text-[var(--accent-gold)] transition-colors">
+              {dict.privacyPolicy || 'Privacy'}
+            </Link>
+            <Link href={`/${locale}/contact`} className="hover:text-[var(--accent-gold)] transition-colors">
+              {dict.contactUs}
             </Link>
           </div>
         </div>

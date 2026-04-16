@@ -313,7 +313,7 @@ export interface Media {
   };
 }
 /**
- * Article categories for The Tribune.
+ * Article categories for Asian Dot.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -331,6 +331,10 @@ export interface Category {
    * Emoji icon for this category
    */
   icon?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -544,6 +548,12 @@ export interface CategoriesSelect<T extends boolean = true> {
   description?: T;
   color?: T;
   icon?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
