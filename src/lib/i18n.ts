@@ -22,6 +22,7 @@ export const i18nStrings = {
     latest: 'Latest',
     opinionOnly: 'Opinion Only',
     databaseRecord: 'Database Record',
+    record: 'Record',
     loadMore: 'Load More Articles',
     noArticlesFound: 'No articles found',
     // Categories
@@ -97,6 +98,7 @@ export const i18nStrings = {
     latest: 'ចុងក្រោយ',
     opinionOnly: 'តែមតិយោបល់',
     databaseRecord: 'កំណត់ត្រាទិន្នន័យ',
+    record: 'កំណត់ត្រា',
     loadMore: 'មើលអត្ថបទបន្ថែមទៀត',
     noArticlesFound: 'រកមិនឃើញអត្ថបទ',
     // Categories
