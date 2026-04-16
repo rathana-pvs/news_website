@@ -23,14 +23,14 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
   const displayRegions = regions.slice(0, 4)
 
   return (
-    <section className="w-full bg-[#0a0a0a] py-12 border-y border-white/5">
+    <section className="w-full bg-[var(--bg-surface)] py-12 border-y border-[var(--border)]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <span className="label-caps !text-[#c9a84c] tracking-[0.2em] mb-2 block">{dict.globalCoverage}</span>
-            <h2 className="text-3xl font-display font-bold text-white">{dict.regionalReports}</h2>
+            <span className="label-caps !text-[var(--accent-red)] tracking-[0.2em] mb-2 block">{dict.globalCoverage}</span>
+            <h2 className="text-3xl font-display font-bold text-[var(--text-primary)]">{dict.regionalReports}</h2>
           </div>
-          <div className="hidden sm:block h-[1px] flex-grow mx-8 bg-gradient-to-r from-[#c9a84c]/20 to-transparent" />
+          <div className="hidden sm:block h-[1px] flex-grow mx-8 bg-gradient-to-r from-[var(--accent-red)]/20 to-transparent" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -42,14 +42,14 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
 
             return (
               <div key={region.id} className="flex flex-col">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                  <h3 className="font-display font-bold text-lg text-white group flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
+                  <h3 className="font-display font-bold text-lg text-[var(--text-primary)] group flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-red)]" />
                     {regionName}
                   </h3>
                   <Link 
                     href={`/${locale}/region/${region.slug}`}
-                    className="text-sm font-bold tracking-wider text-right text-white/50 hover:text-[#c9a84c] transition-colors ml-4 whitespace-nowrap"
+                    className="text-sm font-bold tracking-wider text-right text-[var(--text-muted)] hover:text-[var(--accent-red)] transition-colors ml-4 whitespace-nowrap"
                   >
                     {dict.allIn}
                   </Link>
@@ -68,9 +68,9 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
                         <Link 
                           key={article.id} 
                           href={`/${locale}/article/${article.slug}`}
-                          className="group block border-t border-white/5 pt-3"
+                          className="group block border-t border-[var(--border)] pt-3"
                         >
-                          <h4 className="text-sm font-medium text-white/80 group-hover:text-[#c9a84c] transition-colors line-clamp-2 leading-relaxed">
+                          <h4 className="text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--accent-red)] transition-colors line-clamp-2 leading-relaxed">
                             {article.title}
                           </h4>
                         </Link>
@@ -78,7 +78,7 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-[16/10] bg-white/5 rounded flex items-center justify-center text-white/20 text-xs italic p-4 text-center">
+                  <div className="aspect-[16/10] bg-[var(--bg-card)] border border-[var(--border)] rounded flex items-center justify-center text-[var(--text-muted)] text-xs italic p-4 text-center">
                     {dict.comingSoon}
                   </div>
                 )}

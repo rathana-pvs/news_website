@@ -32,7 +32,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
             >
               {dict.opinion}
             </h2>
-            <div className="h-0.5 mt-1 w-12" style={{ background: '#c9a84c' }} />
+            <div className="h-0.5 mt-1 w-12" style={{ background: 'var(--accent-red)' }} />
           </div>
         </div>
 
@@ -47,13 +47,13 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
             >
               <Link
                 href={`/${locale}/article/${article.slug}`}
-                className="group block rounded-xl p-6 h-full transition-all hover:bg-white/5 border border-transparent hover:border-[var(--accent-gold)]"
+                className="group block rounded-xl p-6 h-full transition-all hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--accent-red)]"
                 style={{ background: 'var(--bg-card)' }}
               >
                 {/* Author Avatar + Name */}
                 {article.author && (
                   <div className="flex items-center gap-4 mb-5">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[var(--accent-gold)]">
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[var(--accent-red)]">
                       {article.author.avatar?.url ? (
                         <Image
                           src={article.author.avatar.url}
@@ -65,7 +65,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
                       ) : (
                         <div
                           className="w-full h-full flex items-center justify-center text-lg font-bold"
-                          style={{ background: 'var(--accent-gold)', color: 'var(--bg-primary)' }}
+                          style={{ background: 'var(--accent-red)', color: 'white' }}
                         >
                           {article.author.name.charAt(0)}
                         </div>
@@ -84,7 +84,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
 
                 {/* Article Headline */}
                 <h3
-                  className="font-display font-bold text-lg leading-snug mb-3 group-hover:text-[var(--accent-gold)] transition-colors"
+                  className="font-display font-bold text-lg leading-snug mb-3 group-hover:text-[var(--accent-red)] transition-colors"
                   style={{ color: 'var(--text-primary)' }}
                 >
                   {article.title}
@@ -93,7 +93,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
                 {/* Excerpt */}
                 <p
                   className="text-sm leading-relaxed line-clamp-2"
-                  style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
+                  style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}
                 >
                   {article.excerpt}
                 </p>
@@ -101,7 +101,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
                 {/* Read More */}
                 <div
                   className="label-caps mt-4 flex items-center gap-1.5 text-sm"
-                  style={{ color: 'var(--accent-gold)' }}
+                  style={{ color: 'var(--accent-red)' }}
                 >
                   {dict.readColumn}
                   <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

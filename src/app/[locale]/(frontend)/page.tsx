@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { CategoryRow } from '@/components/sections/CategoryRow'
 import { RegionSection } from '@/components/sections/RegionSection'
-import { OpinionSection } from '@/components/sections/OpinionSection'
+
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
 import { AdBanner } from '@/components/ads/AdBanner'
@@ -33,8 +33,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const cats = categories as Category[]
   const regs = regions as Region[]
 
-  // Opinion articles
-  const opinionArticles = articles.filter((a) => a.category?.slug === 'opinion')
+
 
   // Editor's picks (first 3 non-featured)
   const editorPicks = articles.filter((a) => !a.isFeatured).slice(0, 3)
@@ -102,8 +101,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
       ))}
 
-      {/* Opinion Section */}
-      <OpinionSection articles={opinionArticles.length > 0 ? opinionArticles : articles.slice(0, 3)} />
+
 
       {/* Most Read + Editor's Picks */}
       <MostRead editorPicks={editorPicks} mostRead={mostRead} />
