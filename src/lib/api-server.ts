@@ -115,7 +115,7 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
       ]
     },
     limit: 5,
-    depth: 1,
+    depth: 2,
     locale: locale as any,
   })
   return result.docs as unknown as Article[]

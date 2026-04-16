@@ -20,7 +20,8 @@ export function AuthorChip({ author, date, readTime, size = 'md', className }: A
   const locale = (params?.locale as string) || 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
-  if (!author) return null
+  if (!author || typeof author === 'string') return null;
+  if (!author.name) return null; // Ensure we have at least the name
 
   const avatarSize = size === 'sm' ? 24 : size === 'md' ? 32 : 40
 
@@ -36,11 +37,12 @@ export function AuthorChip({ author, date, readTime, size = 'md', className }: A
             alt={author.name}
             fill
             className="object-cover"
+            sizes="(max-width: 768px) 40px, 64px"
           />
         ) : (
           <div
             className="w-full h-full flex items-center justify-center text-xs font-bold"
-            style={{ background: 'var(--accent-gold)', color: 'var(--bg-primary)' }}
+            style={{ background: 'var(--accent-red)', color: 'white' }}
           >
             {author.name.charAt(0)}
           </div>

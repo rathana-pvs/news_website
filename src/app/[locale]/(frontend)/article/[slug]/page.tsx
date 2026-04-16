@@ -231,7 +231,7 @@ export default async function ArticlePage({ params }: PageProps) {
                           alt={article.author.name}
                           fill
                           sizes="96px"
-                          className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                          className="object-cover transition-all duration-500"
                         />
                       ) : (
                         <div
