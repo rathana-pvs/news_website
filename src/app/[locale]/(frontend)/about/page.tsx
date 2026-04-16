@@ -70,79 +70,76 @@ export default async function AboutPage({ params }: PageProps) {
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
-        style={{
-          background: 'radial-gradient(ellipse at 60% 50%, rgba(201,168,76,0.08) 0%, transparent 70%), var(--bg-primary)',
-        }}
+        className="relative min-h-[80vh] flex items-center justify-center overflow-hidden"
       >
-        <Image
-          src="/assets/about-hero.png"
-          alt="The Tribune Bureau"
-          fill
-          priority
-          className="object-cover opacity-20 pointer-events-none"
-        />
-        {/* Background grid pattern */}
+        {/* Background dot matrix */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.4]"
           style={{
-            backgroundImage: 'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
+            backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
           }}
         />
 
         {/* Floating accent lines */}
-        <div className="absolute left-0 top-1/3 w-px h-48 opacity-30" style={{ background: 'linear-gradient(to bottom, transparent, var(--accent-gold), transparent)' }} />
-        <div className="absolute right-0 top-1/2 w-px h-64 opacity-20" style={{ background: 'linear-gradient(to bottom, transparent, var(--accent-gold), transparent)' }} />
+        <div className="absolute left-0 top-1/4 w-[3px] h-64 opacity-80" style={{ background: 'var(--accent-red)' }} />
+        
+        {/* Dot Matrix element like hero */}
+        <div
+          className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)',
+            backgroundSize: '12px 12px',
+          }}
+        />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <p className="label-caps text-xs tracking-[0.3em] mb-8" style={{ color: 'var(--accent-gold)' }}>
+          <p className="font-mono font-bold text-[10px] uppercase tracking-[0.4em] mb-8" style={{ color: 'var(--accent-red)' }}>
             Est. 2010 · Independent Political Reporting
           </p>
           <h1
-            className="font-display font-bold leading-[0.9] mb-10"
+            className="font-display font-bold leading-[0.85] mb-10 tracking-tight"
             style={{
-              fontSize: 'clamp(64px, 12vw, 140px)',
+              fontSize: 'clamp(56px, 12vw, 130px)',
               color: 'var(--text-primary)',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.04em',
             }}
           >
-            asiandot.com
+            Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
           </h1>
           <p
-            className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
+            className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}
           >
             We hold power to account so that citizens can hold power to the light.
           </p>
 
-          {/* Scroll indicator */}
-          <div className="mt-20 flex flex-col items-center gap-2 opacity-40">
-            <span className="label-caps text-xs tracking-widest" style={{ color: 'var(--text-muted)' }}>Scroll</span>
-            <div className="w-px h-12" style={{ background: 'linear-gradient(to bottom, var(--text-muted), transparent)' }} />
+          {/* Scroll indicator with red accent */}
+          <div className="mt-16 flex flex-col items-center gap-2">
+            <div className="w-px h-16" style={{ background: 'linear-gradient(to bottom, var(--accent-red), transparent)' }} />
           </div>
         </div>
       </section>
 
       {/* ── STATS BAR ────────────────────────────────── */}
-      <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4">
             {stats.map((stat, i) => (
               <div
                 key={i}
-                className="py-10 px-8 text-center"
+                className="py-12 px-8 text-center"
                 style={{
                   borderRight: i < stats.length - 1 ? '1px solid var(--border)' : 'none',
                 }}
               >
                 <p
                   className="font-display font-bold mb-2"
-                  style={{ fontSize: 'clamp(40px, 6vw, 72px)', color: 'var(--accent-gold)', lineHeight: 1 }}
+                  style={{ fontSize: 'clamp(36px, 5vw, 64px)', color: 'var(--accent-red)', lineHeight: 1 }}
                 >
                   {stat.number}
                 </p>
-                <p className="label-caps text-xs tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                <p className="font-mono font-bold text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
                   {stat.label}
                 </p>
               </div>
@@ -152,28 +149,29 @@ export default async function AboutPage({ params }: PageProps) {
       </section>
 
       {/* ── MISSION ──────────────────────────────────── */}
-      <section className="py-32 px-4 sm:px-6">
+      <section className="py-24 px-4 sm:px-6">
         <div className="max-w-[1280px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-4">
-              <p className="label-caps text-xs tracking-[0.2em] mb-4" style={{ color: 'var(--accent-gold)' }}>
-                {dict.ourMission}
-              </p>
-              <div className="w-10 h-px" style={{ background: 'var(--accent-gold)' }} />
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
+                <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+                  {dict.ourMission}
+                </h2>
+              </div>
             </div>
             <div className="lg:col-span-8">
               <blockquote
                 className="font-display font-bold leading-tight mb-12"
                 style={{
-                  fontSize: 'clamp(28px, 4vw, 48px)',
+                  fontSize: 'clamp(24px, 4vw, 44px)',
                   color: 'var(--text-primary)',
-                  borderLeft: '3px solid var(--accent-gold)',
-                  paddingLeft: '2rem',
+                  letterSpacing: '-0.02em',
                 }}
               >
                 "To provide independent, data-driven political reporting that empowers citizens and strengthens the foundations of democracy."
               </blockquote>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-base leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 text-base leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
                 <p>
                   Asian Dot was founded on a simple conviction: that in a healthy democracy, citizens need access to accurate, unspun information about those who govern them.
                 </p>
@@ -187,35 +185,37 @@ export default async function AboutPage({ params }: PageProps) {
       </section>
 
       {/* ── VALUES ───────────────────────────────────── */}
-      <section className="py-24 px-4 sm:px-6" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <section className="py-24 px-4 sm:px-6" style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="max-w-[1280px] mx-auto">
-          <p className="label-caps text-xs tracking-[0.2em] text-center mb-4" style={{ color: 'var(--accent-gold)' }}>
-            {dict.editorialStandards}
-          </p>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-center mb-16" style={{ color: 'var(--text-primary)' }}>
-            What We Stand For
-          </h2>
+          <div className="text-center mb-20">
+            <h2 className="font-mono font-bold text-xs uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--accent-red)' }}>
+               {dict.editorialStandards}
+            </h2>
+            <h3 className="font-display font-bold text-4xl md:text-5xl" style={{ color: 'var(--text-primary)' }}>
+              What We Stand For
+            </h3>
+          </div>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {values.map((v, i) => (
               <div
                 key={i}
-                className="group p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+                className="group p-8 transition-all duration-300 border hover:border-[var(--accent-red)]"
                 style={{
                   background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                  borderColor: 'var(--border)',
                 }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-6"
-                  style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)' }}
+                  className="w-12 h-12 flex items-center justify-center text-2xl mb-8"
+                  style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
                 >
                   {v.icon}
                 </div>
-                <h3 className="font-display font-bold text-xl mb-3 group-hover:text-[var(--accent-gold)] transition-colors" style={{ color: 'var(--text-primary)' }}>
+                <h4 className="font-display font-bold text-xl mb-4 group-hover:text-[var(--accent-red)] transition-colors" style={{ color: 'var(--text-primary)' }}>
                   {v.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)', fontFamily: 'Source Serif 4, serif' }}>
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}>
                   {v.body}
                 </p>
               </div>
@@ -227,26 +227,27 @@ export default async function AboutPage({ params }: PageProps) {
       {/* ── TIMELINE ─────────────────────────────────── */}
       <section className="py-32 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
-          <p className="label-caps text-xs tracking-[0.2em] text-center mb-4" style={{ color: 'var(--accent-gold)' }}>
-            Our Journey
-          </p>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-center mb-20" style={{ color: 'var(--text-primary)' }}>
-            15 Years of Accountability
-          </h2>
-          <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-[72px] top-0 bottom-0 w-px" style={{ background: 'var(--border)' }} />
+          <div className="text-center mb-20">
+            <h2 className="font-mono font-bold text-xs uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--accent-red)' }}>
+              Our Journey
+            </h2>
+            <h3 className="font-display font-bold text-4xl md:text-5xl" style={{ color: 'var(--text-primary)' }}>
+              15 Years of Accountability
+            </h3>
+          </div>
 
-            <div className="space-y-12">
+          <div className="relative">
+            {/* Vertical line with red gradient */}
+            <div className="absolute left-[72px] top-0 bottom-0 w-[2px]" style={{ background: 'linear-gradient(to bottom, var(--accent-red), var(--border) 20%, var(--border) 80%, var(--accent-red))' }} />
+
+            <div className="space-y-16">
               {timeline.map((item, i) => (
                 <div key={i} className="relative flex gap-10 items-start">
                   {/* Year badge */}
-                  <div
-                    className="relative z-10 flex-shrink-0 w-[72px] text-right"
-                  >
+                  <div className="relative z-10 flex-shrink-0 w-[72px] text-right">
                     <span
-                      className="font-display font-bold tabular-nums"
-                      style={{ color: i === timeline.length - 1 ? 'var(--accent-gold)' : 'var(--text-muted)', fontSize: 15 }}
+                      className="font-display font-extrabold tabular-nums"
+                      style={{ color: i === timeline.length - 1 ? 'var(--accent-red)' : 'var(--text-muted)', fontSize: 16 }}
                     >
                       {item.year}
                     </span>
@@ -254,18 +255,18 @@ export default async function AboutPage({ params }: PageProps) {
 
                   {/* Dot */}
                   <div
-                    className="relative z-10 flex-shrink-0 w-3 h-3 rounded-full mt-1.5"
+                    className="relative z-10 flex-shrink-0 w-4 h-4 rounded-full mt-1.5"
                     style={{
-                      background: i === timeline.length - 1 ? 'var(--accent-gold)' : 'var(--bg-card)',
-                      border: `2px solid ${i === timeline.length - 1 ? 'var(--accent-gold)' : 'var(--border)'}`,
-                      marginLeft: '-6px',
+                      background: i === timeline.length - 1 ? 'var(--accent-red)' : 'var(--bg-card)',
+                      border: `2px solid ${i === timeline.length - 1 ? 'var(--accent-red)' : 'var(--border)'}`,
+                      marginLeft: '-7px',
                     }}
                   />
 
                   {/* Content */}
                   <p
                     className="text-base leading-relaxed pt-0.5"
-                    style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
+                    style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}
                   >
                     {item.event}
                   </p>
@@ -278,22 +279,29 @@ export default async function AboutPage({ params }: PageProps) {
 
       {/* ── CLOSING QUOTE ────────────────────────────── */}
       <section
-        className="py-32 px-4 sm:px-6 text-center"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.06) 0%, transparent 70%)',
-          borderTop: '1px solid var(--border)',
-        }}
+        className="py-32 px-4 sm:px-6 text-center border-t relative overflow-hidden"
+        style={{ borderColor: 'var(--border)' }}
       >
-        <div className="max-w-3xl mx-auto">
-          <p className="text-6xl mb-10" style={{ color: 'var(--accent-gold)', opacity: 0.4 }}>"</p>
+        {/* Subtle dot matrix again */}
+         <div
+          className="absolute inset-0 opacity-[0.2]"
+          style={{
+            backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+        
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <p className="font-display font-bold text-6xl mb-10 leading-none" style={{ color: 'var(--accent-red)', opacity: 0.6 }}>"</p>
           <blockquote
-            className="font-display font-medium italic leading-tight mb-10"
-            style={{ fontSize: 'clamp(24px, 4vw, 40px)', color: 'var(--text-primary)' }}
+            className="font-display font-bold italic leading-tight mb-10"
+            style={{ fontSize: 'clamp(24px, 4vw, 42px)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}
           >
             Democracy dies in darkness. We carry the light.
           </blockquote>
-          <p className="label-caps text-sm tracking-[0.2em]" style={{ color: 'var(--accent-gold)' }}>
-            The Editorial Board, Asian Dot
+          <div className="w-12 h-[2px] mx-auto mb-6" style={{ background: 'var(--accent-red)' }} />
+          <p className="font-mono font-bold text-xs uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
+             The Editorial Board, Asian Dot
           </p>
         </div>
       </section>

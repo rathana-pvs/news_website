@@ -51,7 +51,7 @@ export function LiveTimeline({ updates }: LiveTimelineProps) {
                   className="label-caps px-1.5 py-0.5 rounded-sm text-xs"
                   style={{ background: 'var(--accent-red)', color: '#fff' }}
                 >
-                  BREAKING
+                  {dict.breaking}
                 </span>
               )}
             </div>

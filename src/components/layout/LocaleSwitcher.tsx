@@ -29,8 +29,8 @@ export function LocaleSwitcher() {
             href={redirectedPathname(locale)}
             className="px-2.5 py-1 rounded-md text-sm font-bold uppercase transition-all"
             style={{ 
-              background: active ? 'var(--accent-gold)' : 'transparent',
-              color: active ? 'var(--bg-primary)' : 'var(--text-muted)',
+              background: active ? 'var(--accent-red)' : 'transparent',
+              color: active ? '#ffffff' : 'var(--text-secondary)',
               fontFamily: 'IBM Plex Mono, monospace'
             }}
           >

@@ -67,10 +67,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* Latest News Divider */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center gap-4 py-8">
-          <h2 className="label-caps !text-[#c9a84c] tracking-[0.2em] whitespace-nowrap">
+          <h2 className="label-caps !text-[var(--accent-red)] tracking-[0.2em] whitespace-nowrap">
             {dict.latestNews}
           </h2>
-          <div className="h-[1px] w-full bg-gradient-to-r from-[#c9a84c]/30 to-transparent" />
+          <div className="h-[1px] w-full bg-gradient-to-r from-[var(--accent-red)]/30 to-transparent" />
         </div>
       </div>
 

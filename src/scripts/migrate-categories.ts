@@ -74,7 +74,7 @@ async function seed() {
         continue
       }
 
-      await payload.create({
+      const created = await payload.create({
         collection: 'categories',
         data: {
           name: data.name,
@@ -82,27 +82,18 @@ async function seed() {
           description: data.description,
           color: data.color,
         },
-        // We handle the Khmer translation by passing the 'locale' inside the seed loops if needed, 
-        // but for initial create we update localized fields specifically.
       })
 
-      // Update localized Khmer name
-      const created = await payload.find({
+      // Update localized Khmer name using the ID from the created object
+      await payload.update({
         collection: 'categories',
-        where: { slug: { equals: data.slug } }
+        id: created.id,
+        locale: 'km',
+        data: {
+          name: data.khmerName,
+          description: data.description
+        }
       })
-
-      if (created.docs.length > 0) {
-        await payload.update({
-          collection: 'categories',
-          id: created.docs[0].id,
-          locale: 'km',
-          data: {
-            name: data.khmerName,
-            description: data.description // You can provide a Khmer description later if you have one
-          }
-        })
-      }
 
       console.log(`✅ Created: ${data.name}`)
     } catch (error) {

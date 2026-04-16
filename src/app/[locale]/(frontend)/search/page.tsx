@@ -75,222 +75,246 @@ export default function SearchPage() {
   if (loading) {
     return (
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
-        <div className="animate-spin w-8 h-8 border-4 border-[var(--accent-gold)] border-t-transparent rounded-full mx-auto mb-4" />
-        <p className="text-[var(--text-muted)]">{dict.searchPlaceholder}...</p>
+        <div className="animate-spin w-8 h-8 border-2 border-[var(--accent-red)] border-t-transparent rounded-full mx-auto mb-4" />
+        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">INITIALIZING SEARCH ENGINE...</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-10">
-      {/* Search Bar */}
-      <div className="mb-8">
-        <h1 className="font-display font-bold text-3xl mb-6" style={{ color: 'var(--text-primary)' }}>
-          {dict.searchArticles}
-        </h1>
-        <div className="relative">
-          <svg
-            className="absolute left-5 top-1/2 -translate-y-1/2"
-            width="22"
-            height="22"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            style={{ color: 'var(--text-muted)' }}
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-          <input
-            autoFocus
-            type="text"
-            placeholder={dict.searchPlaceholder}
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setVisibleCount(12) // Reset visible count on search
-            }}
-            className="w-full pl-14 pr-5 py-4 rounded-xl text-lg outline-none transition-all"
-            style={{
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              border: '2px solid var(--border)',
-              fontFamily: 'Source Serif 4, serif',
-            }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent-gold)')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-          />
-          {query && (
-            <button
-              onClick={() => {
-                setQuery('')
-                setVisibleCount(12)
-              }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-12 relative overflow-hidden">
+      {/* Dot matrix texture background */}
+      <div 
+        className="absolute inset-0 opacity-[0.2] pointer-events-none" 
+        style={{ backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
+      />
+
+      <div className="relative z-10">
+        {/* Search Header */}
+        <div className="mb-12">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-[4px] h-10" style={{ background: 'var(--accent-red)' }} />
+            <h1 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter" style={{ color: 'var(--text-primary)' }}>
+              {dict.searchArticles}
+            </h1>
+          </div>
+          
+          <div className="relative group">
+            <svg
+              className="absolute left-6 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--accent-red)] transition-colors"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
               style={{ color: 'var(--text-muted)' }}
             >
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => {
-              setSelectedCategory(null)
-              setVisibleCount(12)
-            }}
-            className="label-caps text-sm px-3 py-1.5 rounded-full transition-all"
-            style={{
-              background: !selectedCategory ? 'var(--accent-gold)' : 'var(--bg-card)',
-              color: !selectedCategory ? 'var(--bg-primary)' : 'var(--text-secondary)',
-              border: `1px solid ${!selectedCategory ? 'var(--accent-gold)' : 'var(--border)'}`,
-            }}
-          >
-            {dict.allCategories}
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                const newCat = cat.slug === selectedCategory ? null : cat.slug!
-                setSelectedCategory(newCat)
-                setVisibleCount(12)
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              autoFocus
+              type="text"
+              placeholder={dict.searchPlaceholder}
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setVisibleCount(12) // Reset visible count on search
               }}
-              className="label-caps text-sm px-3 py-1.5 rounded-full transition-all flex items-center gap-1"
+              className="w-full pl-16 pr-8 py-5 text-xl outline-none transition-all border border-[var(--border)] focus:border-[var(--accent-red)]"
               style={{
-                background: selectedCategory === cat.slug ? `${cat.color}20` : 'var(--bg-card)',
-                color: selectedCategory === cat.slug ? cat.color : 'var(--text-secondary)',
-                border: `1px solid ${selectedCategory === cat.slug ? cat.color! : 'var(--border)'}`,
+                background: 'var(--bg-primary)',
+                color: 'var(--text-primary)',
+                fontFamily: 'Syne, sans-serif',
               }}
-            >
-              {cat.icon} {cat.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Date Range */}
-        <div className="flex gap-2 ml-auto">
-          {DATE_FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => {
-                setDateRange(f.value)
-                setVisibleCount(12)
-              }}
-              className="label-caps text-sm px-3 py-1.5 rounded-full transition-all"
-              style={{
-                background: dateRange === f.value ? 'var(--bg-hover)' : 'transparent',
-                color: dateRange === f.value ? 'var(--text-primary)' : 'var(--text-muted)',
-                border: `1px solid ${dateRange === f.value ? 'var(--border)' : 'transparent'}`,
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Results Count */}
-      {query && (
-        <p className="label-caps text-sm mb-5" style={{ color: 'var(--text-muted)' }}>
-          {results.length} {dict.resultsFor} "{query}"
-        </p>
-      )}
-
-      {/* Results List */}
-      {results.length === 0 ? (
-        <div className="py-24 text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h2 className="font-display text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-            {dict.noResults}
-          </h2>
-          <p className="text-base mb-8" style={{ color: 'var(--text-muted)', fontFamily: 'Source Serif 4, serif' }}>
-            {dict.tryDifferent}
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/${locale}/category/${cat.slug}`}
-                className="px-4 py-2 rounded-full label-caps text-sm transition-all hover:opacity-80"
-                style={{ background: `${cat.color}20`, color: cat.color, border: `1px solid ${cat.color}40` }}
-              >
-                {cat.icon} {cat.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-col gap-5">
-            {displayedResults.map((article) => (
-              <Link
-                key={article.id}
-                href={`/${locale}/article/${article.slug}`}
-                className="group flex gap-5 p-4 rounded-xl transition-all hover:bg-white/5 border border-transparent hover:border-[var(--accent-gold)]"
-                style={{ background: 'var(--bg-card)' }}
-              >
-                {/* Thumbnail */}
-                <div className="relative w-40 h-28 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image
-                    src={article.coverImage?.url || 'https://picsum.photos/seed/result/400/300'}
-                    alt={article.coverImage?.alt || article.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex flex-col justify-center min-w-0">
-                  {article.category && (
-                    <CategoryBadge name={article.category.name} color={article.category.color} size="sm" className="mb-2 self-start" />
-                  )}
-                  <h2
-                    className="font-display font-bold text-lg leading-snug mb-1.5 line-clamp-2 group-hover:text-[var(--accent-gold)] transition-colors"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {article.title}
-                  </h2>
-                  <p
-                    className="text-sm leading-relaxed line-clamp-2 mb-3"
-                    style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}
-                  >
-                    {article.excerpt}
-                  </p>
-                  <AuthorChip author={article.author || null} date={article.publishedAt} readTime={article.readTime} size="sm" />
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Load More Button */}
-          {results.length > visibleCount && (
-            <div className="mt-12 text-center">
+            />
+            {query && (
               <button
-                onClick={() => setVisibleCount((prev) => prev + 12)}
-                className="px-8 py-3 rounded-full label-caps font-bold transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'var(--bg-card)',
-                  color: 'var(--accent-gold)',
-                  border: '1px solid var(--accent-gold)',
-                  boxShadow: '0 4px 20px rgba(201,168,76,0.1)'
+                onClick={() => {
+                  setQuery('')
+                  setVisibleCount(12)
                 }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center hover:text-[var(--accent-red)] transition-colors"
+                style={{ color: 'var(--text-muted)' }}
               >
-                {dict.viewAll || 'Load More'}
+                <span className="font-mono text-xl">✕</span>
               </button>
-              <p className="mt-4 text-sm" style={{ color: 'var(--text-muted)' }}>
-                Showing {visibleCount} of {results.length} articles
-              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Filter Controls */}
+        <div className="flex flex-col lg:flex-row gap-8 mb-12 border-b border-[var(--border)] pb-8">
+          {/* Category Selection */}
+          <div className="flex-1">
+             <h3 className="font-mono font-bold text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--text-muted)' }}>
+                FILTER BY CATEGORY
+             </h3>
+             <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedCategory(null)
+                    setVisibleCount(12)
+                  }}
+                  className="font-mono font-bold text-[10px] uppercase tracking-widest px-4 py-2 border transition-all"
+                  style={{
+                    background: !selectedCategory ? 'var(--accent-red)' : 'var(--bg-card)',
+                    color: !selectedCategory ? '#fff' : 'var(--text-secondary)',
+                    borderColor: !selectedCategory ? 'var(--accent-red)' : 'var(--border)',
+                  }}
+                >
+                  {dict.allCategories}
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      const newCat = cat.slug === selectedCategory ? null : cat.slug!
+                      setSelectedCategory(newCat)
+                      setVisibleCount(12)
+                    }}
+                    className="font-mono font-bold text-[10px] uppercase tracking-widest px-4 py-2 border transition-all"
+                    style={{
+                      background: selectedCategory === cat.slug ? 'var(--accent-red)' : 'var(--bg-card)',
+                      color: selectedCategory === cat.slug ? '#fff' : 'var(--text-secondary)',
+                      borderColor: selectedCategory === cat.slug ? 'var(--accent-red)' : 'var(--border)',
+                    }}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+             </div>
+          </div>
+
+          {/* Date Filter */}
+          <div className="flex-shrink-0">
+             <h3 className="font-mono font-bold text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--text-muted)' }}>
+                TIMELINE
+             </h3>
+             <div className="flex gap-1 border border-[var(--border)] p-1 bg-[var(--bg-card)]">
+                {DATE_FILTERS.map((f) => (
+                  <button
+                    key={f.value}
+                    onClick={() => {
+                      setDateRange(f.value)
+                      setVisibleCount(12)
+                    }}
+                    className="font-mono font-bold text-[9px] uppercase tracking-widest px-4 py-2 transition-all"
+                    style={{
+                      background: dateRange === f.value ? 'var(--accent-red)' : 'transparent',
+                      color: dateRange === f.value ? '#fff' : 'var(--text-muted)',
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+             </div>
+          </div>
+        </div>
+
+        {/* Results Info */}
+        {query && (
+          <div className="flex items-center gap-4 mb-8">
+             <div className="w-8 h-[2px]" style={{ background: 'var(--accent-red)' }} />
+             <p className="font-mono font-bold text-[11px] uppercase tracking-[0.2em]" style={{ color: 'var(--text-primary)' }}>
+                FOUND {results.length.toString().padStart(2, '0')} RESULTS FOR "{query}"
+             </p>
+          </div>
+        )}
+
+        {/* Results Listing */}
+        {results.length === 0 ? (
+          <div className="py-32 text-center border border-dashed border-[var(--border)] bg-[var(--bg-surface)]">
+            <h2 className="font-display font-black text-4xl uppercase tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>
+              {dict.noResults}
+            </h2>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] mb-8" style={{ color: 'var(--text-muted)' }}>
+              {dict.tryDifferent}
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center max-w-xl mx-auto px-4">
+              {categories.slice(0, 6).map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/${locale}/category/${cat.slug}`}
+                  className="px-6 py-3 border font-mono font-bold text-[10px] uppercase tracking-widest transition-all hover:bg-[var(--accent-red)] hover:text-white"
+                  style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
+                >
+                  {cat.name}
+                </Link>
+              ))}
             </div>
-          )}
-        </>
-      )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-col gap-6">
+              {displayedResults.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/${locale}/article/${article.slug}`}
+                  className="group flex flex-col sm:flex-row gap-8 p-6 border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--accent-red)] transition-all"
+                >
+                  {/* Thumbnail */}
+                  <div className="relative w-full sm:w-64 h-48 overflow-hidden flex-shrink-0 border border-[var(--border)]">
+                    <Image
+                      src={article.coverImage?.url || 'https://picsum.photos/seed/result/400/300'}
+                      alt={article.coverImage?.alt || article.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 256px"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0"
+                    />
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex flex-col justify-center min-w-0 flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      {article.category && (
+                        <CategoryBadge name={article.category.name} color={article.category.color} size="sm" />
+                      )}
+                      {article.isBreaking && (
+                         <span className="font-mono font-bold text-[9px] uppercase tracking-widest" style={{ color: 'var(--accent-red)' }}>
+                           · BREAKING
+                         </span>
+                      )}
+                    </div>
+                    <h2
+                      className="font-display font-black text-2xl leading-tight mb-4 tracking-tight group-hover:text-[var(--accent-red)] transition-colors line-clamp-2"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {article.title}
+                    </h2>
+                    <p
+                      className="text-base leading-relaxed mb-6 line-clamp-2"
+                      style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}
+                    >
+                      {article.excerpt}
+                    </p>
+                    <div className="mt-auto">
+                       <AuthorChip author={article.author || null} date={article.publishedAt} readTime={article.readTime} size="sm" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination / Load More */}
+            {results.length > visibleCount && (
+              <div className="mt-16 text-center">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 12)}
+                  className="px-12 py-5 border border-[var(--border)] font-mono font-bold text-xs uppercase tracking-[0.3em] transition-all hover:bg-[var(--accent-red)] hover:text-white hover:border-[var(--accent-red)]"
+                  style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+                >
+                   LOAD MORE DATA
+                </button>
+                <p className="mt-6 font-mono text-[9px] uppercase tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
+                  RECORDS {visibleCount} / {results.length} ACCESSED
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

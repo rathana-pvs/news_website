@@ -9,19 +9,15 @@ interface CategoryBadgeProps {
   className?: string
 }
 
-export function CategoryBadge({ name, color = '#c9a84c', size = 'md', className }: CategoryBadgeProps) {
+export function CategoryBadge({ name, size = 'md', className }: CategoryBadgeProps) {
   return (
     <span
       className={cn(
-        'label-caps inline-flex items-center rounded-sm font-semibold',
-        size === 'sm' ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-sm',
+        'inline-flex items-center font-mono font-bold uppercase tracking-widest',
+        size === 'sm' ? 'text-[9px] px-0 py-0' : 'text-[10px] px-0 py-0',
         className,
       )}
-      style={{
-        backgroundColor: `${color}20`,
-        color: color,
-        border: `1px solid ${color}40`,
-      }}
+      style={{ color: 'var(--accent-red)', letterSpacing: '0.15em' }}
     >
       {name}
     </span>

@@ -19,28 +19,42 @@ export function LatestNewsGrid({ articles }: LatestNewsGridProps) {
   if (!articles || articles.length === 0) return null
 
   return (
-    <section className="w-full bg-[#0a0a0a]/50">
+    <section className="w-full" style={{ borderTop: '1px solid var(--border)' }}>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        {/* Section Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
+          <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+            {dict.latest || 'Latest'}
+          </h2>
+          <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {articles.map((article, i) => (
-            <ArticleCard 
-              key={article.id} 
-              article={article} 
-              size="sm" 
-              index={i} 
-              className="h-full bg-white/5 border border-white/5 rounded-xl transition-all hover:bg-white/10"
+            <ArticleCard
+              key={article.id}
+              article={article}
+              size="sm"
+              index={i}
             />
           ))}
         </div>
-        
-        <div className="mt-12 flex justify-center relative z-10">
-          <Link 
+
+        <div className="mt-10 flex justify-center">
+          <Link
             href={`/${locale}/search`}
-            className="inline-block px-8 py-3 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] text-sm label-caps transition-all hover:bg-[#c9a84c]/10 hover:border-[#c9a84c] active:scale-95"
+            className="inline-flex items-center gap-2 px-8 py-3 font-mono font-bold text-[11px] uppercase tracking-[0.15em] transition-all hover:bg-[var(--accent-red)] hover:text-white"
+            style={{
+              border: '1px solid var(--accent-red)',
+              color: 'var(--accent-red)',
+            }}
           >
             {dict.viewAll}
           </Link>
         </div>
+
       </div>
     </section>
   )

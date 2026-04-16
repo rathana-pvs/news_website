@@ -8,6 +8,8 @@ import { Article, Category } from '@/types'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
+import { i18nStrings } from '@/lib/i18n'
+import { Locale } from '@/i18n-config'
 
 type FilterType = 'latest' | 'breaking' | 'opinion'
 
@@ -19,6 +21,7 @@ interface CategoryPageClientProps {
 export function CategoryPageClient({ category, initialArticles }: CategoryPageClientProps) {
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
+  const dict = i18nStrings[locale as Locale] || i18nStrings.en
   const [filter, setFilter] = useState<FilterType>('latest')
   const [page, setPage] = useState(1)
   const PER_PAGE = 12
@@ -33,67 +36,67 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
   const hasMore = paginated.length < filtered.length
 
   const FILTERS: { label: string; value: FilterType }[] = [
-    { label: 'Latest', value: 'latest' },
-    { label: 'Breaking', value: 'breaking' },
-    { label: 'Opinion Only', value: 'opinion' },
+    { label: dict.latest, value: 'latest' },
+    { label: dict.breaking, value: 'breaking' },
+    { label: dict.opinionOnly, value: 'opinion' },
   ]
 
   return (
     <>
       {/* Category Hero Banner */}
       <section
-        className="relative w-full py-16 overflow-hidden"
+        className="relative w-full py-20 overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${category.color}15 0%, var(--bg-surface) 60%, var(--bg-primary) 100%)`,
           borderBottom: '1px solid var(--border)',
         }}
       >
-        {/* Shimmer overlay */}
-        <div className="shimmer-bg absolute inset-0" />
+        {/* Dot matrix background */}
+        <div 
+          className="absolute inset-0 opacity-[0.3]" 
+          style={{ backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
+        />
+        
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-6">
-            <span className="text-7xl">{category.icon}</span>
-            <div>
-              <h1
-                className="font-display font-bold"
-                style={{ fontSize: 'clamp(36px, 5vw, 64px)', color: 'var(--text-primary)', lineHeight: 1.3 }}
-              >
-                {category.name}
-              </h1>
-              {category.description && (
-                <p className="mt-4 text-base max-w-xl" style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}>
-                  {category.description}
-                </p>
-              )}
-              <div className="mt-3 flex items-center gap-3">
-                <div
-                  className="w-8 h-1 rounded-full"
-                  style={{ background: category.color }}
-                />
-                <span
-                  className="label-caps text-sm"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {filtered.length} articles
-                </span>
+           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div className="relative">
+                 {/* Red left accent bar */}
+                 <div className="absolute -left-6 top-0 bottom-0 w-[4px]" style={{ background: 'var(--accent-red)' }} />
+                 <h1
+                   className="font-display font-black tracking-tighter uppercase"
+                   style={{ fontSize: 'clamp(40px, 6vw, 64px)', color: 'var(--text-primary)', lineHeight: 0.9 }}
+                 >
+                   {category.name}
+                 </h1>
+                 {category.description && (
+                   <p className="mt-4 text-lg max-w-xl italic" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
+                     {category.description}
+                   </p>
+                 )}
               </div>
-            </div>
-          </div>
+              <div className="flex flex-col items-end">
+                 <span className="font-mono font-bold text-[9px] uppercase mb-1" style={{ color: 'var(--accent-red)' }}>
+                   {dict.record}
+                 </span>
+                 <span className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
+                   {filtered.length.toString().padStart(3, '0')}
+                 </span>
+              </div>
+           </div>
         </div>
       </section>
 
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-12">
         {/* Filter Bar */}
-        <div className="flex items-center gap-2 mb-8 flex-wrap">
+        <div className="flex items-center gap-4 mb-12 flex-wrap">
           {FILTERS.map((f) => (
             <button
               key={f.value}
               onClick={() => { setFilter(f.value); setPage(1) }}
-              className="px-4 py-2 rounded-full label-caps text-sm transition-all"
+              className="px-6 py-2 border font-mono font-bold text-[10px] uppercase tracking-widest transition-all"
               style={{
-                background: filter === f.value ? category.color : 'var(--bg-card)',
+                background: filter === f.value ? 'var(--accent-red)' : 'var(--bg-card)',
                 color: filter === f.value ? '#fff' : 'var(--text-secondary)',
-                border: `1px solid ${filter === f.value ? category.color : 'var(--border)'}`,
+                borderColor: filter === f.value ? 'var(--accent-red)' : 'var(--border)',
               }}
             >
               {f.label}
@@ -102,9 +105,9 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
         </div>
 
         {paginated.length === 0 ? (
-          <div className="py-24 text-center">
-            <p className="text-2xl mb-2" style={{ color: 'var(--text-muted)' }}>No articles found</p>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Try a different filter</p>
+          <div className="py-24 text-center border border-dashed border-[var(--border)]">
+            <p className="font-display font-bold text-2xl mb-2" style={{ color: 'var(--text-muted)' }}>{dict.noArticlesFound}</p>
+            <p className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{dict.tryDifferent}</p>
           </div>
         ) : (
           <>
@@ -112,27 +115,41 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
             {paginated[0] && (
               <Link
                 href={`/${locale}/article/${paginated[0].slug}`}
-                className="group flex flex-col sm:flex-row gap-0 rounded-2xl overflow-hidden mb-8 border border-transparent hover:border-[var(--accent-gold)] transition-all"
+                className="group flex flex-col lg:flex-row gap-0 overflow-hidden mb-12 border border-[var(--border)] hover:border-[var(--accent-red)] transition-all"
                 style={{ background: 'var(--bg-card)' }}
               >
-                <div className="relative sm:w-1/2" style={{ minHeight: 280 }}>
+                <div className="relative lg:w-3/5" style={{ minHeight: 350 }}>
                   <Image
                     src={paginated[0].coverImage?.url || 'https://picsum.photos/seed/featured/800/500'}
                     alt={paginated[0].coverImage?.alt || paginated[0].title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
+                  {/* Subtle diagonal line decoration */}
+                  <div className="absolute inset-0 pointer-events-none opacity-20" 
+                       style={{ background: 'linear-gradient(45deg, var(--accent-red) -20%, transparent 40%)' }} />
                 </div>
-                <div className="sm:w-1/2 p-8 flex flex-col justify-center">
-                  <CategoryBadge name={category.name} color={category.color} className="mb-3 self-start" />
+                <div className="lg:w-2/5 p-10 flex flex-col justify-center relative">
+                  <div className="absolute top-0 right-0 w-16 h-16 opacity-10" 
+                       style={{ backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)', backgroundSize: '8px 8px' }} />
+                  
+                  <div className="flex items-center gap-3 mb-6">
+                    <CategoryBadge name={category.name} size="sm" />
+                    {paginated[0].isBreaking && (
+                      <span className="font-mono font-bold text-[9px] uppercase tracking-widest" style={{ color: 'var(--accent-red)' }}>
+                        · {dict.breaking}
+                      </span>
+                    )}
+                  </div>
+
                   <h2
-                    className="font-display font-bold text-2xl leading-snug mb-3 group-hover:text-[var(--accent-gold)] transition-colors"
+                    className="font-display font-black text-3xl sm:text-4xl leading-tight mb-6 tracking-tight group-hover:text-[var(--accent-red)] transition-colors"
                     style={{ color: 'var(--text-primary)' }}
                   >
                     {paginated[0].title}
                   </h2>
-                  <p className="text-base leading-relaxed mb-5 line-clamp-3" style={{ color: 'var(--text-secondary)', fontFamily: 'Source Serif 4, serif' }}>
+                  <p className="text-base leading-relaxed mb-8 line-clamp-3" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
                     {paginated[0].excerpt}
                   </p>
                   <AuthorChip author={paginated[0].author || null} date={paginated[0].publishedAt} readTime={paginated[0].readTime} />
@@ -140,8 +157,8 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
               </Link>
             )}
 
-            {/* Remaining: 3-col Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Remaining: Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {paginated.slice(1).map((article, i) => (
                 <ArticleCard key={article.id} article={article} size="md" index={i} />
               ))}
@@ -149,16 +166,16 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
 
             {/* Load More */}
             {hasMore && (
-              <div className="mt-10 text-center">
+              <div className="mt-16 text-center">
                 <button
                   onClick={() => setPage((p) => p + 1)}
-                  className="px-8 py-3 rounded-lg label-caps text-base font-bold transition-all hover:opacity-80"
+                  className="px-12 py-4 border font-mono font-bold text-xs uppercase tracking-[0.3em] transition-all hover:bg-[var(--accent-red)] hover:text-white hover:border-[var(--accent-red)]"
                   style={{
-                    background: category.color,
-                    color: '#fff',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
                   }}
                 >
-                  Load More Articles
+                  {dict.loadMore}
                 </button>
               </div>
             )}

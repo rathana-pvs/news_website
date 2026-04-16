@@ -3,6 +3,7 @@ import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from '../blocks/VideoEmbed'
 import slugify from 'slugify'
 import { revalidatePath } from 'next/cache'
+import { i18n } from '../i18n-config'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -55,10 +56,11 @@ export const Articles: CollectionConfig = {
           // Revalidate the home page (for all locales)
           revalidatePath('/', 'layout')
           
-          // Revalidate the specific article if it's published
+          // Revalidate the specific article if it's published for all supported locales
           if (doc.status === 'published') {
-            revalidatePath(`/en/article/${doc.slug}`)
-            revalidatePath(`/km/article/${doc.slug}`)
+            i18n.locales.forEach(locale => {
+              revalidatePath(`/${locale}/article/${doc.slug}`)
+            })
           }
         } catch (e) {
           // Ignore revalidation errors during seeding/CLI

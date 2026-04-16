@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,34 +7,32 @@
 /* ─── Design System Variables ─────────────────────────────────── */
 :root {
   /* Dark Mode (Default) */
-  --bg-primary: #0d1117;
-  --bg-surface: #161b22;
-  --bg-card: #1c2128;
-  --bg-hover: #21262d;
-  --text-primary: #f5f0e8;
-  --text-secondary: #c9c3b8;
-  --text-muted: #8b949e;
-  --accent-gold: #c9a84c;
-  --accent-gold-dim: #c9a84c20;
-  --accent-red: #c0392b;
-  --accent-red-bright: #e74c3c;
-  --border: #30363d;
-  --border-subtle: #21262d;
+  --bg-primary: #0a0a0a;
+  --bg-surface: #141414;
+  --bg-card: #1a1a1a;
+  --bg-hover: #1f1f1f;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --accent-red: #e8002d;
+  --accent-red-dim: rgba(232, 0, 45, 0.1);
+  --border: #1f1f1f;
+  --border-subtle: #141414;
   --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 [data-theme="light"] {
   --bg-primary: #ffffff;
-  --bg-surface: #f6f8fa;
+  --bg-surface: #f7f7f7;
   --bg-card: #ffffff;
-  --bg-hover: #f0f2f5;
-  --text-primary: #1a1a1a;
+  --bg-hover: #f0f0f0;
+  --text-primary: #0a0a0a;
   --text-secondary: #444444;
-  --text-muted: #6a737d;
-  --accent-gold: #a3822e; /* Richer gold for light mode contrast */
-  --accent-gold-dim: #a3822e15;
-  --border: #e1e4e8;
-  --border-subtle: #f0f2f5;
+  --text-muted: #777777;
+  --accent-red: #e8002d;
+  --accent-red-dim: rgba(232, 0, 45, 0.05);
+  --border: #e5e5e5;
+  --border-subtle: #f7f7f7;
 }
 
 /* ─── Global Transitions ───────────────────────────────────────── */
@@ -56,84 +54,138 @@ html {
 
 body {
   background-color: var(--bg-primary);
+  /* Dot Matrix Texture */
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0;
   color: var(--text-primary);
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 16px;
-  line-height: 1.6;
+  /* Inter for body copy — superior legibility at all sizes */
+  font-family: 'Inter', 'Syne', system-ui, sans-serif;
+  font-size: clamp(15px, 1vw + 13px, 17px);
+  line-height: 1.65;
+  /* Professional typesetting */
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  font-variant-numeric: oldstyle-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Dot Matrix Decorative Element */
+.dot-matrix {
+  background-image: radial-gradient(var(--accent-red) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.2;
 }
 
 /* ─── Typography ──────────────────────────────────────────────── */
 .font-display {
   font-family: 'Playfair Display', Georgia, serif;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'dlig' 1;
+  /* Tighter tracking on large display sizes via CSS var */
+  letter-spacing: -0.03em;
 }
 
 .font-body {
-  font-family: 'Source Serif 4', Georgia, serif;
+  /* Inter for reading-heavy body copy */
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+.font-ui {
+  /* Syne for UI elements, labels, nav */
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
 }
 
 .font-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-feature-settings: 'kern' 0, 'liga' 0;
 }
 
+/* label-caps: no forced color — let context set it */
 .label-caps {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* Fix: Khmer script does not support letter-spacing (tracking) well */
+[lang="km"] .label-caps,
+[lang="km"] .tracking-widest,
+[lang="km"] .tracking-tighter,
+:lang(km) {
+  letter-spacing: normal !important;
 }
 
 /* ─── Article Body Typography ─────────────────────────────────── */
 .article-body {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 18px;
+  /* Inter for long-form reading — optimized legibility */
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(17px, 1vw + 14px, 19px);
   line-height: 1.85;
   color: var(--text-secondary);
+  font-weight: 400;
+  /* Optical kerning for article body */
+  font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+  text-rendering: optimizeLegibility;
 }
 
 .article-body h2 {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 900;
   color: var(--text-primary);
-  margin: 2.5rem 0 1rem;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 3rem 0 1.25rem;
 }
 
 .article-body h3 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 22px;
-  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 700;
   color: var(--text-primary);
-  margin: 2rem 0 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 2.5rem 0 1rem;
 }
 
 .article-body p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+  /* Hyphenation for long articles */
+  hyphens: auto;
+  word-spacing: 0.01em;
 }
 
-/* Drop Cap for first paragraph */
+/* Drop Cap for first paragraph — editorial touch */
 .article-body > p:first-of-type::first-letter {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--accent-gold);
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--accent-red);
   float: left;
-  line-height: 0.75;
-  margin-right: 0.12em;
-  margin-top: 0.1em;
+  line-height: 0.82;
+  margin-right: 0.1em;
+  margin-top: 0.08em;
+  /* Prevent orphan ligatures */
+  padding-right: 2px;
 }
 
 /* Pull Quotes */
 .article-body blockquote {
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
-  font-size: 22px;
-  line-height: 1.5;
+  font-size: 24px;
+  line-height: 1.4;
   color: var(--text-primary);
-  border-left: 4px solid var(--accent-gold);
-  padding: 1rem 2rem;
-  margin: 2rem 0;
+  border-left: 6px solid var(--accent-red);
+  padding: 1.5rem 2.5rem;
+  margin: 3rem 0;
+  background: var(--bg-surface);
 }
 
 /* Image Captions */
@@ -168,7 +220,7 @@ body {
   top: 0;
   left: 0;
   height: 3px;
-  background: var(--accent-gold);
+  background: var(--accent-red);
   z-index: 9999;
   transition: width 0.1s linear;
 }
@@ -240,24 +292,24 @@ body {
   flex-shrink: 0;
 }
 
-/* ─── Gold Underline Divider ──────────────────────────────────── */
-.gold-divider {
+/* ─── Red Underline Divider ──────────────────────────────────── */
+.red-divider {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.gold-divider::after {
+.red-divider::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--border);
 }
 
-.gold-divider-line {
-  width: 40px;
+.red-divider-line {
+  width: 60px;
   height: 3px;
-  background: var(--accent-gold);
+  background: var(--accent-red);
   display: inline-block;
 }
 
@@ -277,7 +329,7 @@ body {
 }
 
 .card-hover:hover {
-  border-color: var(--accent-gold) !important;
+  border-color: var(--accent-red) !important;
 }
 
 .card-hover:hover .card-image {
@@ -290,19 +342,19 @@ body {
 
 /* ─── TOC Active State ────────────────────────────────────────── */
 .toc-item.active {
-  color: var(--accent-gold);
-  border-left-color: var(--accent-gold);
+  color: var(--accent-red);
+  border-left-color: var(--accent-red);
 }
 
 /* ─── Custom Focus Styles ─────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--accent-gold);
+  outline: 2px solid var(--accent-red);
   outline-offset: 2px;
 }
 
 /* ─── Selection Color ─────────────────────────────────────────── */
 ::selection {
-  background: var(--accent-gold-dim);
+  background: var(--accent-red-dim);
   color: var(--text-primary);
 }
 

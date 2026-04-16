@@ -23,15 +23,16 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
     <section className="bg-transparent">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
-          {/* Editor's Picks - 70% */}
+
+          {/* Editor's Picks — 70% */}
           <div className="lg:col-span-7">
-            <div className="flex items-center gap-3 mb-6">
-              <div>
-                <h2 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>
-                  {dict.editorsPicks}
-                </h2>
-                <div className="h-0.5 mt-1 w-12" style={{ background: 'var(--accent-gold)' }} />
-              </div>
+            {/* Section Header */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
+              <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+                {dict.editorsPicks}
+              </h2>
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -41,15 +42,14 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
             </div>
           </div>
 
-          {/* Most Read - 30% */}
-          <div className="lg:col-span-3">
-            <div className="flex items-center gap-3 mb-6">
-              <div>
-                <h2 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>
-                  {dict.mostRead}
-                </h2>
-                <div className="h-0.5 mt-1 w-12" style={{ background: 'var(--accent-gold)' }} />
-              </div>
+          {/* Most Read — 30% */}
+          <div className="lg:col-span-3" style={{ borderLeft: '1px solid var(--border)', paddingLeft: '2rem' }}>
+            {/* Section Header */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
+              <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+                {dict.mostRead}
+              </h2>
             </div>
 
             <div className="flex flex-col gap-0" style={{ borderTop: '1px solid var(--border)' }}>
@@ -62,33 +62,33 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
                 >
                   <Link
                     href={`/${locale}/article/${article.slug}`}
-                    className="flex items-start gap-4 py-4 group hover:bg-white/5 px-2 rounded-lg transition-colors -mx-2"
-                    style={{ borderBottom: '1px solid var(--border-subtle)' }}
+                    className="flex items-start gap-4 py-4 group transition-colors"
+                    style={{ borderBottom: '1px solid var(--border)' }}
                   >
                     {/* Number */}
                     <span
-                      className="font-display font-bold text-4xl flex-shrink-0 leading-none"
-                      style={{ color: i === 0 ? 'var(--accent-gold)' : 'var(--border)', lineHeight: 1 }}
+                      className="font-display font-bold text-3xl flex-shrink-0 leading-none"
+                      style={{ color: i === 0 ? 'var(--accent-red)' : 'var(--border)', lineHeight: 1 }}
                     >
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div className="min-w-0">
                       {article.category && (
                         <span
-                          className="label-caps text-xs mb-1 block"
-                          style={{ color: article.category.color }}
+                          className="font-mono font-bold text-[9px] uppercase tracking-widest mb-1 block"
+                          style={{ color: 'var(--accent-red)' }}
                         >
                           {(dict as any)[article.category.slug || ''] || article.category.name}
                         </span>
                       )}
                       <h3
-                        className="font-display font-semibold text-sm leading-snug line-clamp-3 group-hover:text-[var(--accent-gold)] transition-colors"
+                        className="font-display font-semibold text-sm leading-snug line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors"
                         style={{ color: 'var(--text-primary)' }}
                       >
                         {article.title}
                       </h3>
                       {article.publishedAt && (
-                        <p className="label-caps text-xs mt-1.5" style={{ color: 'var(--text-muted)' }} suppressHydrationWarning>
+                        <p className="font-mono text-[9px] mt-1.5 tracking-wider" style={{ color: 'var(--text-muted)' }} suppressHydrationWarning>
                           {formatDate(article.publishedAt, 'MMM d', locale)}
                         </p>
                       )}
@@ -98,6 +98,7 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>

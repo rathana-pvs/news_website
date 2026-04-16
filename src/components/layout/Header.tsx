@@ -77,38 +77,23 @@ export function Header({ categories, locale }: HeaderProps) {
       <header
         className="sticky top-0 w-full z-50 transition-all duration-300"
         style={{
-          background: scrolled ? (theme === 'dark' ? 'rgba(13,17,23,0.95)' : 'rgba(255,255,255,0.95)') : 'var(--bg-primary)',
+          background: scrolled ? (theme === 'dark' ? 'rgba(10,10,10,0.98)' : 'rgba(255,255,255,0.98)') : 'transparent',
           borderBottom: '1px solid var(--border)',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
         }}
       >
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative">
           {/* Top Bar: Logo + Actions */}
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href={`/${locale}`} className="flex items-center gap-2.5 group">
-              <div 
-                className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full overflow-hidden transition-all duration-500" 
-                style={{ 
-                  mixBlendMode: theme === 'dark' ? 'screen' : 'multiply'
-                }}
+            <Link href={`/${locale}`} className="flex items-center group">
+              <span
+                className="font-display font-bold text-2xl sm:text-3xl tracking-tight"
+                style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}
               >
-                <Image
-                  src={theme === 'dark' ? "/icon.png" : "/icon_light.png"}
-                  alt=""
-                  fill
-                  priority
-                  className="object-contain" 
-                />
-              </div>
-              <div className="flex flex-col -ml-1">
-                <span
-                  className="font-display font-bold text-lg sm:text-xl italic group-hover:text-[var(--accent-gold)] transition-colors"
-                  style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}
-                >
-                  asiandot
-                </span>
-              </div>
+                Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
+              </span>
             </Link>
 
             <div className="flex items-center gap-3">
@@ -163,9 +148,9 @@ export function Header({ categories, locale }: HeaderProps) {
           <nav className="hidden lg:flex items-center gap-0 h-16 overflow-x-auto" aria-label="Category navigation">
             <Link
               href={`/${locale}`}
-              className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-semibold tracking-[0.08em] text-sm transition-all border-b-2 ${pathname === `/${locale}` ? 'border-[var(--accent-gold)] text-[var(--accent-gold)]' : 'border-transparent hover:text-[var(--text-primary)]'
+              className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2 ${pathname === `/${locale}` ? 'border-[var(--accent-red)] text-[var(--accent-red)]' : 'border-transparent hover:text-[var(--text-primary)]'
                 }`}
-              style={{ color: pathname === `/${locale}` ? 'var(--accent-gold)' : 'var(--text-secondary)' }}
+              style={{ color: pathname === `/${locale}` ? 'var(--accent-red)' : 'var(--text-secondary)' }}
             >
               {dict.home}
             </Link>
@@ -176,10 +161,10 @@ export function Header({ categories, locale }: HeaderProps) {
                 <Link
                   key={cat.id}
                   href={href}
-                  className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-semibold tracking-[0.08em] text-sm transition-all border-b-2`}
+                  className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2`}
                   style={{
-                    color: active ? cat.color : 'var(--text-secondary)',
-                    borderColor: active ? cat.color : 'transparent',
+                    color: active ? 'var(--accent-red)' : 'var(--text-secondary)',
+                    borderBottomColor: active ? 'var(--accent-red)' : 'transparent',
                   }}
                 >
                   {cat.name}
@@ -204,13 +189,13 @@ export function Header({ categories, locale }: HeaderProps) {
           >
             {/* Mobile Nav Header */}
             <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
-              <Link href={`/${locale}`} className="relative h-8 w-32">
-                <Image
-                  src="/logo.png"
-                  alt="Asian Dot"
-                  fill
-                  className="object-contain"
-                />
+              <Link href={`/${locale}`}>
+                <span
+                  className="font-display font-bold text-2xl tracking-tight"
+                  style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}
+                >
+                  Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
+                </span>
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -232,16 +217,20 @@ export function Header({ categories, locale }: HeaderProps) {
               >
                 🏠 {dict.home}
               </Link>
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/${locale}/category/${cat.slug}`}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
-                  style={{ color: cat.color }}
-                >
-                  {cat.name}
-                </Link>
-              ))}
+              {categories.map((cat) => {
+                const href = `/${locale}/category/${cat.slug}`
+                const active = isActive(href)
+                return (
+                  <Link
+                    key={cat.id}
+                    href={href}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
+                    style={{ color: active ? 'var(--accent-red)' : 'var(--text-secondary)' }}
+                  >
+                    {cat.name}
+                  </Link>
+                )
+              })}
 
               <Link
                 href={`/${locale}/search`}

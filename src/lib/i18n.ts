@@ -19,6 +19,11 @@ export const i18nStrings = {
     breaking: 'BREAKING',
     region: 'Region',
     noArticlesRegion: 'No articles found in this region yet.',
+    latest: 'Latest',
+    opinionOnly: 'Opinion Only',
+    record: 'Record',
+    loadMore: 'Load More Articles',
+    noArticlesFound: 'No articles found',
     // Categories
     elections: 'Elections',
     parliament: 'Parliament',
@@ -89,6 +94,11 @@ export const i18nStrings = {
     breaking: 'ព័ត៌មានទាន់ហេតុការណ៍',
     region: 'តំបន់',
     noArticlesRegion: 'មិនទាន់មានអត្ថបទក្នុងតំបន់នេះនៅឡើយទេ។',
+    latest: 'ចុងក្រោយ',
+    opinionOnly: 'តែមតិយោបល់',
+    record: 'កំណត់ត្រា',
+    loadMore: 'មើលអត្ថបទបន្ថែមទៀត',
+    noArticlesFound: 'រកមិនឃើញអត្ថបទ',
     // Categories
     elections: 'ការបោះឆ្នោត',
     parliament: 'សភា',
