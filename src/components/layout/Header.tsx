@@ -145,23 +145,6 @@ export function Header({ categories, locale }: HeaderProps) {
                 </svg>
               </Link>
 
-              {/* Live Link */}
-              <Link
-                href={`/${locale}/live`}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors"
-                style={{
-                  background: 'var(--accent-red)',
-                  color: '#fff',
-                  fontFamily: 'IBM Plex Mono',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                <span className="live-dot w-1.5 h-1.5 rounded-full bg-white" />
-                {dict.live}
-              </Link>
-
               {/* Hamburger */}
               <button
                 className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-white/5 lg:hidden"
@@ -199,19 +182,10 @@ export function Header({ categories, locale }: HeaderProps) {
                     borderColor: active ? cat.color : 'transparent',
                   }}
                 >
-                  <span className="mr-3 text-lg">{cat.icon}</span>
                   {cat.name}
                 </Link>
               )
             })}
-            <Link
-              href={`/${locale}/live`}
-              className="flex-shrink-0 px-6 h-full flex items-center font-mono font-semibold tracking-[0.08em] text-sm transition-all border-b-2 border-transparent"
-              style={{ color: 'var(--accent-red)' }}
-            >
-              <span className="live-dot mr-3 w-2.5 h-2.5 rounded-full inline-block bg-current" />
-              {dict.live}
-            </Link>
           </nav>
         </div>
       </header>
@@ -265,16 +239,10 @@ export function Header({ categories, locale }: HeaderProps) {
                   className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                   style={{ color: cat.color }}
                 >
-                  {cat.icon} {cat.name}
+                  {cat.name}
                 </Link>
               ))}
-              <Link
-                href={`/${locale}/live`}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
-                style={{ color: 'var(--accent-red)' }}
-              >
-                🔴 {dict.live}
-              </Link>
+
               <Link
                 href={`/${locale}/search`}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"

@@ -327,10 +327,6 @@ export interface Category {
    * Hex color for this category
    */
   color?: string | null;
-  /**
-   * Emoji icon for this category
-   */
-  icon?: string | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -547,7 +543,6 @@ export interface CategoriesSelect<T extends boolean = true> {
   slug?: T;
   description?: T;
   color?: T;
-  icon?: T;
   seo?:
     | T
     | {

@@ -49,13 +49,6 @@ export const Categories: CollectionConfig = {
       },
     },
     {
-      name: 'icon',
-      type: 'text',
-      admin: {
-        description: 'Emoji icon for this category',
-      },
-    },
-    {
       name: 'seo',
       type: 'group',
       fields: [

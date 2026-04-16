@@ -62,6 +62,11 @@ export async function getCategories(locale?: string): Promise<Category[]> {
     collection: 'categories',
     limit: 20,
     locale: locale as any,
+    select: {
+      name: true,
+      slug: true,
+      color: true,
+    }
   })
   return result.docs as unknown as Category[]
 }

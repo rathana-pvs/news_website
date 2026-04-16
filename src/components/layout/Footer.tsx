@@ -145,15 +145,6 @@ export function Footer({
               ))}
             </div>
 
-            {/* Live Link */}
-            <Link
-              href={`/${locale}/live`}
-              className="mt-6 flex items-center gap-2 text-sm hover:text-red-400 transition-colors"
-              style={{ color: 'var(--accent-red)' }}
-            >
-              <span className="live-dot w-2 h-2 rounded-full bg-current" />
-              <span className="label-caps" style={{ fontSize: 10 }}>{dict.live}</span>
-            </Link>
           </div>
         </div>
         
