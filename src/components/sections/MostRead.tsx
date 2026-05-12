@@ -21,15 +21,15 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
 
   return (
     <section className="bg-transparent">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
+      <div className="news-shell py-10 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-10">
 
           {/* Editor's Picks — 70% */}
           <div className="lg:col-span-7">
             {/* Section Header */}
             <div className="flex items-center gap-4 mb-6">
               <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
-              <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+              <h2 className="section-eyebrow">
                 {dict.editorsPicks}
               </h2>
               <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
@@ -43,11 +43,11 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
           </div>
 
           {/* Most Read — 30% */}
-          <div className="lg:col-span-3" style={{ borderLeft: '1px solid var(--border)', paddingLeft: '2rem' }}>
+          <div className="lg:col-span-3 lg:border-l lg:pl-8" style={{ borderColor: 'var(--border)' }}>
             {/* Section Header */}
             <div className="flex items-center gap-4 mb-6">
               <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
-              <h2 className="font-mono font-bold text-xs uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
+              <h2 className="section-eyebrow">
                 {dict.mostRead}
               </h2>
             </div>
@@ -74,10 +74,7 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
                     </span>
                     <div className="min-w-0">
                       {article.category && (
-                        <span
-                          className="font-mono font-bold text-[9px] uppercase tracking-widest mb-1 block"
-                          style={{ color: 'var(--accent-red)' }}
-                        >
+                        <span className="section-eyebrow mb-1 block" style={{ fontSize: 9 }}>
                           {(dict as any)[article.category.slug || ''] || article.category.name}
                         </span>
                       )}
