@@ -39,7 +39,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
 
           {/* Hero Article — 60% */}
           <motion.div
-            className="lg:col-span-8 relative overflow-hidden cursor-pointer group news-card"
+            className="lg:col-span-8 xl:col-span-9 relative overflow-hidden cursor-pointer group news-card"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -57,7 +57,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                 />
               </div>
 
-              <div className="relative flex flex-col justify-center p-5 sm:p-7 md:col-span-2 lg:p-9">
+              <div className="relative flex min-w-0 flex-col justify-center p-5 sm:p-7 md:col-span-2 lg:p-8 xl:p-9">
                 <motion.div
                   className="mb-4 flex flex-wrap gap-2"
                   initial={{ opacity: 0, y: 8 }}
@@ -73,8 +73,8 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                 </motion.div>
 
                 <motion.h1
-                  className="font-display font-extrabold leading-[1.02] mb-4 group-hover:text-[var(--accent-red)] transition-colors"
-                  style={{ fontSize: 'clamp(34px, 5vw, 64px)', color: 'var(--text-primary)' }}
+                  className="font-display font-extrabold leading-[1.04] mb-4 break-words group-hover:text-[var(--accent-red)] transition-colors"
+                  style={{ fontSize: 'clamp(32px, 3.4vw, 52px)', color: 'var(--text-primary)' }}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
@@ -117,7 +117,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
           </motion.div>
 
           {/* Secondary Articles — 40% */}
-          <div className="lg:col-span-4 grid gap-5">
+          <div className="lg:col-span-4 xl:col-span-3 grid gap-5">
             {secondary.slice(0, 2).map((article, i) => {
               const categoryName = article.category ? ((dict as any)[article.category.slug] || article.category.name) : ''
               return (

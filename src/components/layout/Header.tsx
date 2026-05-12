@@ -23,27 +23,10 @@ export function Header({ categories, locale }: HeaderProps) {
   useEffect(() => {
     // 1. Check for manually saved theme
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light'
-    
-    // 2. Check for system preference
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const defaultTheme = systemPrefersDark ? 'dark' : 'light'
-
-    const initialTheme = savedTheme || defaultTheme
+    const initialTheme = savedTheme || 'light'
     
     setTheme(initialTheme)
     document.documentElement.setAttribute('data-theme', initialTheme)
-
-    // Listen for system changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const newSystemTheme = e.matches ? 'dark' : 'light'
-        setTheme(newSystemTheme)
-        document.documentElement.setAttribute('data-theme', newSystemTheme)
-      }
-    }
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const toggleTheme = () => {

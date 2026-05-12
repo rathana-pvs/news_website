@@ -6,20 +6,20 @@
 
 /* ─── Design System Variables ─────────────────────────────────── */
 :root {
-  --bg-primary: #f7f4ef;
+  --bg-primary: #f5f6f8;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
-  --bg-hover: #f0ebe3;
-  --text-primary: #151515;
-  --text-secondary: #3f3f3f;
-  --text-muted: #74706a;
-  --accent-red: #b50021;
-  --accent-red-dim: rgba(181, 0, 33, 0.08);
+  --bg-hover: #f0f2f5;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --accent-red: #c1121f;
+  --accent-red-dim: rgba(193, 18, 31, 0.08);
   --accent-ink: #171f2a;
   --hero-overlay: #111111;
   --hero-overlay-rgba: 17, 17, 17;
-  --border: #ded7cc;
-  --border-subtle: #ece6dc;
+  --border: #e5e7eb;
+  --border-subtle: #f1f3f5;
   --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
@@ -40,27 +40,6 @@
   --border-subtle: #20252a;
 }
 
-/* System Preference Fallback */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg-primary: #101214;
-    --bg-surface: #171a1e;
-    --bg-card: #1b1f24;
-    --bg-hover: #23282e;
-    --text-primary: #f7f2ea;
-    --text-secondary: #d6d0c7;
-    --text-muted: #9b948b;
-    --accent-red: #f04452;
-    --accent-red-dim: rgba(240, 68, 82, 0.13);
-    --accent-ink: #f7f2ea;
-    --hero-overlay: #0d0f11;
-    --hero-overlay-rgba: 13, 15, 17;
-    --border: #2a3036;
-    --border-subtle: #20252a;
-  }
-}
-
-
 /* ─── Base Styles ─────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
@@ -74,7 +53,7 @@ html {
 
 body {
   background-color: var(--bg-primary);
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.45), transparent 320px);
+  background-image: none;
   color: var(--text-primary);
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 16px;
@@ -391,12 +370,12 @@ body {
 .news-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  box-shadow: 0 18px 45px rgba(24, 24, 24, 0.06);
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.05);
 }
 
 .news-card:hover {
   border-color: color-mix(in srgb, var(--accent-red) 45%, var(--border));
-  box-shadow: 0 22px 50px rgba(24, 24, 24, 0.1);
+  box-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
 }
 
 .line-clamp-2,
