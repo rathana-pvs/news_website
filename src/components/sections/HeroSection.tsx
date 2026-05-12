@@ -55,6 +55,21 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 />
+                {/* Theme-aware gradient overlay */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(to top, var(--hero-overlay) 40%, rgba(var(--hero-overlay-rgba), 0.4) 70%, transparent)',
+                  }}
+                />
+                {/* Dot Matrix — top right */}
+                <div
+                  className="absolute top-0 right-0 w-48 h-32 pointer-events-none"
+                  style={{
+                    backgroundImage: 'radial-gradient(rgba(232,0,45,0.5) 1px, transparent 1px)',
+                    backgroundSize: '8px 8px',
+                  }}
+                />
               </div>
 
               <div className="relative flex min-w-0 flex-col justify-center p-5 sm:p-7 md:col-span-2 lg:p-8 xl:p-9">
@@ -90,9 +105,10 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   transition={{ delay: 0.4, duration: 0.4, transformOrigin: 'left' }}
                 />
 
+                {/* Excerpt — muted Syne */}
                 <motion.p
-                  className="mb-5 text-base leading-7 line-clamp-4"
-                  style={{ color: 'var(--text-secondary)' }}
+                  className="text-base leading-relaxed mb-4 line-clamp-2 max-w-xl"
+                  style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45, duration: 0.4 }}
@@ -105,12 +121,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.4 }}
                 >
-                  <AuthorChip 
-                    author={hero.author || null} 
-                    date={hero.publishedAt} 
-                    readTime={hero.readTime}
-                    className="hero-author-chip"
-                  />
+                  <AuthorChip author={hero.author || null} date={hero.publishedAt} readTime={hero.readTime} />
                 </motion.div>
               </div>
             </Link>

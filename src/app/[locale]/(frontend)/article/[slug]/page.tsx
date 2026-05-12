@@ -107,11 +107,18 @@ export default async function ArticlePage({ params }: PageProps) {
           className="object-cover scale-105"
         />
         
-        {/* Subtle, High-Visibility Gradient Overlay */}
+        {/* Dark High-Contrast Gradient */}
         <div
           className="absolute inset-0"
+          style={{ background: 'linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.2) 100%)' }}
+        />
+
+        {/* Backdrop Dot Matrix texture */}
+        <div
+          className="absolute inset-0 opacity-[0.2] pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, var(--bg-primary) 0%, rgba(var(--hero-overlay-rgba), 0.75) 15%, rgba(var(--hero-overlay-rgba), 0) 50%)',
+            backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
           }}
         />
 
@@ -127,7 +134,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 )}
                 {article.isBreaking && (
                   <span className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
-                     · {dict.breaking}
+                     · BREAKING
                   </span>
                 )}
               </div>
@@ -143,7 +150,6 @@ export default async function ArticlePage({ params }: PageProps) {
                     date={article.publishedAt}
                     readTime={article.readTime}
                     size="lg"
-                    className="article-hero-chip"
                   />
               </div>
            </div>
@@ -172,7 +178,7 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
 
             {/* Rich Text Body */}
-            <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
+            <div className="article-body prose prose-invert prose-lg max-w-none">
               {article.content ? (
                 <RichText content={article.content} />
               ) : (
@@ -181,18 +187,6 @@ export default async function ArticlePage({ params }: PageProps) {
                 </p>
               )}
             </div>
-
-           {/* Attribution / Source */}
-            {article.credit && (
-               <div className="mb-12 py-6 border-t border-b border-[var(--border)] flex items-center gap-4">
-                  <span className="font-mono font-bold text-[9px] uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
-                    SOURCE
-                  </span>
-                  <p className="font-mono text-xs italic" style={{ color: 'var(--text-muted)' }}>
-                    {article.credit}
-                  </p>
-               </div>
-            )}
 
             {/* Tags / Topics Section */}
             {article.tags && article.tags.length > 0 && (

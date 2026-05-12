@@ -23,21 +23,20 @@
   --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
-[data-theme="dark"] {
-  --bg-primary: #101214;
-  --bg-surface: #171a1e;
-  --bg-card: #1b1f24;
-  --bg-hover: #23282e;
-  --text-primary: #f7f2ea;
-  --text-secondary: #d6d0c7;
-  --text-muted: #9b948b;
-  --accent-red: #f04452;
-  --accent-red-dim: rgba(240, 68, 82, 0.13);
-  --accent-ink: #f7f2ea;
-  --hero-overlay: #0d0f11;
-  --hero-overlay-rgba: 13, 15, 17;
-  --border: #2a3036;
-  --border-subtle: #20252a;
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-surface: #f7f7f7;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0f0;
+  --text-primary: #0a0a0a;
+  --text-secondary: #444444;
+  --text-muted: #777777;
+  --accent-red: #e8002d;
+  --accent-red-dim: rgba(232, 0, 45, 0.05);
+  --hero-overlay: #ffffff;
+  --hero-overlay-rgba: 255, 255, 255;
+  --border: #e5e5e5;
+  --border-subtle: #f7f7f7;
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────── */

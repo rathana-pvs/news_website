@@ -74,7 +74,6 @@ export const i18nStrings = {
     'middle-east': 'Middle East',
     africa: 'Africa',
     'us-canada': 'US & Canada',
-    credit: 'Credit',
   },
   km: {
     home: 'ទំព័រដើម',
@@ -151,6 +150,5 @@ export const i18nStrings = {
     privacyPolicy: 'គោលការណ៍ឯកជនភាព',
     dataCollection: 'ការប្រមូលទិន្នន័យ និងការវិភាគ',
     privacyText: 'យើងប្រើប្រាស់ Google Analytics និង cookies ដើម្បីស្វែងយល់ពីមិត្តអ្នកអាន និងកែលម្អការផ្តល់ជូននូវការរាយការណ៍នយោបាយដែលមានគុណភាពខ្ពស់។',
-    credit: 'ឥណទាន',
   },
 } as const

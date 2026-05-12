@@ -53,7 +53,6 @@ export interface Article {
   excerpt: string
   content?: any
   coverImage: MediaItem
-  credit?: string
   category?: Category
   region?: Region
   author?: Author
