@@ -23,14 +23,15 @@ export function CategoryRow({ category, articles }: CategoryRowProps) {
 
   return (
     <section className="w-full" style={{ borderTop: '1px solid var(--border)' }}>
-      <div className="news-shell py-8 sm:py-10">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
         {/* Row Header with red left accent */}
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <div className="w-[4px] h-6 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
             <div>
               <h2
-                className="section-eyebrow"
+                className="font-mono font-bold text-xs uppercase tracking-[0.2em]"
+                style={{ color: 'var(--accent-red)' }}
               >
                 {translatedName}
               </h2>
@@ -38,7 +39,7 @@ export function CategoryRow({ category, articles }: CategoryRowProps) {
           </div>
           <Link
             href={`/${locale}/category/${category.slug}`}
-            className="font-mono font-bold text-[10px] uppercase tracking-[0.1em] flex shrink-0 items-center gap-1.5 px-3 py-2 transition-all hover:bg-[var(--bg-hover)]"
+            className="font-mono font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-3 py-1.5 transition-all"
             style={{
               color: 'var(--text-muted)',
               border: '1px solid var(--border)',
@@ -54,7 +55,7 @@ export function CategoryRow({ category, articles }: CategoryRowProps) {
         {/* Horizontal Scroll */}
         <div className="horizontal-scroll gap-4 pb-2">
           {articles.slice(0, 4).map((article, i) => (
-            <div key={article.id} className="w-[82vw] max-w-[370px] sm:w-[360px] flex-shrink-0">
+            <div key={article.id} className="w-[300px] sm:w-[360px] flex-shrink-0">
               <ArticleCard article={article} size="sm" index={i} className="w-full h-full" />
             </div>
           ))}

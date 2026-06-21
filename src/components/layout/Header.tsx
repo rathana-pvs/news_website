@@ -8,13 +8,15 @@ import { LocaleSwitcher } from './LocaleSwitcher'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
+import Image from 'next/image'
+
 interface HeaderProps {
   categories: Category[]
   locale: string
 }
 
 export function Header({ categories, locale }: HeaderProps) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
@@ -23,10 +25,27 @@ export function Header({ categories, locale }: HeaderProps) {
   useEffect(() => {
     // 1. Check for manually saved theme
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light'
-    const initialTheme = savedTheme || 'light'
+    
+    // 2. Check for system preference
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const defaultTheme = systemPrefersDark ? 'dark' : 'light'
+
+    const initialTheme = savedTheme || defaultTheme
     
     setTheme(initialTheme)
     document.documentElement.setAttribute('data-theme', initialTheme)
+
+    // Listen for system changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        const newSystemTheme = e.matches ? 'dark' : 'light'
+        setTheme(newSystemTheme)
+        document.documentElement.setAttribute('data-theme', newSystemTheme)
+      }
+    }
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const toggleTheme = () => {
@@ -58,33 +77,32 @@ export function Header({ categories, locale }: HeaderProps) {
       <header
         className="sticky top-0 w-full z-50 transition-all duration-300"
         style={{
-          background: scrolled ? 'color-mix(in srgb, var(--bg-surface) 92%, transparent)' : 'var(--bg-surface)',
+          background: scrolled ? (theme === 'dark' ? 'rgba(10,10,10,0.98)' : 'rgba(255,255,255,0.98)') : 'transparent',
           borderBottom: '1px solid var(--border)',
-          backdropFilter: scrolled ? 'blur(14px)' : 'none',
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
         }}
       >
 
-        <div className="news-shell relative">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative">
           {/* Top Bar: Logo + Actions */}
-          <div className="flex items-center justify-between h-16 sm:h-[72px]">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href={`/${locale}`} className="flex items-center gap-3 group min-w-0">
-              <span className="hidden sm:block h-9 w-[3px] rounded-full" style={{ background: 'var(--accent-red)' }} />
+            <Link href={`/${locale}`} className="flex items-center group">
               <span
-                className="font-display font-extrabold text-3xl sm:text-4xl whitespace-nowrap"
-                style={{ color: 'var(--text-primary)', lineHeight: 1 }}
+                className="font-display font-bold text-2xl sm:text-3xl tracking-tight"
+                style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}
               >
                 Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
               </span>
             </Link>
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-3">
               <LocaleSwitcher />
 
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="w-10 h-10 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--bg-hover)]"
+                className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
                 aria-label="Toggle theme"
               >
@@ -112,7 +130,7 @@ export function Header({ categories, locale }: HeaderProps) {
               {/* Search */}
               <Link
                 href={`/${locale}/search`}
-                className="w-10 h-10 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--bg-hover)]"
+                className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
                 aria-label={dict.search}
               >
@@ -124,7 +142,7 @@ export function Header({ categories, locale }: HeaderProps) {
 
               {/* Hamburger */}
               <button
-                className="w-10 h-10 flex items-center justify-center rounded-md transition-colors hover:bg-[var(--bg-hover)] lg:hidden"
+                className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-white/5 lg:hidden"
                 style={{ color: 'var(--text-secondary)' }}
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
@@ -137,10 +155,10 @@ export function Header({ categories, locale }: HeaderProps) {
           </div>
 
           {/* Category Nav */}
-          <nav className="hidden lg:flex items-center gap-1 h-12 overflow-x-auto border-t" style={{ borderColor: 'var(--border)' }} aria-label="Category navigation">
+          <nav className="hidden lg:flex items-center gap-0 h-16 overflow-x-auto" aria-label="Category navigation">
             <Link
               href={`/${locale}`}
-              className={`flex-shrink-0 px-4 h-full flex items-center font-mono font-bold tracking-[0.1em] text-[11px] uppercase transition-all border-b-2 ${pathname === `/${locale}` ? 'border-[var(--accent-red)] text-[var(--accent-red)]' : 'border-transparent hover:text-[var(--text-primary)]'
+              className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2 ${pathname === `/${locale}` ? 'border-[var(--accent-red)] text-[var(--accent-red)]' : 'border-transparent hover:text-[var(--text-primary)]'
                 }`}
               style={{ color: pathname === `/${locale}` ? 'var(--accent-red)' : 'var(--text-secondary)' }}
             >
@@ -153,7 +171,7 @@ export function Header({ categories, locale }: HeaderProps) {
                 <Link
                   key={cat.id}
                   href={href}
-                  className="flex-shrink-0 px-4 h-full flex items-center font-mono font-bold tracking-[0.1em] text-[11px] uppercase transition-all border-b-2"
+                  className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2`}
                   style={{
                     color: active ? 'var(--accent-red)' : 'var(--text-secondary)',
                     borderBottomColor: active ? 'var(--accent-red)' : 'transparent',
@@ -176,7 +194,7 @@ export function Header({ categories, locale }: HeaderProps) {
             onClick={() => setMobileOpen(false)}
           />
           <div
-            className="absolute top-0 right-0 bottom-0 w-[min(88vw,360px)] flex flex-col"
+            className="absolute top-0 right-0 bottom-0 w-80 flex flex-col"
             style={{ background: 'var(--bg-surface)', borderLeft: '1px solid var(--border)' }}
           >
             {/* Mobile Nav Header */}
@@ -191,7 +209,7 @@ export function Header({ categories, locale }: HeaderProps) {
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-md hover:bg-[var(--bg-hover)]"
+                className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
               >
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -204,14 +222,10 @@ export function Header({ categories, locale }: HeaderProps) {
             <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
               <Link
                 href={`/${locale}`}
-                className="flex items-center gap-3 px-4 py-3 rounded-md label-caps text-sm transition-colors hover:bg-[var(--bg-hover)]"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path d="M3 10.5 12 3l9 7.5" />
-                  <path d="M5 10v10h14V10" />
-                </svg>
-                {dict.home}
+                🏠 {dict.home}
               </Link>
               {categories.map((cat) => {
                 const href = `/${locale}/category/${cat.slug}`
@@ -220,7 +234,7 @@ export function Header({ categories, locale }: HeaderProps) {
                   <Link
                     key={cat.id}
                     href={href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-md label-caps text-sm transition-colors hover:bg-[var(--bg-hover)]"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                     style={{ color: active ? 'var(--accent-red)' : 'var(--text-secondary)' }}
                   >
                     {cat.name}
@@ -230,14 +244,10 @@ export function Header({ categories, locale }: HeaderProps) {
 
               <Link
                 href={`/${locale}/search`}
-                className="flex items-center gap-3 px-4 py-3 rounded-md label-caps text-sm transition-colors hover:bg-[var(--bg-hover)]"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-                {dict.search}
+                🔍 {dict.search}
               </Link>
             </nav>
           </div>

@@ -155,6 +155,10 @@ export interface Article {
     [k: string]: unknown;
   } | null;
   coverImage: number | Media;
+  /**
+   * News source or attribution (e.g. CNN, AP, Reuters).
+   */
+  credit?: string | null;
   category?: (number | null) | Category;
   region?: (number | null) | Region;
   author?: (number | null) | Author;
@@ -502,6 +506,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   excerpt?: T;
   content?: T;
   coverImage?: T;
+  credit?: T;
   category?: T;
   region?: T;
   author?: T;

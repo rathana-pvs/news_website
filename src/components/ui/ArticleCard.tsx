@@ -34,10 +34,11 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.4 }}
-        className={`group flex gap-3 cursor-pointer transition-all news-card ${className || ''}`}
+        className={`group flex gap-3 border rounded-lg p-3 cursor-pointer transition-all ${className || ''}`}
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
-        <Link href={href} className="flex w-full gap-3 p-3">
-          <div className="relative flex-shrink-0 overflow-hidden" style={{ width: 108, height: 78 }}>
+        <Link href={href} className="flex gap-3 w-full">
+          <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 72 }}>
             <Image
               src={imageUrl}
               alt={article.coverImage?.alt || article.title}
@@ -52,7 +53,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
                 <CategoryBadge name={translatedCategoryName} size="sm" className="mb-1.5 block" />
               )}
               <h3
-                className="font-display font-bold leading-tight line-clamp-3 text-[15px] group-hover:text-[var(--accent-red)] transition-colors"
+                className="font-display font-bold leading-tight line-clamp-3 text-sm group-hover:text-[var(--accent-red)] transition-colors"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {article.title}
@@ -60,7 +61,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
             </div>
             <div className="font-mono flex items-center gap-2 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
               {article.author && <span>{article.author.name}</span>}
-              {article.readTime && <span>/ {article.readTime} {dict.minRead}</span>}
+              {article.readTime && <span>· {article.readTime} {dict.minRead}</span>}
             </div>
           </div>
         </Link>
@@ -74,7 +75,8 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.4 }}
-        className={`group overflow-hidden cursor-pointer transition-all news-card ${className || ''}`}
+        className={`group border rounded-xl overflow-hidden cursor-pointer transition-all hover:border-[var(--accent-red)] ${className || ''}`}
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
         <Link href={href}>
           <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/10' }}>
@@ -96,16 +98,16 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
               {article.isBreaking && <BreakingBadge />}
             </div>
           </div>
-          <div className="p-5 sm:p-6">
+          <div className="p-5">
             <h2
-              className="font-display text-2xl sm:text-3xl font-bold leading-tight mb-3 line-clamp-4 group-hover:text-[var(--accent-red)] transition-colors duration-200"
+              className="font-display text-2xl font-bold leading-tight mb-2 line-clamp-4 group-hover:text-[var(--accent-red)] transition-colors duration-200"
               style={{ color: 'var(--text-primary)' }}
             >
               {article.title}
             </h2>
             <p
               className="text-sm leading-relaxed mb-4 line-clamp-3"
-              style={{ color: 'var(--text-muted)' }}
+              style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
             >
               {article.excerpt}
             </p>
@@ -122,7 +124,8 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className={`group overflow-hidden cursor-pointer transition-all news-card ${className || ''}`}
+      className={`group border rounded-xl overflow-hidden cursor-pointer transition-all hover:border-[var(--accent-red)] ${className || ''}`}
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
     >
       <Link href={href}>
         <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
@@ -139,19 +142,19 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
             </div>
           )}
         </div>
-        <div className="p-4 sm:p-5">
+        <div className="p-4">
           {article.category && (
             <CategoryBadge name={translatedCategoryName} size="sm" className="mb-2 block" />
           )}
           <h3
             className="font-display font-bold leading-tight mb-2 line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors duration-200"
-            style={{ color: 'var(--text-primary)', fontSize: '20px' }}
+            style={{ color: 'var(--text-primary)', fontSize: '17px' }}
           >
             {article.title}
           </h3>
           <p
             className="text-sm leading-relaxed mb-3 line-clamp-2"
-            style={{ color: 'var(--text-muted)' }}
+            style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
           >
             {truncate(article.excerpt, 120)}
           </p>

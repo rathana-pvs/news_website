@@ -33,7 +33,7 @@ export function AdBanner({ slotId, format = '728x90', className = '', label = 'A
   }, [slotId])
 
   return (
-    <div className={`ad-container flex flex-col items-center my-8 sm:my-10 ${className}`}>
+    <div className={`ad-container flex flex-col items-center my-10 ${className}`}>
       {label && (
         <span className="label-caps text-[10px] mb-2 tracking-widest opacity-30">
           {label}
@@ -42,25 +42,36 @@ export function AdBanner({ slotId, format = '728x90', className = '', label = 'A
       
       <div 
         ref={adContainerRef}
-        className="relative bg-[var(--bg-surface)] border border-[var(--border)] overflow-hidden flex items-center justify-center text-[var(--text-muted)] italic text-sm transition-all hover:border-[var(--accent-red)]/50"
+        className="relative bg-[var(--bg-surface)] border border-[var(--border)] overflow-hidden flex items-center justify-center text-[var(--text-muted)] italic text-sm transition-all hover:border-[var(--accent-gold)]/50"
         style={{ 
           width: dim.width, 
           height: dim.height,
           maxWidth: '100%',
+          borderRadius: '8px',
           boxShadow: 'inset 0 0 20px rgba(0,0,0,0.2)',
+          // Scale down for mobile if it's the large leaderboard
+          transform: format === '728x90' ? 'scale(var(--ad-scale, 1))' : 'none',
+          transformOrigin: 'top center'
         }}
       >
         <style jsx>{`
+          div {
+            --ad-scale: 1;
+          }
           @media (max-width: 768px) {
             div {
-              width: 100% !important;
-              height: 76px !important;
+              --ad-scale: 0.45; /* Scales 728px down to roughly fit 330px width */
+            }
+          }
+           @media (max-width: 400px) {
+            div {
+              --ad-scale: 0.4;
             }
           }
         `}</style>
         {!slotId && (
           <div className="flex flex-col items-center gap-2">
-            <span className="h-1 w-12 bg-[var(--accent-red)]" />
+            <span className="text-xl">📢</span>
             <span>{format} Ad Slot</span>
           </div>
         )}

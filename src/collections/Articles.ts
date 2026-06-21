@@ -93,6 +93,7 @@ export const Articles: CollectionConfig = {
       localized: true 
     },
     { name: 'coverImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'credit', type: 'text', localized: false, admin: { description: 'News source or attribution (e.g. CNN, AP, Reuters).' } },
     { name: 'category', type: 'relationship', relationTo: 'categories', admin: { position: 'sidebar' } },
     { name: 'region', type: 'relationship', relationTo: 'regions', admin: { position: 'sidebar' } },
     { name: 'author', type: 'relationship', relationTo: 'authors', admin: { position: 'sidebar' } },

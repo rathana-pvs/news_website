@@ -59,14 +59,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <HeroSection hero={hero} secondary={secondary} />
 
       {/* Ad Spot */}
-      <div className="news-shell">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <AdBanner format="728x90" label="Sponsor Spotlight" />
       </div>
 
       {/* Latest News Divider */}
-      <div className="news-shell py-2">
-        <div className="flex items-center gap-4 py-6">
-          <h2 className="section-eyebrow whitespace-nowrap">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4">
+        <div className="flex items-center gap-4 py-8">
+          <h2 className="label-caps !text-[var(--accent-red)] tracking-[0.2em] whitespace-nowrap">
             {dict.latestNews}
           </h2>
           <div className="h-[1px] w-full bg-gradient-to-r from-[var(--accent-red)]/30 to-transparent" />

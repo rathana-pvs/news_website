@@ -23,17 +23,17 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
   const displayRegions = regions.slice(0, 4)
 
   return (
-    <section className="w-full bg-[var(--bg-surface)] py-10 sm:py-12 border-y border-[var(--border)]">
-      <div className="news-shell">
-        <div className="flex items-end justify-between gap-4 mb-8">
+    <section className="w-full bg-[var(--bg-surface)] py-12 border-y border-[var(--border)]">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <span className="section-eyebrow mb-2 block">{dict.globalCoverage}</span>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold leading-none text-[var(--text-primary)]">{dict.regionalReports}</h2>
+            <span className="label-caps !text-[var(--accent-red)] tracking-[0.2em] mb-2 block">{dict.globalCoverage}</span>
+            <h2 className="text-3xl font-display font-bold text-[var(--text-primary)]">{dict.regionalReports}</h2>
           </div>
           <div className="hidden sm:block h-[1px] flex-grow mx-8 bg-gradient-to-r from-[var(--accent-red)]/20 to-transparent" />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {displayRegions.map((region) => {
             const articles = articlesByRegion[region.slug] || []
             const leadArticle = articles[0]
@@ -44,12 +44,12 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
               <div key={region.id} className="flex flex-col">
                 <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
                   <h3 className="font-display font-bold text-lg text-[var(--text-primary)] group flex items-center gap-2">
-                    <span className="h-5 w-[3px] bg-[var(--accent-red)]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-red)]" />
                     {regionName}
                   </h3>
                   <Link 
                     href={`/${locale}/region/${region.slug}`}
-                    className="text-xs font-bold uppercase tracking-[0.1em] text-right text-[var(--text-muted)] hover:text-[var(--accent-red)] transition-colors ml-4 whitespace-nowrap"
+                    className="text-sm font-bold tracking-wider text-right text-[var(--text-muted)] hover:text-[var(--accent-red)] transition-colors ml-4 whitespace-nowrap"
                   >
                     {dict.allIn}
                   </Link>
@@ -78,7 +78,7 @@ export function RegionSection({ regions, articlesByRegion }: RegionSectionProps)
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-[16/10] bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-[var(--text-muted)] text-xs italic p-4 text-center">
+                  <div className="aspect-[16/10] bg-[var(--bg-card)] border border-[var(--border)] rounded flex items-center justify-center text-[var(--text-muted)] text-xs italic p-4 text-center">
                     {dict.comingSoon}
                   </div>
                 )}

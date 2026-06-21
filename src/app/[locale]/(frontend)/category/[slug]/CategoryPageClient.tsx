@@ -51,11 +51,6 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
           borderBottom: '1px solid var(--border)',
         }}
       >
-        {/* Dot matrix background */}
-        <div 
-          className="absolute inset-0 opacity-[0.3]" 
-          style={{ backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
-        />
         
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6">
            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
