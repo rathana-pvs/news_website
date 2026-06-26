@@ -6,6 +6,7 @@ import { BreakingTicker } from '@/components/layout/BreakingTicker'
 import { getCategories, getBreakingArticles } from '@/lib/api-server'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { NavigationProgress } from '@/components/layout/NavigationProgress'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'),
@@ -61,6 +62,10 @@ export default async function FrontendLayout({
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
+        <Script id="wau-init" strategy="afterInteractive">
+          {`var _wau = _wau || []; _wau.push(["dynamic", "zzpbthitpu", "t8q", "c4302bffffff", "small"]);`}
+        </Script>
+        <Script src="//waust.at/d.js" strategy="afterInteractive" />
       </body>
     </html>
   )
