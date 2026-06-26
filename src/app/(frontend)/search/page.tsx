@@ -236,7 +236,7 @@ export default function SearchPage() {
               {categories.slice(0, 6).map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/${locale}/category/${cat.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="px-6 py-3 border font-mono font-bold text-[10px] uppercase tracking-widest transition-all hover:bg-[var(--accent-red)] hover:text-white"
                   style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
                 >
@@ -251,7 +251,7 @@ export default function SearchPage() {
               {displayedResults.map((article) => (
                 <Link
                   key={article.id}
-                  href={`/${locale}/article/${article.slug}`}
+                  href={`/article/${article.slug}`}
                   className="group flex flex-col sm:flex-row gap-8 p-6 border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--accent-red)] transition-all"
                 >
                   {/* Thumbnail */}

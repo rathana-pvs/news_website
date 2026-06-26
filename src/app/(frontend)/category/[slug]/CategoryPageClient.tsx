@@ -110,7 +110,7 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
             {/* First Article: Featured Full-Width */}
             {paginated[0] && (
               <Link
-                href={`/${locale}/article/${paginated[0].slug}`}
+                href={`/article/${paginated[0].slug}`}
                 className="group flex flex-col lg:flex-row gap-0 overflow-hidden mb-12 border border-[var(--border)] hover:border-[var(--accent-red)] transition-all"
                 style={{ background: 'var(--bg-card)' }}
               >
