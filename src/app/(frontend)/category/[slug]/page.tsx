@@ -5,20 +5,22 @@ import { Article, Category } from '@/types'
 import { CategoryPageClient } from './CategoryPageClient'
 
 interface PageProps {
-  params: Promise<{ slug: string; locale: string }>
+  params: Promise<{ slug: string }>
 }
 
-import { i18n } from '@/i18n-config'
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug, locale } = await params
+  const { slug } = await params
+  const locale = 'en'
   const categories = await getCategories(locale)
   const category = (categories as Category[]).find((c) => c.slug === slug)
   if (!category) return { title: 'Category Not Found' }
 
   return {
-    title: `${category.name} — Asian Dot`,
+    title: category.name,
     description: category.description || `All ${category.name} articles from Asian Dot.`,
+    alternates: {
+      canonical: `/category/${slug}`,
+    },
   }
 }
 
@@ -27,7 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export const dynamic = 'force-dynamic'
 
 export default async function CategoryPage({ params }: PageProps) {
-  const { slug, locale } = await params
+  const { slug } = await params
+  const locale = 'en'
   const [categories, { docs: articles }] = await Promise.all([
     getCategories(locale),
     getArticles({ category: slug, limit: 50, locale }),

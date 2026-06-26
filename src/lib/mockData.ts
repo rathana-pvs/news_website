@@ -1,4 +1,4 @@
-import { Article, Author, Category, Region } from '@/types'
+import { Article, Author, Category } from '@/types'
 
 export const mockCategories: Partial<Category>[] = [
   { id: 'cat-1', name: 'Elections', slug: 'elections', color: '#e74c3c', icon: '🗳️', description: 'Election coverage, results, and analysis.' },
@@ -11,13 +11,7 @@ export const mockCategories: Partial<Category>[] = [
   { id: 'cat-8', name: 'Interviews', slug: 'interviews', color: '#e91e63', icon: '🎙️', description: 'In-depth interviews with political figures.' },
 ]
 
-export const mockRegions: Partial<Region>[] = [
-  { id: 'reg-1', name: 'Asia', slug: 'asia', description: 'News and analysis from across the Asian continent.' },
-  { id: 'reg-2', name: 'US & Canada', slug: 'us-canada', description: 'Political developments in North America.' },
-  { id: 'reg-3', name: 'Europe', slug: 'europe', description: 'Reports from the European Union and beyond.' },
-  { id: 'reg-4', name: 'Middle East', slug: 'middle-east', description: 'Geopolitics and conflict reporting from the Middle East.' },
-  { id: 'reg-5', name: 'Africa', slug: 'africa', description: 'Updates on African governance and economics.' },
-]
+
 
 export const mockAuthors: Partial<Author>[] = [
   {
@@ -54,7 +48,6 @@ export const mockAuthors: Partial<Author>[] = [
 
 const cat = (id: string) => mockCategories.find((c) => c.id === id) as any
 const auth = (id: string) => mockAuthors.find((a) => a.id === id) as any
-const reg = (id: string) => mockRegions.find((r) => r.id === id) as any
 
 export const mockArticles: Partial<Article>[] = [
   {
@@ -68,7 +61,6 @@ export const mockArticles: Partial<Article>[] = [
     status: 'published',
     isBreaking: true,
     isFeatured: true,
-    language: 'all',
     publishedAt: '2026-04-12T04:00:00Z',
     readTime: 6,
     tags: [{ tag: 'parliament' }, { tag: 'emergency powers' }, { tag: 'legislation' }],

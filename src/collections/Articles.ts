@@ -3,7 +3,7 @@ import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from '../blocks/VideoEmbed'
 import slugify from 'slugify'
 import { revalidatePath } from 'next/cache'
-import { i18n } from '../i18n-config'
+
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -56,11 +56,9 @@ export const Articles: CollectionConfig = {
           // Revalidate the home page (for all locales)
           revalidatePath('/', 'layout')
           
-          // Revalidate the specific article if it's published for all supported locales
+          // Revalidate the specific article if it's published
           if (doc.status === 'published') {
-            i18n.locales.forEach(locale => {
-              revalidatePath(`/${locale}/article/${doc.slug}`)
-            })
+            revalidatePath(`/article/${doc.slug}`)
           }
         } catch (e) {
           // Ignore revalidation errors during seeding/CLI
@@ -78,7 +76,7 @@ export const Articles: CollectionConfig = {
       unique: true,
       admin: { position: 'sidebar', description: 'Auto-generated from title.' },
     },
-    { name: 'excerpt', type: 'textarea', required: true, maxLength: 160, localized: true },
+    { name: 'excerpt', type: 'textarea', required: true, maxLength: 255, localized: true },
     { 
       name: 'content', 
       type: 'richText', 
@@ -95,7 +93,6 @@ export const Articles: CollectionConfig = {
     { name: 'coverImage', type: 'upload', relationTo: 'media', required: true },
     { name: 'credit', type: 'text', localized: false, admin: { description: 'News source or attribution (e.g. CNN, AP, Reuters).' } },
     { name: 'category', type: 'relationship', relationTo: 'categories', admin: { position: 'sidebar' } },
-    { name: 'region', type: 'relationship', relationTo: 'regions', admin: { position: 'sidebar' } },
     { name: 'author', type: 'relationship', relationTo: 'authors', admin: { position: 'sidebar' } },
     { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text', localized: true }] },
     {
@@ -106,22 +103,31 @@ export const Articles: CollectionConfig = {
         { label: 'Published', value: 'published' },
         { label: 'Archived', value: 'archived' },
       ],
-      defaultValue: 'draft',
+      defaultValue: 'published',
       admin: { position: 'sidebar' },
     },
-    { name: 'isBreaking', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar' } },
-    { name: 'isFeatured', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar' } },
     {
-      name: 'language',
-      type: 'select',
-      options: [
-        { label: 'All Languages', value: 'all' },
-        { label: 'English', value: 'en' },
-        { label: 'Khmer', value: 'km' },
-      ],
-      defaultValue: 'all',
-      admin: { position: 'sidebar', description: 'Target specific user language.' },
+      name: 'aiAssistant',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '/src/components/admin/AIAssistant#AIAssistant',
+        },
+      },
     },
+    {
+      name: 'shareLink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '/src/components/admin/ShareLink#ShareLink',
+        },
+      },
+    },
+    { name: 'isBreaking', type: 'checkbox', defaultValue: true, admin: { position: 'sidebar' } },
+    { name: 'isFeatured', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar' } },
     {
       name: 'publishedAt',
       type: 'date',

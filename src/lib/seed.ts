@@ -1,6 +1,6 @@
 import { getPayload } from 'payload'
 import config from '../../payload.config'
-import { mockArticles, mockAuthors, mockCategories, mockRegions } from './mockData'
+import { mockArticles, mockAuthors, mockCategories } from './mockData'
 
 const seed = async () => {
   const payload = await getPayload({ config })
@@ -53,40 +53,7 @@ const seed = async () => {
     }
   }
 
-  console.log('--- Seeding Regions ---')
-  const regionMap: Record<string, string | number> = {}
-  for (const reg of mockRegions) {
-    const existing = await payload.find({
-      collection: 'regions',
-      locale: 'en',
-      where: { slug: { equals: reg.slug } },
-    })
 
-    const data = {
-      name: reg.name || '',
-      slug: reg.slug || '',
-      description: reg.description || '',
-    }
-
-    if (existing.docs.length === 0) {
-      const created = await payload.create({
-        collection: 'regions',
-        data,
-        draft: false,
-      })
-      regionMap[reg.slug!] = created.id
-      console.log(`Created region: ${reg.name}`)
-    } else {
-      const updated = await payload.update({
-        collection: 'regions',
-        id: existing.docs[0].id,
-        data,
-        draft: false,
-      })
-      regionMap[reg.slug!] = updated.id
-      console.log(`Updated region: ${reg.name}`)
-    }
-  }
 
   console.log('--- Seeding Authors ---')
   const authorMap: Record<string, string | number> = {}
@@ -159,7 +126,6 @@ const seed = async () => {
       isBreaking: article.isBreaking,
       isFeatured: article.isFeatured,
       category: categoryMap[article.category?.slug as string],
-      region: regionMap[article.region?.slug as string],
       author: authorMap[article.author?.slug as string],
     }
 

@@ -1,12 +1,17 @@
+import type { Metadata } from 'next'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
-interface PageProps {
-  params: Promise<{ locale: string }>
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Learn how Asian Dot protects your personal data, privacy rights, and how we handle cookies and analytics.',
+  alternates: {
+    canonical: '/privacy',
+  },
 }
 
-export default async function PrivacyPage({ params }: PageProps) {
-  const { locale } = await params
+export default async function PrivacyPage() {
+  const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   return (
@@ -66,7 +71,7 @@ export default async function PrivacyPage({ params }: PageProps) {
           <section>
             <h2 className="font-mono font-bold text-xs uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--accent-red)' }}>2. Cookies</h2>
             <p>
-              We use functional cookies to remember your language preferences (English or Khmer) and to ensure the website loads as quickly as possible. You can disable cookies in your browser settings at any time.
+              We use functional cookies to remember your preferences and to ensure the website loads as quickly as possible. You can disable cookies in your browser settings at any time.
             </p>
           </section>
 

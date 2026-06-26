@@ -7,12 +7,6 @@ export interface Category {
   icon?: string
 }
 
-export interface Region {
-  id: string | number
-  name: string
-  slug: string
-  description?: string
-}
 
 export interface Author {
   id: string | number
@@ -55,13 +49,11 @@ export interface Article {
   coverImage: MediaItem
   credit?: string
   category?: Category
-  region?: Region
   author?: Author
   tags?: Tag[]
   status: 'draft' | 'published' | 'archived'
   isBreaking: boolean
   isFeatured: boolean
-  language: 'all' | 'en' | 'km'
   publishedAt?: string
   readTime?: number
   seo?: {

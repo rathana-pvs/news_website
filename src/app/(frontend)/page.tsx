@@ -1,13 +1,11 @@
 import type { Metadata } from 'next'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { CategoryRow } from '@/components/sections/CategoryRow'
-import { RegionSection } from '@/components/sections/RegionSection'
-
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
 import { AdBanner } from '@/components/ads/AdBanner'
-import { getArticles, getCategories, getFeatured, getRegions } from '@/lib/api-server'
-import { Article, Category, Region } from '@/types'
+import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
+import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
@@ -18,20 +16,18 @@ export const metadata: Metadata = {
 
 export const revalidate = 10
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function HomePage() {
+  const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
-  const [{ hero, secondary }, allArticles, categories, regions] = await Promise.all([
+  const [{ hero, secondary }, allArticles, categories] = await Promise.all([
     getFeatured(locale),
     getArticles({ limit: 40, locale }),
     getCategories(locale),
-    getRegions(locale),
   ])
 
   const articles = allArticles.docs as Article[]
   const cats = categories as Category[]
-  const regs = regions as Region[]
 
 
 
@@ -47,11 +43,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     articlesByCategory[cat.slug] = articles.filter((a) => a.category?.slug === cat.slug)
   })
 
-  // Build articles per region map
-  const articlesByRegion: Record<string, Article[]> = {}
-  regs.forEach((reg) => {
-    articlesByRegion[reg.slug] = articles.filter((a) => a.region?.slug === reg.slug)
-  })
+
 
   return (
     <>
@@ -89,8 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
       ))}
 
-      {/* Regions Section */}
-      <RegionSection regions={regs} articlesByRegion={articlesByRegion} />
+
 
       {/* Rest of Categories */}
       {cats.slice(2).map((cat) => (

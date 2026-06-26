@@ -1,12 +1,17 @@
+import type { Metadata } from 'next'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
-interface PageProps {
-  params: Promise<{ locale: string }>
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+  alternates: {
+    canonical: '/contact',
+  },
 }
 
-export default async function ContactPage({ params }: PageProps) {
-  const { locale } = await params
+export default async function ContactPage() {
+  const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   return (

@@ -1,4 +1,4 @@
-import { Article, Category, PaginatedArticles, Region } from '@/types'
+import { Article, Category, PaginatedArticles } from '@/types'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
@@ -17,13 +17,10 @@ export async function getArticles(params?: {
     searchParams.set('where[status][equals]', 'published')
     
     if (params?.locale) {
-      searchParams.set('where[or][0][language][equals]', params.locale)
-      searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', params.locale)
     }
 
     if (params?.category) searchParams.set('where[category.slug][equals]', params.category)
-    if (params?.region) searchParams.set('where[region.slug][equals]', params.region)
     searchParams.set('depth', '2')
 
     const res = await fetch(`/api/articles?${searchParams}`)
@@ -68,16 +65,7 @@ export async function getCategories(locale?: string): Promise<Category[]> {
   }
 }
 
-export async function getRegions(locale?: string): Promise<Region[]> {
-  try {
-    const res = await fetch(`/api/regions?limit=20${locale ? `&locale=${locale}` : ''}`)
-    if (!res.ok) return []
-    const data = await res.json()
-    return data.docs || []
-  } catch {
-    return []
-  }
-}
+
 
 export async function getFeatured(locale?: string): Promise<{ hero: Article | null; secondary: Article[] }> {
   try {
@@ -89,8 +77,6 @@ export async function getFeatured(locale?: string): Promise<{ hero: Article | nu
       sort: '-publishedAt'
     })
     if (locale) {
-      searchParams.set('where[or][0][language][equals]', locale)
-      searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', locale)
     }
     const res = await fetch(`/api/articles?${searchParams}`)
@@ -111,8 +97,6 @@ export async function getBreakingArticles(locale?: string): Promise<Article[]> {
       depth: '1'
     })
     if (locale) {
-      searchParams.set('where[or][0][language][equals]', locale)
-      searchParams.set('where[or][1][language][equals]', 'all')
       searchParams.set('locale', locale)
     }
     const res = await fetch(`/api/articles?${searchParams}`)
@@ -133,8 +117,6 @@ export async function getRelatedArticles(articleId: string | number, categoryId?
     
     if (categoryId) params.set('where[category][equals]', String(categoryId))
     if (locale) {
-      params.set('where[or][0][language][equals]', locale)
-      params.set('where[or][1][language][equals]', 'all')
       params.set('locale', locale)
     }
     const res = await fetch(`/api/articles?${params}`)

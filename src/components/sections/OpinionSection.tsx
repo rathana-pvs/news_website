@@ -46,7 +46,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
               transition={{ delay: i * 0.1, duration: 0.5 }}
             >
               <Link
-                href={`/${locale}/article/${article.slug}`}
+                href={`/article/${article.slug}`}
                 className="group block rounded-xl p-6 h-full transition-all hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--accent-red)]"
                 style={{ background: 'var(--bg-card)' }}
               >
@@ -84,7 +84,7 @@ export function OpinionSection({ articles }: OpinionSectionProps) {
 
                 {/* Article Headline */}
                 <h3
-                  className="font-display font-bold text-lg leading-snug mb-3 group-hover:text-[var(--accent-red)] transition-colors"
+                  className="font-card-title text-lg mb-3 group-hover:text-[var(--accent-red)] transition-colors"
                   style={{ color: 'var(--text-primary)' }}
                 >
                   {article.title}

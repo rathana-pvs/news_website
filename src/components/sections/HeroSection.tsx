@@ -40,7 +40,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Link href={`/${locale}/article/${hero.slug}`} className="block h-full">
+            <Link href={`/article/${hero.slug}`} className="block h-full">
               {/* Hero Image */}
               <div className="relative w-full h-full" style={{ minHeight: 520 }}>
                 <Image
@@ -158,7 +158,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 + i * 0.15, duration: 0.5 }}
                 >
-                  <Link href={`/${locale}/article/${article.slug}`} className="flex h-full">
+                  <Link href={`/article/${article.slug}`} className="flex h-full">
                     <div className="relative w-40 flex-shrink-0 overflow-hidden">
                       <Image
                         src={article.coverImage?.url || `https://picsum.photos/seed/${article.id}/400/300`}
@@ -176,7 +176,7 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                         <CategoryBadge name={categoryName} size="sm" className="mb-2 block" />
                       )}
                       <h2
-                        className="font-display font-bold leading-tight line-clamp-3 mb-2 group-hover:text-[var(--accent-red)] transition-colors"
+                        className="font-card-title line-clamp-3 mb-2 group-hover:text-[var(--accent-red)] transition-colors"
                         style={{ fontSize: 15, color: 'var(--text-primary)' }}
                       >
                         {article.title}

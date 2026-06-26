@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Category } from '@/types'
-import { LocaleSwitcher } from './LocaleSwitcher'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
@@ -87,7 +86,7 @@ export function Header({ categories, locale }: HeaderProps) {
           {/* Top Bar: Logo + Actions */}
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href={`/${locale}`} className="flex items-center group">
+            <Link href="/" className="flex items-center group">
               <span
                 className="font-display font-bold text-2xl sm:text-3xl tracking-tight"
                 style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}
@@ -97,7 +96,6 @@ export function Header({ categories, locale }: HeaderProps) {
             </Link>
 
             <div className="flex items-center gap-3">
-              <LocaleSwitcher />
 
               {/* Theme Toggle */}
               <button
@@ -129,7 +127,7 @@ export function Header({ categories, locale }: HeaderProps) {
 
               {/* Search */}
               <Link
-                href={`/${locale}/search`}
+                href="/search"
                 className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
                 aria-label={dict.search}
@@ -157,15 +155,15 @@ export function Header({ categories, locale }: HeaderProps) {
           {/* Category Nav */}
           <nav className="hidden lg:flex items-center gap-0 h-16 overflow-x-auto" aria-label="Category navigation">
             <Link
-              href={`/${locale}`}
-              className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2 ${pathname === `/${locale}` ? 'border-[var(--accent-red)] text-[var(--accent-red)]' : 'border-transparent hover:text-[var(--text-primary)]'
+              href="/"
+              className={`flex-shrink-0 px-6 h-full flex items-center font-mono font-bold tracking-[0.15em] text-xs transition-all border-b-2 ${pathname === '/' ? 'border-[var(--accent-red)] text-[var(--accent-red)]' : 'border-transparent hover:text-[var(--text-primary)]'
                 }`}
-              style={{ color: pathname === `/${locale}` ? 'var(--accent-red)' : 'var(--text-secondary)' }}
+              style={{ color: pathname === '/' ? 'var(--accent-red)' : 'var(--text-secondary)' }}
             >
               {dict.home}
             </Link>
             {categories.map((cat) => {
-              const href = `/${locale}/category/${cat.slug}`
+              const href = `/category/${cat.slug}`
               const active = isActive(href)
               return (
                 <Link
@@ -199,7 +197,7 @@ export function Header({ categories, locale }: HeaderProps) {
           >
             {/* Mobile Nav Header */}
             <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
-              <Link href={`/${locale}`}>
+              <Link href="/">
                 <span
                   className="font-display font-bold text-2xl tracking-tight"
                   style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}
@@ -221,14 +219,14 @@ export function Header({ categories, locale }: HeaderProps) {
             {/* Mobile Nav Links */}
             <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
               <Link
-                href={`/${locale}`}
+                href="/"
                 className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 🏠 {dict.home}
               </Link>
               {categories.map((cat) => {
-                const href = `/${locale}/category/${cat.slug}`
+                const href = `/category/${cat.slug}`
                 const active = isActive(href)
                 return (
                   <Link
@@ -243,7 +241,7 @@ export function Header({ categories, locale }: HeaderProps) {
               })}
 
               <Link
-                href={`/${locale}/search`}
+                href="/search"
                 className="flex items-center gap-3 px-4 py-3 rounded-lg label-caps text-base transition-colors hover:bg-white/5"
                 style={{ color: 'var(--text-secondary)' }}
               >

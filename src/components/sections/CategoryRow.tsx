@@ -38,7 +38,7 @@ export function CategoryRow({ category, articles }: CategoryRowProps) {
             </div>
           </div>
           <Link
-            href={`/${locale}/category/${category.slug}`}
+            href={`/category/${category.slug}`}
             className="font-mono font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-3 py-1.5 transition-all"
             style={{
               color: 'var(--text-muted)',

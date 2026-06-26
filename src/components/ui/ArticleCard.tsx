@@ -24,7 +24,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
   const locale = (params?.locale as string) || 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
   
-  const href = `/${locale}/article/${article.slug}`
+  const href = `/article/${article.slug}`
   const imageUrl = article.coverImage?.url || 'https://picsum.photos/seed/default/800/600'
   const translatedCategoryName = article.category ? ((dict as any)[article.category.slug] || article.category.name) : ''
 
@@ -53,7 +53,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
                 <CategoryBadge name={translatedCategoryName} size="sm" className="mb-1.5 block" />
               )}
               <h3
-                className="font-display font-bold leading-tight line-clamp-3 text-sm group-hover:text-[var(--accent-red)] transition-colors"
+                className="font-card-title line-clamp-3 text-sm group-hover:text-[var(--accent-red)] transition-colors"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {article.title}
@@ -100,7 +100,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
           </div>
           <div className="p-5">
             <h2
-              className="font-display text-2xl font-bold leading-tight mb-2 line-clamp-4 group-hover:text-[var(--accent-red)] transition-colors duration-200"
+              className="font-card-title text-2xl mb-2 line-clamp-4 group-hover:text-[var(--accent-red)] transition-colors duration-200"
               style={{ color: 'var(--text-primary)' }}
             >
               {article.title}
@@ -147,7 +147,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
             <CategoryBadge name={translatedCategoryName} size="sm" className="mb-2 block" />
           )}
           <h3
-            className="font-display font-bold leading-tight mb-2 line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors duration-200"
+            className="font-card-title mb-2 line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors duration-200"
             style={{ color: 'var(--text-primary)', fontSize: '17px' }}
           >
             {article.title}

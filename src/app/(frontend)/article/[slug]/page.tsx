@@ -14,39 +14,59 @@ import { formatDate } from '@/lib/utils'
 import { Article } from '@/types'
 
 interface PageProps {
-  params: Promise<{ slug: string; locale: string }>
+  params: Promise<{ slug: string }>
 }
 
-import { i18n, Locale } from '@/i18n-config'
+import { Locale } from '@/i18n-config'
 import { i18nStrings } from '@/lib/i18n'
 
 // Use dynamic rendering
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug, locale } = await params
+  const { slug } = await params
+  const locale = 'en'
   const article = await getArticle(slug, locale)
   if (!article) return { title: 'Article Not Found' }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
 
+  const getImageUrl = (image: any) => {
+    if (!image) return null
+    if (typeof image === 'string') return image
+    if (typeof image === 'number') return null
+    if (image && typeof image === 'object' && 'url' in image) {
+      return image.url as string
+    }
+    return null
+  }
+
+  const seoTitle = article.meta?.title || article.seo?.metaTitle || article.title
+  const seoDescription = article.meta?.description || article.seo?.metaDescription || article.excerpt
+  const ogImageUrl = getImageUrl(article.meta?.image) || 
+                     getImageUrl(article.seo?.ogImage) || 
+                     getImageUrl(article.coverImage)
+
   return {
-    title: article.seo?.metaTitle || article.title,
-    description: article.seo?.metaDescription || article.excerpt,
+    title: seoTitle,
+    description: seoDescription,
+    alternates: {
+      canonical: `/article/${slug}`,
+    },
     openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      images: article.coverImage?.url ? [article.coverImage.url] : [],
+      title: seoTitle,
+      description: seoDescription,
+      images: ogImageUrl ? [ogImageUrl] : [],
       type: 'article',
-      url: `${siteUrl}/${locale}/article/${slug}`,
+      url: `${siteUrl}/article/${slug}`,
       publishedTime: article.publishedAt,
       authors: [article.author?.name || 'Asian Dot Staff'],
     },
     twitter: {
       card: 'summary_large_image',
-      title: article.title,
-      description: article.excerpt,
-      images: article.coverImage?.url ? [article.coverImage.url] : [],
+      title: seoTitle,
+      description: seoDescription,
+      images: ogImageUrl ? [ogImageUrl] : [],
     },
   }
 }
@@ -54,7 +74,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export const revalidate = 5
 
 export default async function ArticlePage({ params }: PageProps) {
-  const { slug, locale } = await params
+  const { slug } = await params
+  const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
   
@@ -76,7 +97,7 @@ export default async function ArticlePage({ params }: PageProps) {
     author: [{
       '@type': 'Person',
       name: article.author?.name || 'Asian Dot Staff',
-      url: `${siteUrl}/${locale}/about`,
+      url: `${siteUrl}/about`,
     }],
     publisher: {
       '@type': 'Organization',

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&family=Kantumruy+Pro:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -109,6 +109,13 @@ body {
   letter-spacing: -0.03em;
 }
 
+.font-card-title {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
 .font-body {
   /* Inter for reading-heavy body copy */
   font-family: 'Inter', system-ui, sans-serif;
@@ -136,19 +143,7 @@ body {
   line-height: 1.2;
 }
 
-/* Fix: Khmer script does not support letter-spacing (tracking) well */
-[lang="km"] .label-caps,
-[lang="km"] .tracking-widest,
-[lang="km"] .tracking-tighter,
-[lang="km"] {
-  letter-spacing: normal !important;
-  font-family: 'Khmer OS Content', 'Kantumruy Pro', Arial, sans-serif !important;
-}
 
-:lang(km) {
-  letter-spacing: normal !important;
-  font-family: 'Khmer OS Content', 'Kantumruy Pro', Arial, sans-serif !important;
-}
 
 /* ─── Article Body Typography ─────────────────────────────────── */
 .article-body {

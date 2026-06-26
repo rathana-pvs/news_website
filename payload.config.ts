@@ -24,7 +24,6 @@ import { Categories } from './src/collections/Categories'
 import { Authors } from './src/collections/Authors'
 import { Media } from './src/collections/Media'
 import { Users } from './src/collections/Users'
-import { Regions } from './src/collections/Regions'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,10 +36,6 @@ export default buildConfig({
       {
         label: 'English',
         code: 'en',
-      },
-      {
-        label: 'Khmer',
-        code: 'km',
       },
     ],
     defaultLocale: 'en',
@@ -55,7 +50,7 @@ export default buildConfig({
       titleSuffix: '— Asian Dot CMS',
     },
   },
-  collections: [Articles, Categories, Authors, Media, Users, Regions],
+  collections: [Articles, Categories, Authors, Media, Users],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,

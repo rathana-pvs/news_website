@@ -61,7 +61,7 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
                   transition={{ delay: i * 0.07, duration: 0.4 }}
                 >
                   <Link
-                    href={`/${locale}/article/${article.slug}`}
+                    href={`/article/${article.slug}`}
                     className="flex items-start gap-4 py-4 group transition-colors"
                     style={{ borderBottom: '1px solid var(--border)' }}
                   >
@@ -82,7 +82,7 @@ export function MostRead({ editorPicks, mostRead }: MostReadProps) {
                         </span>
                       )}
                       <h3
-                        className="font-display font-semibold text-sm leading-snug line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors"
+                        className="font-card-title text-sm line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors"
                         style={{ color: 'var(--text-primary)' }}
                       >
                         {article.title}

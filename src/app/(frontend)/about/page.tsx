@@ -8,12 +8,15 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: 'About Us — Asian Dot',
+  title: 'About Us',
   description: 'Independent political reporting you can trust. Learn about our mission, editorial standards, and our commitment to democracy since 2010.',
+  alternates: {
+    canonical: '/about',
+  },
 }
 
-export default async function AboutPage({ params }: PageProps) {
-  const { locale } = await params
+export default async function AboutPage() {
+  const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   const stats = [
@@ -60,7 +63,7 @@ export default async function AboutPage({ params }: PageProps) {
     { year: '2010', event: 'Founded in Phnom Penh by a collective of independent journalists committed to impartial political coverage.' },
     { year: '2013', event: 'Launched the Regional Reporting Bureau, expanding coverage across Southeast Asia.' },
     { year: '2016', event: 'Won the South-East Asia Press Freedom Award for investigative reporting on electoral irregularities.' },
-    { year: '2019', event: 'Introduced bilingual English and Khmer coverage, reaching a new generation of readers.' },
+    { year: '2019', event: 'Expanded bilingual coverage, reaching a new generation of readers.' },
     { year: '2022', event: 'Reached 100,000 daily active readers. Launched our dedicated Data & Analysis desk.' },
     { year: '2025', event: 'Launched our digital platform, bringing asiandot.com to readers worldwide.' },
   ]

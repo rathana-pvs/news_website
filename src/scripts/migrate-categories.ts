@@ -84,16 +84,7 @@ async function seed() {
         },
       })
 
-      // Update localized Khmer name using the ID from the created object
-      await payload.update({
-        collection: 'categories',
-        id: created.id,
-        locale: 'km',
-        data: {
-          name: data.khmerName,
-          description: data.description
-        }
-      })
+
 
       console.log(`✅ Created: ${data.name}`)
     } catch (error) {

@@ -72,7 +72,6 @@ export interface Config {
     authors: Author;
     media: Media;
     users: User;
-    regions: Region;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -85,7 +84,6 @@ export interface Config {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    regions: RegionsSelect<false> | RegionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -94,10 +92,10 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'km') | ('en' | 'km')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'en' | 'en'[];
   globals: {};
   globalsSelect: {};
-  locale: 'en' | 'km';
+  locale: 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -160,7 +158,6 @@ export interface Article {
    */
   credit?: string | null;
   category?: (number | null) | Category;
-  region?: (number | null) | Region;
   author?: (number | null) | Author;
   tags?:
     | {
@@ -171,10 +168,6 @@ export interface Article {
   status?: ('draft' | 'published' | 'archived') | null;
   isBreaking?: boolean | null;
   isFeatured?: boolean | null;
-  /**
-   * Target specific user language.
-   */
-  language?: ('all' | 'en' | 'km') | null;
   publishedAt?: string | null;
   /**
    * Auto-calculated
@@ -339,21 +332,7 @@ export interface Category {
   createdAt: string;
 }
 /**
- * Geographic regions for news classification.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "regions".
- */
-export interface Region {
-  id: number;
-  name: string;
-  slug?: string | null;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Tribune staff and contributors.
+ * Asian Dot staff and contributors.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "authors".
@@ -449,10 +428,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
-      } | null)
-    | ({
-        relationTo: 'regions';
-        value: number | Region;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -508,7 +483,6 @@ export interface ArticlesSelect<T extends boolean = true> {
   coverImage?: T;
   credit?: T;
   category?: T;
-  region?: T;
   author?: T;
   tags?:
     | T
@@ -519,7 +493,6 @@ export interface ArticlesSelect<T extends boolean = true> {
   status?: T;
   isBreaking?: T;
   isFeatured?: T;
-  language?: T;
   publishedAt?: T;
   readTime?: T;
   seo?:
@@ -669,17 +642,6 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "regions_select".
- */
-export interface RegionsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

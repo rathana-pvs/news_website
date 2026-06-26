@@ -44,7 +44,7 @@ export function LatestNewsGrid({ articles }: LatestNewsGridProps) {
 
         <div className="mt-10 flex justify-center">
           <Link
-            href={`/${locale}/search`}
+            href="/search"
             className="inline-flex items-center gap-2 px-8 py-3 font-mono font-bold text-[11px] uppercase tracking-[0.15em] transition-all hover:bg-[var(--accent-red)] hover:text-white"
             style={{
               border: '1px solid var(--accent-red)',

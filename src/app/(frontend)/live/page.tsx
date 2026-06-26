@@ -2,12 +2,15 @@ import type { Metadata } from 'next'
 import { LiveBadge } from '@/components/ui/LiveBadge'
 import { LiveTimeline } from '@/components/sections/LiveTimeline'
 import { LiveUpdate } from '@/types'
-import { getArticles } from '@/lib/api'
+import { getArticles } from '@/lib/api-server'
 import { Article } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Live Coverage — The Tribune',
-  description: 'Follow breaking news and live parliamentary coverage from The Tribune.',
+  title: 'Live Coverage',
+  description: 'Follow breaking news and live parliamentary coverage from Asian Dot.',
+  alternates: {
+    canonical: '/live',
+  },
 }
 
 export const revalidate = 30

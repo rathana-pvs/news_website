@@ -1,26 +1,24 @@
 import Link from 'next/link'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
-import { Category, Region } from '@/types'
+import { Category } from '@/types'
 
 export function Footer({ 
   locale = 'en',
-  categories = [],
-  regions = []
+  categories = []
 }: { 
   locale?: string,
-  categories?: Category[],
-  regions?: Region[]
+  categories?: Category[]
 }) {
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   return (
     <footer style={{ borderTop: '1px solid var(--border)' }}>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-10 md:py-14">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-10">
           {/* Col 1: Logo + Tagline */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-2">
-            <Link href={`/${locale}`}>
+          <div className="col-span-2 md:col-span-3 lg:col-span-2">
+            <Link href="/">
               <h2
                 className="font-display text-2xl font-bold mb-4 tracking-tight"
                 style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}
@@ -48,7 +46,7 @@ export function Footer({
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/${locale}/category/${cat.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
                   style={{ color: 'var(--text-secondary)' }}
                 >
@@ -58,27 +56,7 @@ export function Footer({
             </div>
           </div>
 
-          {/* Col 3: Region Links */}
-          <div>
-            <h3
-              className="label-caps mb-4"
-              style={{ color: 'var(--accent-red)', fontSize: 13, letterSpacing: '0.12em' }}
-            >
-              {dict.region}
-            </h3>
-            <div className="flex flex-col gap-1.5">
-              {regions.map((region) => (
-                <Link
-                  key={region.id}
-                  href={`/${locale}/region/${region.slug}`}
-                  className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                   {region.name}
-                </Link>
-              ))}
-            </div>
-          </div>
+
 
           {/* Col 4: Organization */}
           <div>
@@ -90,21 +68,21 @@ export function Footer({
             </h3>
             <div className="flex flex-col gap-1.5">
               <Link
-                href={`/${locale}/about`}
+                href="/about"
                 className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 {dict.aboutUs}
               </Link>
               <Link
-                href={`/${locale}/contact`}
+                href="/contact"
                 className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 {dict.contactUs}
               </Link>
               <Link
-                href={`/${locale}/privacy`}
+                href="/privacy"
                 className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
                 style={{ color: 'var(--text-secondary)' }}
               >
@@ -161,10 +139,10 @@ export function Footer({
           </div>
           
           <div className="flex gap-6 text-[10px] label-caps tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            <Link href={`/${locale}/privacy`} className="hover:text-[var(--accent-red)] transition-colors">
+            <Link href="/privacy" className="hover:text-[var(--accent-red)] transition-colors">
               {dict.privacyPolicy || 'Privacy'}
             </Link>
-            <Link href={`/${locale}/contact`} className="hover:text-[var(--accent-red)] transition-colors">
+            <Link href="/contact" className="hover:text-[var(--accent-red)] transition-colors">
               {dict.contactUs}
             </Link>
           </div>

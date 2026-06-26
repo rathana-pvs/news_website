@@ -59,7 +59,7 @@ export function BreakingTicker({ articles }: BreakingTickerProps) {
           {items.map((article, i) => (
             <Link
               key={`${article.id}-${i}`}
-              href={`/${locale}/article/${article.slug}`}
+              href={`/article/${article.slug}`}
               className="flex items-center gap-4 mr-12 hover:underline"
               style={{ color: '#fff', fontSize: '13px', fontWeight: 500 }}
             >

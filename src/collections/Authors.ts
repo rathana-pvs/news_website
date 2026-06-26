@@ -5,7 +5,7 @@ export const Authors: CollectionConfig = {
   slug: 'authors',
   admin: {
     useAsTitle: 'name',
-    description: 'Tribune staff and contributors.',
+    description: 'Asian Dot staff and contributors.',
   },
   access: {
     read: () => true,

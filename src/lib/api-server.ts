@@ -1,4 +1,4 @@
-import { Article, Category, PaginatedArticles, Region } from '@/types'
+import { Article, Category, PaginatedArticles } from '@/types'
 import { getPayloadClient } from './payload'
 
 export async function getArticles(params?: {
@@ -20,16 +20,7 @@ export async function getArticles(params?: {
   if (params?.category) {
     whereClause['category.slug'] = { equals: params.category }
   }
-  if (params?.region) {
-    whereClause['region.slug'] = { equals: params.region }
-  }
 
-  if (params?.locale) {
-    whereClause.or = [
-      { language: { equals: params.locale } },
-      { language: { equals: 'all' } }
-    ]
-  }
 
   const result = await payload.find({
     collection: 'articles',
@@ -72,15 +63,7 @@ export async function getCategories(locale?: string): Promise<Category[]> {
   return result.docs as unknown as Category[]
 }
 
-export async function getRegions(locale?: string): Promise<Region[]> {
-  const payload = await getPayloadClient()
-  const result = await payload.find({
-    collection: 'regions',
-    limit: 20,
-    locale: locale as any,
-  })
-  return result.docs as unknown as Region[]
-}
+
 
 export async function getFeatured(localeProp?: string): Promise<{ hero: Article | null; secondary: Article[] }> {
   const locale = (localeProp && ['en', 'km'].includes(localeProp)) ? localeProp : 'en'
@@ -90,10 +73,6 @@ export async function getFeatured(localeProp?: string): Promise<{ hero: Article 
     where: {
       isFeatured: { equals: true },
       status: { equals: 'published' },
-      or: [
-        { language: { equals: locale || 'en' } },
-        { language: { equals: 'all' } }
-      ]
     },
     limit: 3,
     depth: 2,
@@ -112,10 +91,6 @@ export async function getBreakingArticles(localeProp?: string): Promise<Article[
     where: {
       isBreaking: { equals: true },
       status: { equals: 'published' },
-      or: [
-        { language: { equals: locale || 'en' } },
-        { language: { equals: 'all' } }
-      ]
     },
     limit: 5,
     depth: 2,
@@ -130,10 +105,6 @@ export async function getRelatedArticles(articleId: string | number, categoryId?
   const where: any = {
     status: { equals: 'published' },
     id: { not_equals: articleId },
-    or: [
-      { language: { equals: locale || 'en' } },
-      { language: { equals: 'all' } }
-    ]
   }
   if (categoryId) where.category = { equals: categoryId }
 
