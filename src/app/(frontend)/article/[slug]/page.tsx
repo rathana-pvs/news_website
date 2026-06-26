@@ -41,10 +41,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return null
   }
 
-  const seoTitle = article.meta?.title || article.seo?.metaTitle || article.title
-  const seoDescription = article.meta?.description || article.seo?.metaDescription || article.excerpt
-  const ogImageUrl = getImageUrl(article.meta?.image) || 
-                     getImageUrl(article.seo?.ogImage) || 
+  const seoTitle = article.seo?.metaTitle || article.title
+  const seoDescription = article.seo?.metaDescription || article.excerpt
+  const ogImageUrl = getImageUrl(article.seo?.ogImage) ||
                      getImageUrl(article.coverImage)
 
   return {
