@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
 }
 
-export const revalidate = 10
+
 
 export default async function HomePage() {
   const locale = 'en'

@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from '../blocks/VideoEmbed'
 import slugify from 'slugify'
-import { revalidatePath } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 
 
 export const Articles: CollectionConfig = {
@@ -50,20 +50,39 @@ export const Articles: CollectionConfig = {
       },
     ],
     afterChange: [
-      ({ doc, req }) => {
-        // Only revalidate if we are in a request context (prevents error during seeding)
+      async ({ doc }) => {
         try {
-          // Revalidate the home page (for all locales)
-          revalidatePath('/', 'layout')
-          
-          // Revalidate the specific article if it's published
-          if (doc.status === 'published') {
-            revalidatePath(`/article/${doc.slug}`)
+          // Clear all cached article lists (home, category rows, breaking ticker, featured)
+          revalidateTag('articles')
+
+          // Clear the category page the article belongs to
+          if (doc.category && typeof doc.category === 'object' && doc.category.slug) {
+            revalidateTag(`category-${doc.category.slug}`)
+          }
+
+          // 🔥 Warm the cache immediately — fire-and-forget background fetches
+          // so pages are pre-built before the first real visitor arrives
+          if (doc.status === 'published' && doc.slug) {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+            // Warm article page
+            fetch(`${siteUrl}/article/${doc.slug}`, { cache: 'no-store' })
+              .catch(() => {})
+
+            // Warm home page
+            fetch(`${siteUrl}/`, { cache: 'no-store' })
+              .catch(() => {})
+
+            // Warm category page
+            if (doc.category && typeof doc.category === 'object' && doc.category.slug) {
+              fetch(`${siteUrl}/category/${doc.category.slug}`, { cache: 'no-store' })
+                .catch(() => {})
+            }
           }
         } catch (e) {
           // Ignore revalidation errors during seeding/CLI
         }
-        
+
         return doc
       },
     ],

@@ -20,8 +20,14 @@ interface PageProps {
 import { Locale } from '@/i18n-config'
 import { i18nStrings } from '@/lib/i18n'
 
-// Use dynamic rendering
-export const dynamic = 'force-dynamic'
+// Allow older articles not in generateStaticParams to be rendered on-demand and cached
+export const dynamicParams = true
+
+// Pre-generate the 20 most recent articles as static pages at deploy time
+export async function generateStaticParams() {
+  const articles = await getArticles({ limit: 20 })
+  return articles.docs.map((a) => ({ slug: a.slug }))
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
@@ -70,7 +76,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export const revalidate = 5
 
 export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params

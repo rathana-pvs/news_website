@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import slugify from 'slugify'
+import { revalidateTag } from 'next/cache'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -20,6 +21,19 @@ export const Categories: CollectionConfig = {
           data.slug = slugify(data.name, { lower: true, strict: true })
         }
         return data
+      },
+    ],
+    afterChange: [
+      ({ doc }) => {
+        try {
+          // Clear category cache (header nav, footer, category rows)
+          revalidateTag('categories')
+          // Clear article cache (article cards show category name/color)
+          revalidateTag('articles')
+        } catch (e) {
+          // Ignore errors during seeding/CLI
+        }
+        return doc
       },
     ],
   },

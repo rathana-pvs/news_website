@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 30
+
 
 export default async function LivePage() {
   const { docs: articles } = await getArticles({ limit: 5 })

@@ -24,9 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// Use dynamic rendering — do NOT pre-generate static paths at startup.
-// This prevents connection spam to Supabase when the server starts.
-export const dynamic = 'force-dynamic'
+
 
 export default async function CategoryPage({ params }: PageProps) {
   const { slug } = await params
