@@ -172,7 +172,7 @@ export default async function AboutPage() {
                   letterSpacing: '-0.02em',
                 }}
               >
-                "To provide independent, data-driven political reporting that empowers citizens and strengthens the foundations of democracy."
+                &ldquo;To provide independent, data-driven political reporting that empowers citizens and strengthens the foundations of democracy.&rdquo;
               </blockquote>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 text-base leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
                 <p>
@@ -295,7 +295,7 @@ export default async function AboutPage() {
         />
         
         <div className="relative z-10 max-w-3xl mx-auto">
-          <p className="font-display font-bold text-6xl mb-10 leading-none" style={{ color: 'var(--accent-red)', opacity: 0.6 }}>"</p>
+          <p className="font-display font-bold text-6xl mb-10 leading-none" style={{ color: 'var(--accent-red)', opacity: 0.6 }}>&ldquo;</p>
           <blockquote
             className="font-display font-bold italic leading-tight mb-10"
             style={{ fontSize: 'clamp(24px, 4vw, 42px)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}

@@ -218,7 +218,7 @@ export default function SearchPage() {
           <div className="flex items-center gap-4 mb-8">
              <div className="w-8 h-[2px]" style={{ background: 'var(--accent-red)' }} />
              <p className="font-mono font-bold text-[11px] uppercase tracking-[0.2em]" style={{ color: 'var(--text-primary)' }}>
-                FOUND {results.length.toString().padStart(2, '0')} RESULTS FOR "{query}"
+                FOUND {results.length.toString().padStart(2, '0')} RESULTS FOR &ldquo;{query}&rdquo;
              </p>
           </div>
         )}
