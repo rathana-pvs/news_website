@@ -8,7 +8,7 @@ const googleAI = createGoogleGenerativeAI({
 })
 
 const primaryModel = googleAI('gemini-2.0-flash')
-const fallbackModel = googleAI('gemini-2.5-flash')
+const fallbackModel = googleAI('gemini-1.5-flash')
 
 const SYSTEM_PROMPT = `You are an expert news editor and content writer for Asian Dot, a reputable English-language news website covering Asia-Pacific regional news, politics, business, culture, and technology. 
 
@@ -114,7 +114,7 @@ Return JSON in this exact format:
       })
       text = response.text
     } catch (e: any) {
-      console.warn('Primary model (gemini-2.0-flash) failed, falling back to gemini-2.5-flash:', e)
+      console.warn('Primary model (gemini-2.0-flash) failed, falling back to gemini-1.5-flash:', e)
       const response = await generateText({
         model: fallbackModel,
         system: SYSTEM_PROMPT,
