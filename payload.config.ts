@@ -78,17 +78,24 @@ export default buildConfig({
       generateTitle: ({ doc }: { doc: any }) => `${doc?.title?.value} — Asian Dot`,
       generateDescription: ({ doc }: { doc: any }) => doc?.excerpt?.value,
     }),
-    cloudinaryStorage({
-      collections: {
-        media: true,
-      },
-      disableLocalStorage: true,
-      config: {
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
-        api_key: process.env.CLOUDINARY_API_KEY || '',
-        api_secret: process.env.CLOUDINARY_API_SECRET || '',
-      },
-    }),
+    ...(process.env.CLOUDINARY_CLOUD_NAME && 
+       process.env.CLOUDINARY_CLOUD_NAME !== 'placeholder' &&
+       process.env.CLOUDINARY_API_KEY && 
+       process.env.CLOUDINARY_API_KEY !== 'placeholder' &&
+       process.env.CLOUDINARY_API_SECRET && 
+       process.env.CLOUDINARY_API_SECRET !== 'placeholder' ? [
+        cloudinaryStorage({
+          collections: {
+            media: true,
+          },
+          disableLocalStorage: true,
+          config: {
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
+            api_key: process.env.CLOUDINARY_API_KEY || '',
+            api_secret: process.env.CLOUDINARY_API_SECRET || '',
+          },
+        })
+      ] : []),
   ],
   serverURL: siteUrl,
   cors: [
