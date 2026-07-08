@@ -19,11 +19,6 @@ export const AIAssistant: React.FC = () => {
    const titleValue = useFormFields(([fields]) => fields?.title?.value as string || '')
    const excerptValue = useFormFields(([fields]) => fields?.excerpt?.value as string || '')
    
-   const allFieldKeys = useFormFields(([fields]) => Object.keys(fields || {}))
-   useEffect(() => {
-     console.log('AI Assistant - Form Field Keys:', allFieldKeys)
-   }, [allFieldKeys])
- 
    const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [activeAction, setActiveAction] = useState<Action | null>(null)
