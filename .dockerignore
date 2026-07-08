@@ -35,4 +35,3 @@ docker-compose*.yml
 nginx/
 setup-vps.sh
 deploy.sh
-entrypoint.sh
