@@ -12,6 +12,15 @@ if (!cached) {
  * This prevents opening too many database connections during development and pre-rendering.
  */
 export async function getPayloadClient() {
+  const isPlaceholderDb = process.env.DATABASE_URI?.includes('placeholder')
+
+  if (isPlaceholderDb) {
+    console.log('⚠️ Using mock Payload client for build phase (placeholder database detected)')
+    return {
+      find: async () => ({ docs: [], totalDocs: 0, hasPrevPage: false, hasNextPage: false }),
+    } as any
+  }
+
   if (cached.client) {
     return cached.client
   }
