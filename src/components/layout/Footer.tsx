@@ -102,13 +102,15 @@ export function Footer({
             <div className="flex flex-col gap-2">
               {[
                 { name: 'Twitter / X', href: '#', icon: '𝕏' },
-                { name: 'Facebook', href: '#', icon: 'f' },
+                { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61570774830775', icon: 'f' },
                 { name: 'YouTube', href: '#', icon: '▶' },
                 { name: 'Telegram', href: '#', icon: '✈' },
               ].map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
+                  target={social.href !== '#' ? '_blank' : undefined}
+                  rel={social.href !== '#' ? 'noopener noreferrer' : undefined}
                   className="flex items-center gap-2.5 text-sm hover:text-[var(--accent-red)] transition-colors"
                   style={{ color: 'var(--text-secondary)' }}
                 >
