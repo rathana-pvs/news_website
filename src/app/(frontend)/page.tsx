@@ -4,6 +4,7 @@ import { CategoryRow } from '@/components/sections/CategoryRow'
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
 import { AdBanner } from '@/components/ads/AdBanner'
+import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
 import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
@@ -14,6 +15,27 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Asian Dot — Independent Political Reporting',
   description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
+  openGraph: {
+    title: 'Asian Dot — Independent Political Reporting',
+    description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
+    url: '/',
+    siteName: 'Asian Dot',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Asian Dot Logo',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Asian Dot — Independent Political Reporting',
+    description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
+    images: ['/logo.png'],
+  },
 }
 
 
@@ -21,6 +43,9 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
+
+  const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
+  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2043075'
 
   const [{ hero, secondary }, allArticles, categories] = await Promise.all([
     getFeatured(locale),
@@ -47,14 +72,33 @@ export default async function HomePage() {
 
 
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsMediaOrganization',
+    name: 'Asian Dot',
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
+    sameAs: [
+      'https://twitter.com/asiandot',
+      'https://www.facebook.com/asiandot',
+    ],
+    publishingPrinciples: `${siteUrl}/about`,
+    ethicsPolicy: `${siteUrl}/about`,
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
       <HeroSection hero={hero} secondary={secondary} />
 
       {/* Ad Spot */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdBanner format="728x90" label="Sponsor Spotlight" />
+        <AdskeeperWidget widgetId={widgetUnderArticle} />
       </div>
 
       {/* Latest News Divider */}
@@ -71,7 +115,7 @@ export default async function HomePage() {
 
       {/* Second Ad Spot */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdBanner format="728x90" label="Global News Sponsor" />
+        <AdskeeperWidget widgetId={widgetFeed} />
       </div>
 
       {/* Category Rows */}

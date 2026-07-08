@@ -8,6 +8,27 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/privacy',
   },
+  openGraph: {
+    title: 'Privacy Policy — Asian Dot',
+    description: 'Learn how Asian Dot protects your personal data, privacy rights, and how we handle cookies and analytics.',
+    url: '/privacy',
+    siteName: 'Asian Dot',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Asian Dot Logo',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy — Asian Dot',
+    description: 'Learn how Asian Dot protects your personal data, privacy rights, and how we handle cookies and analytics.',
+    images: ['/logo.png'],
+  },
 }
 
 export default async function PrivacyPage() {

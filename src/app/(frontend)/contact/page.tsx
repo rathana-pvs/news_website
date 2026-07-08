@@ -8,14 +8,54 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/contact',
   },
+  openGraph: {
+    title: 'Contact Us — Asian Dot',
+    description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+    url: '/contact',
+    siteName: 'Asian Dot',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Asian Dot Logo',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Us — Asian Dot',
+    description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+    images: ['/logo.png'],
+  },
 }
 
 export default async function ContactPage() {
   const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact Asian Dot',
+    description: 'Contact form and secure tips submission options for Asian Dot.',
+    url: `${siteUrl}/contact`,
+    mainEntity: {
+      '@type': 'NewsMediaOrganization',
+      name: 'Asian Dot',
+      url: siteUrl,
+      email: 'hello@asiandot.com',
+    }
+  }
+
   return (
     <div className="bg-[var(--bg-primary)] min-h-screen py-20 px-4 sm:px-6 relative overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Background dot matrix */}
       <div
         className="absolute inset-0 opacity-[0.4] pointer-events-none"

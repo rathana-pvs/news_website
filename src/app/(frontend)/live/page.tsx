@@ -11,6 +11,27 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/live',
   },
+  openGraph: {
+    title: 'Live Coverage — Asian Dot',
+    description: 'Follow breaking news and live parliamentary coverage from Asian Dot.',
+    url: '/live',
+    siteName: 'Asian Dot',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Asian Dot Logo',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Live Coverage — Asian Dot',
+    description: 'Follow breaking news and live parliamentary coverage from Asian Dot.',
+    images: ['/logo.png'],
+  },
 }
 
 

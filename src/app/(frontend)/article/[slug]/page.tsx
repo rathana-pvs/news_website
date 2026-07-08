@@ -10,6 +10,7 @@ import { ReadingBar } from '@/components/ui/ReadingBar'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { RichText } from '@/components/RichText'
 import { AdBanner } from '@/components/ads/AdBanner'
+import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { formatDate } from '@/lib/utils'
 import { Article } from '@/types'
 
@@ -82,6 +83,11 @@ export default async function ArticlePage({ params }: PageProps) {
   const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+  
+  const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2043076'
+  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
+  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2044156'
+  const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
   
   const article = await getArticle(slug, locale)
   if (!article) notFound()
@@ -193,13 +199,17 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
 
             <div className="lg:hidden mb-12">
-              <AdBanner format="300x250" label="SPONSORED CONTENT" />
+              <AdskeeperWidget widgetId={widgetSidebar} onlyShowOn="mobile" />
             </div>
 
             {/* Rich Text Body */}
             <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
               {article.content ? (
-                <RichText content={article.content} />
+                <RichText
+                  content={article.content}
+                  adWidgetId={widgetInArticle1}
+                  secondAdWidgetId={widgetInArticle2}
+                />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">
                   {dict.comingSoon}
@@ -336,7 +346,7 @@ export default async function ArticlePage({ params }: PageProps) {
               </div>
 
               {/* Related / Trending Sidebar Ad */}
-              <AdBanner format="300x250" label="FEATURED PARTNER" />
+              <AdskeeperWidget widgetId={widgetSidebar} adType="sidebar" onlyShowOn="desktop" />
             </div>
           </aside>
         </div>
@@ -358,9 +368,9 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         )}
         
-        {/* Bottom Page Ad */}
+        {/* Under-article Native Recommendations Widget (ID: 2043079) */}
         <div className="mt-20">
-           <AdBanner format="728x90" />
+           <AdskeeperWidget widgetId={widgetUnderArticle} />
         </div>
       </div>
     </>

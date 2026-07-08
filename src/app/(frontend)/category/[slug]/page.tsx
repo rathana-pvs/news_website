@@ -15,11 +15,35 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const category = (categories as Category[]).find((c) => c.slug === slug)
   if (!category) return { title: 'Category Not Found' }
 
+  const title = `${category.name} — Asian Dot`
+  const description = category.description || `Read the latest articles about ${category.name} on Asian Dot.`
+
   return {
     title: category.name,
-    description: category.description || `All ${category.name} articles from Asian Dot.`,
+    description: description,
     alternates: {
       canonical: `/category/${slug}`,
+    },
+    openGraph: {
+      title: title,
+      description: description,
+      url: `/category/${slug}`,
+      siteName: 'Asian Dot',
+      images: [
+        {
+          url: '/logo.png',
+          width: 1200,
+          height: 630,
+          alt: 'Asian Dot Logo',
+        },
+      ],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: description,
+      images: ['/logo.png'],
     },
   }
 }

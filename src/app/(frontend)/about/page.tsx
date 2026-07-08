@@ -13,6 +13,27 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/about',
   },
+  openGraph: {
+    title: 'About Us — Asian Dot',
+    description: 'Independent political reporting you can trust. Learn about our mission, editorial standards, and our commitment to democracy since 2010.',
+    url: '/about',
+    siteName: 'Asian Dot',
+    images: [
+      {
+        url: '/assets/about-hero.png',
+        width: 1200,
+        height: 630,
+        alt: 'About Asian Dot Hero',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us — Asian Dot',
+    description: 'Independent political reporting you can trust. Learn about our mission, editorial standards, and our commitment to democracy since 2010.',
+    images: ['/assets/about-hero.png'],
+  },
 }
 
 export default async function AboutPage() {
@@ -68,8 +89,26 @@ export default async function AboutPage() {
     { year: '2025', event: 'Launched our digital platform, bringing asiandot.com to readers worldwide.' },
   ]
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    mainEntity: {
+      '@type': 'NewsMediaOrganization',
+      name: 'Asian Dot',
+      url: siteUrl,
+      logo: `${siteUrl}/logo.png`,
+      foundingDate: '2010',
+      description: 'Independent political news covering Southeast Asia and beyond.',
+    }
+  }
+
   return (
     <div style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section
