@@ -9,7 +9,6 @@ export const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticDir: path.resolve(dirname, '../../../public/media'),
-    staticURL: '/api/media/file',
     mimeTypes: ['image/*', 'video/*'],
     imageSizes: [
       {
