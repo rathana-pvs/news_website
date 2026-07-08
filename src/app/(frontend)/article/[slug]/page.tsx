@@ -321,30 +321,6 @@ export default async function ArticlePage({ params }: PageProps) {
           <aside className="lg:col-span-4 space-y-8">
             <div className="sticky top-24 space-y-8">
               
-              {/* Share Interaction */}
-              <div className="p-8 border border-[var(--border)] bg-[var(--bg-card)]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-[3px] h-4" style={{ background: 'var(--accent-red)' }} />
-                  <h3 className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--text-primary)' }}>
-                    {dict.shareArticle}
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: 'X / Twitter', icon: '𝕏', color: '#ffffff' },
-                    { label: 'Facebook', icon: 'fb', color: '#ffffff' },
-                    { label: 'Telegram', icon: 'tg', color: '#ffffff' },
-                    { label: 'Link', icon: '🔗', color: '#ffffff' },
-                  ].map((btn) => (
-                    <button
-                      key={btn.label}
-                      className="flex items-center justify-center gap-3 py-3 border border-[var(--border)] font-mono font-bold text-[9px] uppercase tracking-widest transition-all hover:border-[var(--accent-red)] hover:text-[var(--accent-red)]"
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Related / Trending Sidebar Ad */}
               <AdskeeperWidget widgetId={widgetSidebar} adType="sidebar" onlyShowOn="desktop" />
