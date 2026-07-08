@@ -88,6 +88,7 @@ export default async function ArticlePage({ params }: PageProps) {
   const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
   const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2044156'
   const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
+  const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
   
   const article = await getArticle(slug, locale)
   if (!article) notFound()
@@ -371,6 +372,11 @@ export default async function ArticlePage({ params }: PageProps) {
         {/* Under-article Native Recommendations Widget (ID: 2043079) */}
         <div className="mt-20">
            <AdskeeperWidget widgetId={widgetUnderArticle} />
+        </div>
+
+        {/* Bottom Page Feed Widget */}
+        <div className="mt-20">
+           <AdskeeperWidget widgetId={widgetBottomFeed} />
         </div>
       </div>
     </>
