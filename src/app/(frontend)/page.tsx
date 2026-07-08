@@ -9,6 +9,8 @@ import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Asian Dot — Independent Political Reporting',
   description: 'Breaking political news, parliament coverage, international affairs, and deep investigations from Asian Dot.',
