@@ -15,6 +15,13 @@ export const ShareLink: React.FC = () => {
   const [pendingUrl, setPendingUrl] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
+  // Tracking links state
+  const [links, setLinks] = useState<any[]>([])
+  const [label, setLabel] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [loadingLinks, setLoadingLinks] = useState(true)
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
+
   useEffect(() => {
     if (typeof window !== 'undefined' && slugValue) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
@@ -23,6 +30,94 @@ export const ShareLink: React.FC = () => {
       setShareUrl('')
     }
   }, [slugValue])
+
+  const fetchLinks = async () => {
+    if (!id) return
+    try {
+      setLoadingLinks(true)
+      const response = await fetch(`/api/share-links?where[article][equals]=${id}&limit=100&depth=0`)
+      if (response.ok) {
+        const data = await response.json()
+        setLinks(data.docs || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch share links:', error)
+    } finally {
+      setLoadingLinks(false)
+    }
+  }
+
+  useEffect(() => {
+    if (id) {
+      fetchLinks()
+    }
+  }, [id])
+
+  const handleGenerate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!id || isGenerating) return
+
+    try {
+      setIsGenerating(true)
+      const response = await fetch('/api/share-links', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          article: id,
+          label: label.trim() || undefined,
+        }),
+      })
+
+      if (response.ok) {
+        setLabel('')
+        await fetchLinks()
+      } else {
+        alert('Failed to generate link')
+      }
+    } catch (error) {
+      console.error('Error generating link:', error)
+      alert('An error occurred while generating the link')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleDelete = async (linkId: string) => {
+    if (!confirm('Are you sure you want to delete this share link?')) return
+
+    try {
+      const response = await fetch(`/api/share-links/${linkId}`, {
+        method: 'DELETE',
+      })
+      if (response.ok) {
+        await fetchLinks()
+      } else {
+        alert('Failed to delete link')
+      }
+    } catch (error) {
+      console.error('Error deleting link:', error)
+    }
+  }
+
+  const handleCopyLink = async (url: string, linkId: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopiedLinkId(linkId)
+      setTimeout(() => setCopiedLinkId(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
+
+  const getFullUrl = (key: string) => {
+    if (typeof window !== 'undefined') {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      return `${siteUrl}/article/${key}/${slugValue}`
+    }
+    return `/article/${key}/${slugValue}`
+  }
 
   // Intercept Next.js navigation clicks
   useEffect(() => {
@@ -271,9 +366,9 @@ export const ShareLink: React.FC = () => {
           color: 'var(--theme-text-muted, #8b949e)'
         }}>
           <div style={{ fontWeight: 'bold', marginBottom: '4px', color: 'var(--theme-text-color, #f5f0e8)' }}>
-            Shareable Link
+            Shareable Links
           </div>
-          <p style={{ margin: 0 }}>Save the article to generate a shareable link.</p>
+          <p style={{ margin: 0 }}>Save the article to generate shareable links.</p>
         </div>
         {modalElement}
       </>
@@ -288,75 +383,220 @@ export const ShareLink: React.FC = () => {
         borderRadius: '4px',
         backgroundColor: 'var(--theme-elevation-50, #161b22)',
         marginBottom: '20px',
-        fontFamily: 'var(--font-mono, monospace)',
+        fontFamily: 'var(--font-sans, sans-serif)',
         fontSize: '12px'
       }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--theme-text-color, #f5f0e8)' }}>
-          Shareable Link
-        </div>
-        
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <input
-            type="text"
-            readOnly
-            value={shareUrl || 'Generating...'}
-            style={{
-              flex: 1,
-              padding: '8px',
-              border: '1px solid var(--theme-border-color, #30363d)',
-              borderRadius: '4px',
-              backgroundColor: 'var(--theme-input-bg, #0d1117)',
-              color: 'var(--theme-text-color, #f5f0e8)',
-              fontSize: '11px',
-              textOverflow: 'ellipsis'
-            }}
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            type="button"
-            onClick={handleCopy}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              border: '1px solid var(--theme-border-color, #30363d)',
-              borderRadius: '4px',
-              backgroundColor: copied ? '#2ecc71' : 'var(--theme-elevation-150, #21262d)',
-              color: copied ? '#ffffff' : 'var(--theme-text-color, #f5f0e8)',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              textAlign: 'center',
-              transition: 'background-color 0.2s ease',
-              fontSize: '11px',
-              borderStyle: 'solid'
-            }}
-          >
-            {copied ? 'Copied!' : 'Copy Link'}
-          </button>
-
-          {shareUrl && (
-            <a
-              href={shareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+        {/* Canonical Link section */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--theme-text-color, #f5f0e8)', fontFamily: 'var(--font-mono, monospace)' }}>
+            Canonical Link
+          </div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <input
+              type="text"
+              readOnly
+              value={shareUrl || 'Generating...'}
               style={{
                 flex: 1,
-                padding: '8px 12px',
+                padding: '8px',
                 border: '1px solid var(--theme-border-color, #30363d)',
                 borderRadius: '4px',
-                backgroundColor: 'var(--theme-elevation-150, #21262d)',
+                backgroundColor: 'var(--theme-input-bg, #0d1117)',
                 color: 'var(--theme-text-color, #f5f0e8)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono, monospace)',
+                textOverflow: 'ellipsis'
+              }}
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={handleCopy}
+              style={{
+                flex: 1,
+                padding: '6px 12px',
+                border: '1px solid var(--theme-border-color, #30363d)',
+                borderRadius: '4px',
+                backgroundColor: copied ? '#2ecc71' : 'var(--theme-elevation-150, #21262d)',
+                color: copied ? '#ffffff' : 'var(--theme-text-color, #f5f0e8)',
                 fontWeight: 'bold',
-                textDecoration: 'none',
+                cursor: 'pointer',
                 textAlign: 'center',
-                display: 'inline-block',
-                fontSize: '11px'
+                transition: 'background-color 0.2s ease',
+                fontSize: '11px',
+                borderStyle: 'solid'
               }}
             >
-              View Article
-            </a>
+              {copied ? 'Copied!' : 'Copy Canonical'}
+            </button>
+            {shareUrl && (
+              <a
+                href={shareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  padding: '6px 12px',
+                  border: '1px solid var(--theme-border-color, #30363d)',
+                  borderRadius: '4px',
+                  backgroundColor: 'var(--theme-elevation-150, #21262d)',
+                  color: 'var(--theme-text-color, #f5f0e8)',
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  textAlign: 'center',
+                  display: 'inline-block',
+                  fontSize: '11px'
+                }}
+              >
+                View Article
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Dynamic Share Links Section */}
+        <div style={{ borderTop: '1px solid var(--theme-border-color, #30363d)', paddingTop: '16px' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--theme-text-color, #f5f0e8)', fontFamily: 'var(--font-mono, monospace)' }}>
+            Anti-Spam / Tracking Links
+          </div>
+          
+          <form onSubmit={handleGenerate} style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <input
+              type="text"
+              placeholder="Label (e.g. FB Group Comment)"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              style={{
+                flex: 1,
+                padding: '8px',
+                border: '1px solid var(--theme-border-color, #30363d)',
+                borderRadius: '4px',
+                backgroundColor: 'var(--theme-input-bg, #0d1117)',
+                color: 'var(--theme-text-color, #f5f0e8)',
+                fontSize: '11px',
+              }}
+            />
+            <button
+              type="submit"
+              disabled={isGenerating}
+              style={{
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '4px',
+                backgroundColor: '#2ecc71',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '11px',
+                opacity: isGenerating ? 0.6 : 1,
+              }}
+            >
+              {isGenerating ? '...' : 'Create'}
+            </button>
+          </form>
+
+          {loadingLinks ? (
+            <div style={{ color: 'var(--theme-text-muted, #8b949e)', fontSize: '11px', textAlign: 'center', padding: '10px 0' }}>
+              Loading links...
+            </div>
+          ) : links.length === 0 ? (
+            <div style={{ color: 'var(--theme-text-muted, #8b949e)', fontSize: '11px', fontStyle: 'italic', textAlign: 'center', padding: '10px 0' }}>
+              No tracking links generated yet.
+            </div>
+          ) : (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              maxHeight: '260px',
+              overflowY: 'auto',
+              paddingRight: '4px'
+            }}>
+              {links.map((link) => {
+                const fullUrl = getFullUrl(link.key)
+                const isCopied = copiedLinkId === link.id
+                return (
+                  <div key={link.id} style={{
+                    padding: '10px',
+                    border: '1px solid var(--theme-border-color, #30363d)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--theme-elevation-100, #1c2128)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', fontSize: '11px' }}>
+                      <span style={{ fontWeight: 'bold', color: 'var(--theme-text-color, #f5f0e8)' }}>
+                        {link.label || 'Unnamed Link'}
+                      </span>
+                      <span style={{
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: 'var(--theme-elevation-150, #21262d)',
+                        color: 'var(--theme-text-color, #f5f0e8)',
+                        fontWeight: 'bold',
+                        fontSize: '10px'
+                      }}>
+                        {link.clicks || 0} clicks
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      readOnly
+                      value={fullUrl}
+                      style={{
+                        width: '100%',
+                        padding: '6px',
+                        border: '1px solid var(--theme-border-color, #30363d)',
+                        borderRadius: '4px',
+                        backgroundColor: 'var(--theme-input-bg, #0d1117)',
+                        color: 'var(--theme-text-color, #f5f0e8)',
+                        fontSize: '10px',
+                        fontFamily: 'var(--font-mono, monospace)',
+                        textOverflow: 'ellipsis',
+                        marginBottom: '8px'
+                      }}
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyLink(fullUrl, link.id)}
+                        style={{
+                          flex: 1,
+                          padding: '6px',
+                          border: '1px solid var(--theme-border-color, #30363d)',
+                          borderRadius: '4px',
+                          backgroundColor: isCopied ? '#2ecc71' : 'var(--theme-elevation-150, #21262d)',
+                          color: isCopied ? '#ffffff' : 'var(--theme-text-color, #f5f0e8)',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '10px',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                      >
+                        {isCopied ? 'Copied!' : 'Copy'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(link.id)}
+                        style={{
+                          padding: '6px 10px',
+                          border: '1px solid #e74c3c',
+                          borderRadius: '4px',
+                          backgroundColor: 'transparent',
+                          color: '#e74c3c',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '10px'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       </div>
