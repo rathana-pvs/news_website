@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useDocumentInfo, useFormFields, useForm, useFormModified } from '@payloadcms/ui'
 
 export const ShareLink: React.FC = () => {
-  try {
-    const { id } = useDocumentInfo()
+  const { id } = useDocumentInfo()
     const { submit } = useForm()
     const modified = useFormModified()
     const slugValue = useFormFields((args) => args?.[0]?.slug?.value)
@@ -356,7 +355,8 @@ export const ShareLink: React.FC = () => {
       </div>
     )
 
-    if (!id) {
+    try {
+      if (!id) {
       return (
         <>
           <div style={{
