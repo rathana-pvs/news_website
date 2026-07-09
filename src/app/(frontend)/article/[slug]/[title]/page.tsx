@@ -14,7 +14,7 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { Article } from '@/types'
 
 interface PageProps {
-  params: Promise<{ key: string; slug: string }>
+  params: Promise<{ slug: string; title: string }>
 }
 
 import { Locale } from '@/i18n-config'
@@ -24,7 +24,8 @@ import { i18nStrings } from '@/lib/i18n'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { key, slug } = await params
+  // slug = tracking key, title = article slug
+  const { slug: key, title: slug } = await params
   const locale = 'en'
   const article = await getArticle(slug, locale)
   if (!article) return { title: 'Article Not Found' }
@@ -71,7 +72,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DynamicArticlePage({ params }: PageProps) {
-  const { key, slug } = await params
+  // slug = tracking key, title = article slug
+  const { slug: key, title: slug } = await params
   const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
