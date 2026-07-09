@@ -72,6 +72,7 @@ export interface Config {
     authors: Author;
     media: Media;
     users: User;
+    'share-links': ShareLink;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -210,67 +212,6 @@ export interface Media {
    * Direct link to an external image (e.g., Unsplash, Cloudinary)
    */
   externalUrl?: string | null;
-  /**
-   * Cloudinary Media Information
-   */
-  cloudinary?: {
-    /**
-     * Cloudinary Public ID (used for transformations)
-     */
-    public_id?: string | null;
-    /**
-     * Type of the resource (image, video, raw)
-     */
-    resource_type?: string | null;
-    /**
-     * File format
-     */
-    format?: string | null;
-    /**
-     * Secure delivery URL
-     */
-    secure_url?: string | null;
-    /**
-     * File size in bytes
-     */
-    bytes?: number | null;
-    /**
-     * Creation timestamp
-     */
-    created_at?: string | null;
-    /**
-     * Current version number
-     */
-    version?: string | null;
-    /**
-     * Unique version identifier
-     */
-    version_id?: string | null;
-    /**
-     * Width in pixels
-     */
-    width?: number | null;
-    /**
-     * Height in pixels
-     */
-    height?: number | null;
-    /**
-     * Duration in seconds (for videos)
-     */
-    duration?: number | null;
-    /**
-     * Number of pages (for PDFs)
-     */
-    pages?: number | null;
-    /**
-     * Which page of the PDF to use for thumbnails (changes will apply after saving)
-     */
-    selected_page?: number | null;
-    /**
-     * URL for the thumbnail image (automatically generated for PDFs)
-     */
-    thumbnail_url?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -386,6 +327,30 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Dynamic share links for article tracking and anti-spam.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "share-links".
+ */
+export interface ShareLink {
+  id: number;
+  /**
+   * Auto-generated 5-character unique key.
+   */
+  key?: string | null;
+  /**
+   * The target article for this share link.
+   */
+  article: number | Article;
+  /**
+   * Optional tag/label to identify this share link (e.g. "FB Group Comment A").
+   */
+  label?: string | null;
+  clicks?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -428,6 +393,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'share-links';
+        value: number | ShareLink;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -554,24 +523,6 @@ export interface MediaSelect<T extends boolean = true> {
   caption?: T;
   source?: T;
   externalUrl?: T;
-  cloudinary?:
-    | T
-    | {
-        public_id?: T;
-        resource_type?: T;
-        format?: T;
-        secure_url?: T;
-        bytes?: T;
-        created_at?: T;
-        version?: T;
-        version_id?: T;
-        width?: T;
-        height?: T;
-        duration?: T;
-        pages?: T;
-        selected_page?: T;
-        thumbnail_url?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -642,6 +593,18 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "share-links_select".
+ */
+export interface ShareLinksSelect<T extends boolean = true> {
+  key?: T;
+  article?: T;
+  label?: T;
+  clicks?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
