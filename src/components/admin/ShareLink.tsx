@@ -54,8 +54,11 @@ export const ShareLink: React.FC = () => {
       }
     }, [id, fetchLinks])
 
-    const handleGenerate = async (e: React.FormEvent) => {
-      e.preventDefault()
+    const handleGenerate = async (e?: any) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
       if (!id || isGenerating) return
 
       try {
@@ -463,12 +466,19 @@ export const ShareLink: React.FC = () => {
               Anti-Spam / Tracking Links
             </div>
             
-            <form onSubmit={handleGenerate} style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               <input
                 type="text"
                 placeholder="Label (e.g. FB Group Comment)"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    void handleGenerate()
+                  }
+                }}
                 style={{
                   flex: 1,
                   padding: '8px',
@@ -480,7 +490,8 @@ export const ShareLink: React.FC = () => {
                 }}
               />
               <button
-                type="submit"
+                type="button"
+                onClick={() => handleGenerate()}
                 disabled={isGenerating}
                 style={{
                   padding: '8px 12px',
@@ -496,7 +507,7 @@ export const ShareLink: React.FC = () => {
               >
                 {isGenerating ? '...' : 'Create'}
               </button>
-            </form>
+            </div>
 
             {loadingLinks ? (
               <div style={{ color: 'var(--theme-text-muted, #8b949e)', fontSize: '11px', textAlign: 'center', padding: '10px 0' }}>
