@@ -3,7 +3,7 @@ set -e
 
 # Run Payload migrations automatically
 echo "🗄️  Running database migrations..."
-npx payload migrate
+npx payload migrate --force
 
 # Start the Next.js production server
 echo "✅ Migrations complete. Starting server..."
