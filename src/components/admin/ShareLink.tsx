@@ -7,7 +7,7 @@ export const ShareLink: React.FC = () => {
   const { id } = useDocumentInfo()
   const { submit } = useForm()
   const modified = useFormModified()
-  const slugValue = useFormFields(([fields]) => fields.slug?.value)
+  const slugValue = useFormFields((args) => args?.[0]?.slug?.value)
   
   const [copied, setCopied] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
@@ -514,11 +514,11 @@ export const ShareLink: React.FC = () => {
               overflowY: 'auto',
               paddingRight: '4px'
             }}>
-              {links.map((link) => {
-                const fullUrl = getFullUrl(link.key)
-                const isCopied = copiedLinkId === link.id
+              {links.map((link, index) => {
+                const fullUrl = getFullUrl(link?.key || '')
+                const isCopied = copiedLinkId === link?.id
                 return (
-                  <div key={link.id} style={{
+                  <div key={link?.id || index} style={{
                     padding: '10px',
                     border: '1px solid var(--theme-border-color, #30363d)',
                     borderRadius: '4px',
@@ -526,7 +526,7 @@ export const ShareLink: React.FC = () => {
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', fontSize: '11px' }}>
                       <span style={{ fontWeight: 'bold', color: 'var(--theme-text-color, #f5f0e8)' }}>
-                        {link.label || 'Unnamed Link'}
+                        {link?.label || 'Unnamed Link'}
                       </span>
                       <span style={{
                         padding: '2px 8px',
@@ -536,7 +536,7 @@ export const ShareLink: React.FC = () => {
                         fontWeight: 'bold',
                         fontSize: '10px'
                       }}>
-                        {link.clicks || 0} clicks
+                        {link?.clicks || 0} clicks
                       </span>
                     </div>
                     <input
@@ -560,7 +560,7 @@ export const ShareLink: React.FC = () => {
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <button
                         type="button"
-                        onClick={() => handleCopyLink(fullUrl, link.id)}
+                        onClick={() => handleCopyLink(fullUrl, link?.id || '')}
                         style={{
                           flex: 1,
                           padding: '6px',
@@ -578,7 +578,7 @@ export const ShareLink: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(link.id)}
+                        onClick={() => handleDelete(link?.id || '')}
                         style={{
                           padding: '6px 10px',
                           border: '1px solid #e74c3c',
