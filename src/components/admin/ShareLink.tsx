@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useDocumentInfo, useFormFields, useForm, useFormModified } from '@payloadcms/ui'
 
 export const ShareLink: React.FC = () => {
@@ -31,7 +31,7 @@ export const ShareLink: React.FC = () => {
     }
   }, [slugValue])
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     if (!id) return
     try {
       setLoadingLinks(true)
@@ -45,13 +45,13 @@ export const ShareLink: React.FC = () => {
     } finally {
       setLoadingLinks(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     if (id) {
       fetchLinks()
     }
-  }, [id])
+  }, [id, fetchLinks])
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()

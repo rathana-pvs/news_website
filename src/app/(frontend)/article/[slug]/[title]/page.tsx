@@ -96,7 +96,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
     if (!isBot) {
       const payload = await getPayloadClient()
       const shareLinkResult = await payload.find({
-        collection: 'share-links',
+        collection: 'share-links' as any,
         where: { key: { equals: key } },
         limit: 1,
       })
@@ -104,7 +104,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
       const shareLink = shareLinkResult.docs[0]
       if (shareLink) {
         await payload.update({
-          collection: 'share-links',
+          collection: 'share-links' as any,
           id: shareLink.id,
           data: {
             clicks: (shareLink.clicks || 0) + 1,

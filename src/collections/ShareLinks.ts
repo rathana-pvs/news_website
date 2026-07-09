@@ -27,7 +27,7 @@ export const ShareLinks: CollectionConfig = {
             // Generate a 5-char alphanumeric key
             uniqueKey = Math.random().toString(36).substring(2, 7)
             const existing = await req.payload.find({
-              collection: 'share-links',
+              collection: 'share-links' as any,
               where: { key: { equals: uniqueKey } },
               limit: 1,
             })
