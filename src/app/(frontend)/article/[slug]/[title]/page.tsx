@@ -34,17 +34,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const getImageUrl = (image: any) => {
     if (!image) return null
-    if (typeof image === 'string') return image
-    if (typeof image === 'number') return null
-    if (image && typeof image === 'object' && 'url' in image) {
-      return image.url as string
+    let url = ''
+    if (typeof image === 'string') {
+      url = image
+    } else if (image && typeof image === 'object' && 'url' in image && typeof image.url === 'string') {
+      url = image.url
+    } else {
+      return null
     }
-    return null
+    if (url.startsWith('/')) {
+      return `${siteUrl}${url}`
+    }
+    return url
   }
 
-  const seoTitle = article.seo?.metaTitle || article.title
-  const seoDescription = article.seo?.metaDescription || article.excerpt
-  const ogImageUrl = getImageUrl(article.seo?.ogImage) ||
+  const seoTitle = article.og?.metaTitle || article.meta?.title || article.title
+  const seoDescription = article.og?.metaDescription || article.meta?.description || article.excerpt
+  const ogImageUrl = getImageUrl(article.og?.ogImage) ||
+                     getImageUrl(article.meta?.image) ||
                      getImageUrl(article.coverImage)
 
   return {

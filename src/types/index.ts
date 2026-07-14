@@ -56,7 +56,7 @@ export interface Article {
   isFeatured: boolean
   publishedAt?: string
   readTime?: number
-  seo?: {
+  og?: {
     metaTitle?: string
     metaDescription?: string
     ogImage?: MediaItem

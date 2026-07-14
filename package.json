@@ -21,6 +21,7 @@
     "@payloadcms/plugin-seo": "latest",
     "@payloadcms/richtext-lexical": "latest",
     "ai": "^7.0.2",
+    "cheerio": "^1.2.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.0.0",

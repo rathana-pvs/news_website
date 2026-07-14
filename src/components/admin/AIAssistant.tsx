@@ -3,15 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { useFormFields, useForm } from '@payloadcms/ui'
 
-type Action = 'generate_article' | 'write_excerpt' | 'seo_suggestions' | 'suggest_tags'
+type Action = 'full' | 'content_only' | 'seo_only' | 'scrape_direct'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
 interface AIResult {
+  title?: string
   content?: string
   excerpt?: string
   tags?: string[]
   metaTitle?: string
   metaDescription?: string
+  coverImage?: number | string
+  scrapedImageUrl?: string
 }
 
 export const AIAssistant: React.FC = () => {
@@ -26,6 +29,7 @@ export const AIAssistant: React.FC = () => {
   const [error, setError] = useState('')
   const [applied, setApplied] = useState<Record<string, boolean>>({})
   const [pulse, setPulse] = useState(true)
+  const [scrapeUrlValue, setScrapeUrlValue] = useState('')
 
   // Stop pulsing after 5s
   useEffect(() => {
@@ -44,7 +48,7 @@ export const AIAssistant: React.FC = () => {
       const res = await fetch('/api/ai/assist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, title: titleValue, content: excerptValue }),
+        body: JSON.stringify({ action, title: titleValue, content: excerptValue, url: scrapeUrlValue }),
       })
       const json = await res.json()
       if (!res.ok || !json.success) throw new Error(json.error || 'Something went wrong')
@@ -105,10 +109,10 @@ export const AIAssistant: React.FC = () => {
     if (fieldName === 'tags' && Array.isArray(value)) {
       dispatchFields({ type: 'UPDATE', path: 'tags', value: value.map((tag: string) => ({ tag })) })
     } else if (fieldName === 'metaTitle') {
-      dispatchFields({ type: 'UPDATE', path: 'seo.metaTitle', value })
+      dispatchFields({ type: 'UPDATE', path: 'og.metaTitle', value })
       dispatchFields({ type: 'UPDATE', path: 'meta.title', value })
     } else if (fieldName === 'metaDescription') {
-      dispatchFields({ type: 'UPDATE', path: 'seo.metaDescription', value })
+      dispatchFields({ type: 'UPDATE', path: 'og.metaDescription', value })
       dispatchFields({ type: 'UPDATE', path: 'meta.description', value })
     } else if (fieldName === 'content' && typeof value === 'string') {
       const lexicalValue = convertTextToLexicalJson(value)
@@ -120,10 +124,9 @@ export const AIAssistant: React.FC = () => {
   }
 
   const buttons: { action: Action; icon: string; label: string; desc: string }[] = [
-    { action: 'generate_article', icon: '✍️', label: 'Generate Article', desc: 'Full draft from title' },
-    { action: 'write_excerpt', icon: '📝', label: 'Write Excerpt', desc: 'Auto-generate excerpt' },
-    { action: 'seo_suggestions', icon: '🔍', label: 'SEO Suggestions', desc: 'Meta title & description' },
-    { action: 'suggest_tags', icon: '🏷️', label: 'Suggest Tags', desc: 'Relevant tags for article' },
+    { action: 'full', icon: '✍️', label: 'Full', desc: 'Generate content, excerpt & SEO' },
+    { action: 'content_only', icon: '📝', label: 'Content Only', desc: 'Generate excerpt & content body' },
+    { action: 'seo_only', icon: '🔍', label: 'SEO Only', desc: 'Generate excerpt, OG & Meta fields' },
   ]
 
   const isLoading = status === 'loading'
@@ -284,6 +287,74 @@ export const AIAssistant: React.FC = () => {
           {/* Body */}
           <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
+            {/* Direct Link Importer (Zero Tokens) */}
+            <div style={{
+              padding: '12px',
+              borderRadius: 10,
+              background: 'var(--theme-elevation-150, #21262d)',
+              border: '1px solid var(--theme-border-color, #30363d)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              marginBottom: 4
+            }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                🔌 Direct Link Importer (Zero AI Tokens)
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  type="url"
+                  placeholder="Paste article or blog link..."
+                  value={scrapeUrlValue}
+                  onChange={(e) => setScrapeUrlValue(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 10px',
+                    borderRadius: 6,
+                    border: '1px solid var(--theme-border-color, #30363d)',
+                    background: 'var(--theme-elevation-200, #1c2128)',
+                    color: 'var(--theme-text-color, #f5f0e8)',
+                    fontSize: 11,
+                    fontFamily: 'inherit',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => callAI('scrape_direct')}
+                  disabled={isLoading || !scrapeUrlValue}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 6,
+                    border: 'none',
+                    background: '#7c6af7',
+                    color: '#fff',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'background 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6
+                  }}
+                >
+                  {activeAction === 'scrape_direct' && isLoading ? (
+                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
+                  ) : 'Import'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{
+              height: '1px',
+              background: 'var(--theme-border-color, #30363d)',
+              margin: '8px 0 4px'
+            }} />
+
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em', paddingLeft: 2 }}>
+              ✨ AI Writing Options
+            </div>
+
             {/* No title warning */}
             {!titleValue && (
               <div style={{
@@ -347,6 +418,18 @@ export const AIAssistant: React.FC = () => {
                   padding: '4px 0',
                 }}>✅ Generated — click to apply</div>
 
+                {result.title && (
+                  <ResultCard label="Title" value={result.title} applied={!!applied['title']} onApply={() => applyField('title', result.title)} />
+                )}
+                {result.coverImage && (
+                  <ResultCard 
+                    label="Cover Image" 
+                    value={`Image imported to media library. ID: ${result.coverImage}`} 
+                    applied={!!applied['coverImage']} 
+                    onApply={() => applyField('coverImage', result.coverImage)} 
+                    imageUrl={result.scrapedImageUrl}
+                  />
+                )}
                 {result.excerpt && (
                   <ResultCard label="Excerpt" value={result.excerpt} applied={!!applied['excerpt']} onApply={() => applyField('excerpt', result.excerpt)} />
                 )}
@@ -389,12 +472,20 @@ export const AIAssistant: React.FC = () => {
   )
 }
 
-function ResultCard({ label, value, applied, onApply }: {
-  label: string; value: string; applied: boolean; onApply: () => void
+function ResultCard({ label, value, applied, onApply, imageUrl }: {
+  label: string; value: string; applied: boolean; onApply: () => void; imageUrl?: string
 }) {
   return (
     <div style={{ padding: 12, borderRadius: 8, background: 'var(--theme-elevation-150, #21262d)', border: '1px solid var(--theme-border-color, #30363d)' }}>
       <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
+      {imageUrl && (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img 
+          src={imageUrl} 
+          alt={label} 
+          style={{ width: '100%', height: 'auto', maxHeight: 120, objectFit: 'cover', borderRadius: 6, marginBottom: 8, border: '1px solid var(--theme-border-color, #30363d)' }} 
+        />
+      )}
       <p style={{ margin: '0 0 8px', fontSize: 11, color: 'var(--theme-text-color, #f5f0e8)', lineHeight: 1.5, wordBreak: 'break-word' }}>{value}</p>
       <button className="ai-apply-btn" disabled={applied} onClick={onApply}>
         {applied ? '✓ Applied' : `Apply ${label}`}

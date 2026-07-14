@@ -78,6 +78,35 @@ export default buildConfig({
       generateTitle: ({ doc }: { doc: any }) => `${doc?.title?.value} — Asian Dot`,
       generateDescription: ({ doc }: { doc: any }) => doc?.excerpt?.value,
     }),
+    (config) => {
+      const articlesCollection = config.collections?.find((c) => c.slug === 'articles')
+      if (articlesCollection && articlesCollection.fields) {
+        const ogIndex = articlesCollection.fields.findIndex((f) => 'name' in f && f.name === 'og')
+        const metaIndex = articlesCollection.fields.findIndex((f) => 'name' in f && f.name === 'meta')
+        
+        if (ogIndex !== -1 && metaIndex !== -1) {
+          const ogField = articlesCollection.fields[ogIndex]
+          const metaField = articlesCollection.fields[metaIndex]
+          
+          articlesCollection.fields = articlesCollection.fields.filter(
+            (f) => !('name' in f && (f.name === 'og' || f.name === 'meta'))
+          )
+          
+          articlesCollection.fields.push({
+            type: 'collapsible',
+            label: 'Advanced (OG & SEO)',
+            admin: {
+              initCollapsed: true,
+            },
+            fields: [
+              ogField,
+              metaField,
+            ],
+          } as any)
+        }
+      }
+      return config
+    },
   ],
   serverURL: siteUrl,
   cors: [

@@ -175,7 +175,7 @@ export interface Article {
    * Auto-calculated
    */
   readTime?: number | null;
-  seo?: {
+  og?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
@@ -464,7 +464,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   isFeatured?: T;
   publishedAt?: T;
   readTime?: T;
-  seo?:
+  og?:
     | T
     | {
         metaTitle?: T;

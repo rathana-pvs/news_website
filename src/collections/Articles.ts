@@ -46,6 +46,35 @@ export const Articles: CollectionConfig = {
           const wordCount = contentStr.split(/\s+/).length
           data.readTime = Math.max(1, Math.ceil(wordCount / 200))
         }
+
+        // Ensure og group exists and auto-populate fields if empty
+        if (!data.og) {
+          data.og = {}
+        }
+        if (!data.og.metaTitle && data.title) {
+          data.og.metaTitle = data.title
+        }
+        if (!data.og.metaDescription && data.excerpt) {
+          data.og.metaDescription = data.excerpt
+        }
+        if (!data.og.ogImage && data.coverImage) {
+          data.og.ogImage = data.coverImage
+        }
+
+        // Ensure meta (SEO plugin) group exists and auto-populate fields if empty
+        if (!data.meta) {
+          data.meta = {}
+        }
+        if (!data.meta.title && data.title) {
+          data.meta.title = data.title
+        }
+        if (!data.meta.description && data.excerpt) {
+          data.meta.description = data.excerpt
+        }
+        if (!data.meta.image && data.coverImage) {
+          data.meta.image = data.coverImage
+        }
+
         return data
       },
     ],
@@ -155,7 +184,8 @@ export const Articles: CollectionConfig = {
     },
     { name: 'readTime', type: 'number', admin: { position: 'sidebar', description: 'Auto-calculated' } },
     {
-      name: 'seo',
+      name: 'og',
+      label: 'OG',
       type: 'group',
       fields: [
         { name: 'metaTitle', type: 'text', localized: true },
