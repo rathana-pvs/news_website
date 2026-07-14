@@ -153,7 +153,7 @@ export const AIAssistant: React.FC = () => {
           position: fixed;
           bottom: 32px;
           right: 32px;
-          z-index: 9999;
+          z-index: 999999;
           width: 56px;
           height: 56px;
           border-radius: 50%;
@@ -179,7 +179,7 @@ export const AIAssistant: React.FC = () => {
           position: fixed;
           bottom: 100px;
           right: 32px;
-          z-index: 9998;
+          z-index: 999998;
           width: 340px;
           max-height: 80vh;
           overflow-y: auto;
@@ -244,7 +244,7 @@ export const AIAssistant: React.FC = () => {
         .ai-backdrop {
           position: fixed;
           inset: 0;
-          z-index: 9997;
+          z-index: 999997;
         }
       `}</style>
 
