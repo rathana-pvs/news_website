@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useFormFields, useForm } from '@payloadcms/ui'
 
 type Action = 'full' | 'content_only' | 'seo_only' | 'scrape_direct'
@@ -31,8 +32,11 @@ export const AIAssistant: React.FC = () => {
   const [pulse, setPulse] = useState(true)
   const [scrapeUrlValue, setScrapeUrlValue] = useState('')
 
-  // Stop pulsing after 5s
+  const [mounted, setMounted] = useState(false)
+
+  // Stop pulsing after 5s and set mounted
   useEffect(() => {
+    setMounted(true)
     const t = setTimeout(() => setPulse(false), 5000)
     return () => clearTimeout(t)
   }, [])
@@ -131,12 +135,14 @@ export const AIAssistant: React.FC = () => {
 
   const isLoading = status === 'loading'
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <>
       <style>{`
         @keyframes ai-pulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(124,106,247,0.6); }
-          50% { box-shadow: 0 0 0 12px rgba(124,106,247,0); }
+          50% { box-shadow: 0 0 0 10px rgba(124,106,247,0); }
         }
         @keyframes ai-spin {
           to { transform: rotate(360deg); }
@@ -248,10 +254,8 @@ export const AIAssistant: React.FC = () => {
         }
       `}</style>
 
-      {/* Backdrop to close on outside click */}
       {open && <div className="ai-backdrop" onClick={() => setOpen(false)} />}
 
-      {/* Floating Action Button */}
       <button
         className={`ai-fab${pulse && !open ? ' pulse' : ''}`}
         onClick={() => setOpen(o => !o)}
@@ -261,33 +265,35 @@ export const AIAssistant: React.FC = () => {
         {open ? '✕' : '✨'}
       </button>
 
-      {/* Floating Panel */}
       {open && (
         <div className="ai-panel">
-          {/* Header */}
           <div style={{
-            padding: '16px 18px 12px',
+            padding: '14px',
             borderBottom: '1px solid var(--theme-border-color, #30363d)',
-            background: 'linear-gradient(135deg, rgba(124,106,247,0.15) 0%, rgba(32,133,236,0.08) 100%)',
-            borderRadius: '16px 16px 0 0',
+            background: 'var(--theme-elevation-150, #21262d)',
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--theme-text-color, #f5f0e8)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--theme-text-color, #f5f0e8)', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span>✨</span> AI Writing Assistant
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>
-                Powered by Google Gemini
-              </div>
+              <div style={{ fontSize: 9, color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>Powered by Google Gemini</div>
             </div>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                background: 'transparent', border: 'none', color: 'var(--theme-text-muted, #8b949e)',
+                cursor: 'pointer', fontSize: 16, padding: 4, display: 'flex', alignItems: 'center',
+              }}
+            >✕</button>
           </div>
 
-          {/* Body */}
           <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-            {/* Direct Link Importer (Zero Tokens) */}
             <div style={{
               padding: '12px',
               borderRadius: 10,
@@ -298,7 +304,7 @@ export const AIAssistant: React.FC = () => {
               gap: 8,
               marginBottom: 4
             }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 🔌 Direct Link Importer (Zero AI Tokens)
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
@@ -351,11 +357,10 @@ export const AIAssistant: React.FC = () => {
               margin: '8px 0 4px'
             }} />
 
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em', paddingLeft: 2 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em', paddingLeft: 2 }}>
               ✨ AI Writing Options
             </div>
 
-            {/* No title warning */}
             {!titleValue && (
               <div style={{
                 padding: '8px 12px',
@@ -369,7 +374,6 @@ export const AIAssistant: React.FC = () => {
               </div>
             )}
 
-            {/* Action Buttons */}
             {buttons.map(({ action, icon, label, desc }) => (
               <button
                 key={action}
@@ -392,7 +396,6 @@ export const AIAssistant: React.FC = () => {
               </button>
             ))}
 
-            {/* Error */}
             {status === 'error' && (
               <div className="ai-result" style={{
                 padding: '10px 12px',
@@ -406,7 +409,6 @@ export const AIAssistant: React.FC = () => {
               </div>
             )}
 
-            {/* Results */}
             {status === 'success' && result && (
               <div className="ai-result" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
                 <div style={{
@@ -468,7 +470,8 @@ export const AIAssistant: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </>,
+    document.body
   )
 }
 
