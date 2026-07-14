@@ -61,6 +61,11 @@ export interface Article {
     metaDescription?: string
     ogImage?: MediaItem
   }
+  meta?: {
+    title?: string
+    description?: string
+    image?: MediaItem
+  }
   createdAt: string
   updatedAt: string
 }
