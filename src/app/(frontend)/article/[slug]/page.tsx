@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticle, getArticles, getRelatedArticles } from '@/lib/api-server'
+import { getArticle, getArticles } from '@/lib/api-server'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { BreakingBadge } from '@/components/ui/BreakingBadge'
@@ -99,8 +99,6 @@ export default async function ArticlePage({ params }: PageProps) {
   
   const article = await getArticle(slug, locale)
   if (!article) notFound()
-
-  const related = await getRelatedArticles(article.id, article.category?.id, locale)
 
   const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
 
@@ -335,22 +333,7 @@ export default async function ArticlePage({ params }: PageProps) {
           </aside>
         </div>
 
-        {/* Post-Article Related Grid */}
-        {related && related.length > 0 && (
-          <div className="mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-4 mb-10">
-              <div className="w-[4px] h-8" style={{ background: 'var(--accent-red)' }} />
-              <h2 className="font-display font-black text-3xl uppercase tracking-tighter" style={{ color: 'var(--text-primary)' }}>
-                {dict.relatedArticles}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(related as Article[]).map((a, i) => (
-                <ArticleCard key={a.id} article={a} size="md" index={i} />
-              ))}
-            </div>
-          </div>
-        )}
+
         
         {/* Under-article Native Recommendations Widget (ID: 2043079) */}
         <div className="mt-20">
