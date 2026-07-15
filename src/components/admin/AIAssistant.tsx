@@ -202,7 +202,7 @@ export const AIAssistant: React.FC = () => {
           padding: 10px 14px;
           border: none;
           border-radius: 6px;
-          background: #7c6af7;
+          background: #2085ec;
           color: #fff;
           font-size: 11px;
           font-weight: 600;
@@ -214,7 +214,7 @@ export const AIAssistant: React.FC = () => {
           gap: 6px;
         }
         .import-btn:hover:not(:disabled) {
-          background: #6558e0;
+          background: #1b74d0;
         }
         .import-btn:disabled {
           opacity: 0.6;
