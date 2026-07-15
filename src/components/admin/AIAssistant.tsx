@@ -2,64 +2,82 @@
 
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useFormFields, useForm } from '@payloadcms/ui'
-
-type Action = 'full' | 'content_only' | 'seo_only' | 'scrape_direct'
-type Status = 'idle' | 'loading' | 'success' | 'error'
-
-interface AIResult {
-  title?: string
-  content?: string
-  excerpt?: string
-  tags?: string[]
-  metaTitle?: string
-  metaDescription?: string
-  coverImage?: number | string
-  scrapedImageUrl?: string
-}
+import { useForm } from '@payloadcms/ui'
 
 export const AIAssistant: React.FC = () => {
   const { dispatchFields } = useForm()
-   const titleValue = useFormFields(([fields]) => fields?.title?.value as string || '')
-   const excerptValue = useFormFields(([fields]) => fields?.excerpt?.value as string || '')
-   
-   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState<Status>('idle')
-  const [activeAction, setActiveAction] = useState<Action | null>(null)
-  const [result, setResult] = useState<AIResult | null>(null)
+  
+  const [open, setOpen] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [error, setError] = useState('')
-  const [applied, setApplied] = useState<Record<string, boolean>>({})
   const [pulse, setPulse] = useState(true)
   const [scrapeUrlValue, setScrapeUrlValue] = useState('')
-
   const [mounted, setMounted] = useState(false)
 
-  // Stop pulsing after 5s and set mounted
   useEffect(() => {
     setMounted(true)
     const t = setTimeout(() => setPulse(false), 5000)
     return () => clearTimeout(t)
   }, [])
 
-  const callAI = async (action: Action) => {
+  const handleImport = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!scrapeUrlValue) return
+
     setStatus('loading')
-    setActiveAction(action)
-    setResult(null)
     setError('')
-    setApplied({})
 
     try {
       const res = await fetch('/api/ai/assist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, title: titleValue, content: excerptValue, url: scrapeUrlValue }),
+        body: JSON.stringify({ action: 'scrape_direct', url: scrapeUrlValue }),
       })
       const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Something went wrong')
-      setResult(json.data)
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Something went wrong')
+      }
+      
+      const data = json.data
+
+      // Auto-apply fields to form
+      if (data.title) {
+        dispatchFields({ type: 'UPDATE', path: 'title', value: data.title })
+        dispatchFields({ type: 'UPDATE', path: 'og.metaTitle', value: data.title })
+        dispatchFields({ type: 'UPDATE', path: 'meta.title', value: data.title })
+      }
+      
+      if (data.excerpt) {
+        dispatchFields({ type: 'UPDATE', path: 'excerpt', value: data.excerpt })
+        dispatchFields({ type: 'UPDATE', path: 'og.metaDescription', value: data.excerpt })
+        dispatchFields({ type: 'UPDATE', path: 'meta.description', value: data.excerpt })
+      }
+
+      if (data.content) {
+        const lexicalValue = convertTextToLexicalJson(data.content)
+        dispatchFields({ type: 'UPDATE', path: 'content', value: lexicalValue, initialValue: lexicalValue })
+      }
+
+      if (data.coverImage) {
+        dispatchFields({ type: 'UPDATE', path: 'coverImage', value: data.coverImage })
+        dispatchFields({ type: 'UPDATE', path: 'og.ogImage', value: data.coverImage })
+        dispatchFields({ type: 'UPDATE', path: 'meta.image', value: data.coverImage })
+      }
+
+      if (data.tags && Array.isArray(data.tags)) {
+        dispatchFields({ type: 'UPDATE', path: 'tags', value: data.tags.map((tag: string) => ({ tag })) })
+      }
+
       setStatus('success')
+      setScrapeUrlValue('')
+      
+      // Close modal after brief success presentation
+      setTimeout(() => {
+        setOpen(false)
+        setStatus('idle')
+      }, 2000)
     } catch (err: any) {
-      setError(err?.message || 'Failed to generate. Try again.')
+      setError(err?.message || 'Failed to import. Try again.')
       setStatus('error')
     }
   }
@@ -109,30 +127,6 @@ export const AIAssistant: React.FC = () => {
     }
   }
 
-  const applyField = (fieldName: string, value: any) => {
-    if (fieldName === 'tags' && Array.isArray(value)) {
-      dispatchFields({ type: 'UPDATE', path: 'tags', value: value.map((tag: string) => ({ tag })) })
-    } else if (fieldName === 'metaTitle') {
-      dispatchFields({ type: 'UPDATE', path: 'og.metaTitle', value })
-      dispatchFields({ type: 'UPDATE', path: 'meta.title', value })
-    } else if (fieldName === 'metaDescription') {
-      dispatchFields({ type: 'UPDATE', path: 'og.metaDescription', value })
-      dispatchFields({ type: 'UPDATE', path: 'meta.description', value })
-    } else if (fieldName === 'content' && typeof value === 'string') {
-      const lexicalValue = convertTextToLexicalJson(value)
-      dispatchFields({ type: 'UPDATE', path: 'content', value: lexicalValue, initialValue: lexicalValue })
-    } else {
-      dispatchFields({ type: 'UPDATE', path: fieldName, value })
-    }
-    setApplied(prev => ({ ...prev, [fieldName]: true }))
-  }
-
-  const buttons: { action: Action; icon: string; label: string; desc: string }[] = [
-    { action: 'full', icon: '✍️', label: 'Full', desc: 'Generate content, excerpt & SEO' },
-    { action: 'content_only', icon: '📝', label: 'Content Only', desc: 'Generate excerpt & content body' },
-    { action: 'seo_only', icon: '🔍', label: 'SEO Only', desc: 'Generate excerpt, OG & Meta fields' },
-  ]
-
   const isLoading = status === 'loading'
 
   if (!mounted) return null
@@ -141,8 +135,8 @@ export const AIAssistant: React.FC = () => {
     <>
       <style>{`
         @keyframes ai-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(124,106,247,0.6); }
-          50% { box-shadow: 0 0 0 10px rgba(124,106,247,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.6); }
+          50% { box-shadow: 0 0 0 10px rgba(46,204,113,0); }
         }
         @keyframes ai-spin {
           to { transform: rotate(360deg); }
@@ -163,7 +157,7 @@ export const AIAssistant: React.FC = () => {
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #7c6af7 0%, #2085ec 100%);
+          background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
           border: none;
           cursor: pointer;
           display: flex;
@@ -172,11 +166,11 @@ export const AIAssistant: React.FC = () => {
           font-size: 22px;
           color: white;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
-          box-shadow: 0 4px 20px rgba(124,106,247,0.5);
+          box-shadow: 0 4px 20px rgba(46,204,113,0.4);
         }
         .ai-fab:hover {
           transform: scale(1.1);
-          box-shadow: 0 6px 28px rgba(124,106,247,0.7);
+          box-shadow: 0 6px 28px rgba(46,204,113,0.6);
         }
         .ai-fab.pulse {
           animation: ai-pulse 1.8s ease-in-out infinite;
@@ -187,65 +181,11 @@ export const AIAssistant: React.FC = () => {
           right: 32px;
           z-index: 999998;
           width: 340px;
-          max-height: 80vh;
-          overflow-y: auto;
           border-radius: 16px;
           background: var(--theme-elevation-100, #1c2128);
-          border: 1px solid rgba(124,106,247,0.3);
+          border: 1px solid rgba(46,204,113,0.3);
           box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
           animation: ai-slide-in 0.25s ease forwards;
-        }
-        .ai-panel::-webkit-scrollbar { width: 4px; }
-        .ai-panel::-webkit-scrollbar-track { background: transparent; }
-        .ai-panel::-webkit-scrollbar-thumb { background: rgba(124,106,247,0.4); border-radius: 4px; }
-        .ai-action-btn {
-          width: 100%;
-          padding: 11px 14px;
-          border: 1px solid var(--theme-border-color, #30363d);
-          border-radius: 8px;
-          background: var(--theme-elevation-150, #21262d);
-          color: var(--theme-text-color, #f5f0e8);
-          cursor: pointer;
-          text-align: left;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          transition: all 0.15s ease;
-          font-family: inherit;
-        }
-        .ai-action-btn:hover:not(:disabled) {
-          border-color: #7c6af7;
-          background: rgba(124,106,247,0.1);
-          transform: translateY(-1px);
-        }
-        .ai-action-btn:disabled {
-          opacity: 0.45;
-          cursor: not-allowed;
-        }
-        .ai-apply-btn {
-          width: 100%;
-          padding: 7px 12px;
-          border: none;
-          border-radius: 6px;
-          background: #7c6af7;
-          color: #fff;
-          font-size: 11px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.15s ease;
-          font-family: inherit;
-        }
-        .ai-apply-btn:hover:not(:disabled) { background: #6558e0; }
-        .ai-apply-btn:disabled { background: #2ecc71; cursor: default; }
-        .ai-result { animation: ai-fade-in 0.3s ease forwards; }
-        .ai-tag {
-          display: inline-block;
-          padding: 3px 10px;
-          border-radius: 100px;
-          background: rgba(124,106,247,0.15);
-          border: 1px solid rgba(124,106,247,0.3);
-          font-size: 10px;
-          color: #a89bf5;
         }
         .ai-backdrop {
           position: fixed;
@@ -259,10 +199,10 @@ export const AIAssistant: React.FC = () => {
       <button
         className={`ai-fab${pulse && !open ? ' pulse' : ''}`}
         onClick={() => setOpen(o => !o)}
-        title="AI Writing Assistant"
+        title="Direct Link Importer"
         type="button"
       >
-        {open ? '✕' : '✨'}
+        {open ? '✕' : '🔌'}
       </button>
 
       {open && (
@@ -279,9 +219,9 @@ export const AIAssistant: React.FC = () => {
           }}>
             <div>
               <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--theme-text-color, #f5f0e8)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>✨</span> AI Writing Assistant
+                <span>🔌</span> Link Importer
               </div>
-              <div style={{ fontSize: 9, color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>Powered by Google Gemini</div>
+              <div style={{ fontSize: 9, color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>Scrapes & Auto-Populates Article Fields</div>
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -292,109 +232,58 @@ export const AIAssistant: React.FC = () => {
             >✕</button>
           </div>
 
-          <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <p style={{ margin: 0, fontSize: 11, color: 'var(--theme-text-muted, #8b949e)', lineHeight: 1.4 }}>
+              Enter an article URL below to fetch and fill the title, content, cover image, excerpt, and tags.
+            </p>
 
-            <div style={{
-              padding: '12px',
-              borderRadius: 10,
-              background: 'var(--theme-elevation-150, #21262d)',
-              border: '1px solid var(--theme-border-color, #30363d)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-              marginBottom: 4
-            }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                🔌 Direct Link Importer (Zero AI Tokens)
-              </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <input
-                  type="url"
-                  placeholder="Paste article or blog link..."
-                  value={scrapeUrlValue}
-                  onChange={(e) => setScrapeUrlValue(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '8px 10px',
-                    borderRadius: 6,
-                    border: '1px solid var(--theme-border-color, #30363d)',
-                    background: 'var(--theme-elevation-200, #1c2128)',
-                    color: 'var(--theme-text-color, #f5f0e8)',
-                    fontSize: 11,
-                    fontFamily: 'inherit',
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => callAI('scrape_direct')}
-                  disabled={isLoading || !scrapeUrlValue}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: 6,
-                    border: 'none',
-                    background: '#7c6af7',
-                    color: '#fff',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'background 0.15s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 6
-                  }}
-                >
-                  {activeAction === 'scrape_direct' && isLoading ? (
-                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
-                  ) : 'Import'}
-                </button>
-              </div>
-            </div>
-
-            <div style={{
-              height: '1px',
-              background: 'var(--theme-border-color, #30363d)',
-              margin: '8px 0 4px'
-            }} />
-
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em', paddingLeft: 2 }}>
-              ✨ AI Writing Options
-            </div>
-
-            {!titleValue && (
-              <div style={{
-                padding: '8px 12px',
-                borderRadius: 8,
-                background: 'rgba(255,193,7,0.08)',
-                border: '1px solid rgba(255,193,7,0.25)',
-                fontSize: '11px',
-                color: '#f0b429',
-              }}>
-                ⚠️ Enter an article title first.
-              </div>
-            )}
-
-            {buttons.map(({ action, icon, label, desc }) => (
+            <form onSubmit={handleImport} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <input
+                type="url"
+                required
+                placeholder="Paste article or blog link..."
+                value={scrapeUrlValue}
+                onChange={(e) => setScrapeUrlValue(e.target.value)}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '8px 10px',
+                  borderRadius: 6,
+                  border: '1px solid var(--theme-border-color, #30363d)',
+                  background: 'var(--theme-elevation-200, #1c2128)',
+                  color: 'var(--theme-text-color, #f5f0e8)',
+                  fontSize: 11,
+                  fontFamily: 'inherit',
+                }}
+              />
               <button
-                key={action}
-                type="button"
-                className="ai-action-btn"
-                disabled={isLoading || !titleValue}
-                onClick={() => callAI(action)}
+                type="submit"
+                disabled={isLoading || !scrapeUrlValue}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 6,
+                  border: 'none',
+                  background: '#2ecc71',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6
+                }}
               >
-                <span style={{ fontSize: 18, flexShrink: 0 }}>
-                  {activeAction === action && isLoading
-                    ? <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
-                    : icon}
-                </span>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 12 }}>{label}</div>
-                  <div style={{ fontSize: 10, color: 'var(--theme-text-muted, #8b949e)', marginTop: 1 }}>
-                    {activeAction === action && isLoading ? 'Generating...' : desc}
-                  </div>
-                </div>
+                {isLoading ? (
+                  <>
+                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
+                    Importing...
+                  </>
+                ) : 'Import Link'}
               </button>
-            ))}
+            </form>
 
             {status === 'error' && (
               <div className="ai-result" style={{
@@ -402,69 +291,26 @@ export const AIAssistant: React.FC = () => {
                 borderRadius: 8,
                 background: 'rgba(231,76,60,0.08)',
                 border: '1px solid rgba(231,76,60,0.3)',
-                fontSize: 12,
+                fontSize: 11,
                 color: '#e74c3c',
+                lineHeight: 1.4,
               }}>
-                ❌ {error}
+                ✕ {error}
               </div>
             )}
 
-            {status === 'success' && result && (
-              <div className="ai-result" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                <div style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: '#2ecc71',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  padding: '4px 0',
-                }}>✅ Generated — click to apply</div>
-
-                {result.title && (
-                  <ResultCard label="Title" value={result.title} applied={!!applied['title']} onApply={() => applyField('title', result.title)} />
-                )}
-                {result.coverImage && (
-                  <ResultCard 
-                    label="Cover Image" 
-                    value={`Image imported to media library. ID: ${result.coverImage}`} 
-                    applied={!!applied['coverImage']} 
-                    onApply={() => applyField('coverImage', result.coverImage)} 
-                    imageUrl={result.scrapedImageUrl}
-                  />
-                )}
-                {result.excerpt && (
-                  <ResultCard label="Excerpt" value={result.excerpt} applied={!!applied['excerpt']} onApply={() => applyField('excerpt', result.excerpt)} />
-                )}
-                {result.content && (
-                  <ResultCard label="Article Content" value={result.content.substring(0, 160) + '...'} applied={!!applied['content']} onApply={() => applyField('content', result.content)} />
-                )}
-                {result.tags && (
-                  <div style={{ padding: 12, borderRadius: 8, background: 'var(--theme-elevation-150, #21262d)', border: '1px solid var(--theme-border-color, #30363d)' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Tags</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
-                      {result.tags.map((tag, i) => <span key={i} className="ai-tag">{tag}</span>)}
-                    </div>
-                    <button className="ai-apply-btn" disabled={!!applied['tags']} onClick={() => applyField('tags', result.tags)}>
-                      {applied['tags'] ? '✓ Applied' : 'Apply Tags'}
-                    </button>
-                  </div>
-                )}
-                {result.metaTitle && (
-                  <ResultCard label="SEO Meta Title" value={result.metaTitle} applied={!!applied['metaTitle']} onApply={() => applyField('metaTitle', result.metaTitle)} />
-                )}
-                {result.metaDescription && (
-                  <ResultCard label="SEO Meta Description" value={result.metaDescription} applied={!!applied['metaDescription']} onApply={() => applyField('metaDescription', result.metaDescription)} />
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => activeAction && callAI(activeAction)}
-                  style={{
-                    width: '100%', padding: '8px', border: '1px solid var(--theme-border-color, #30363d)',
-                    borderRadius: 6, background: 'transparent', color: 'var(--theme-text-muted, #8b949e)',
-                    cursor: 'pointer', fontSize: 11, fontFamily: 'inherit',
-                  }}
-                >🔄 Regenerate</button>
+            {status === 'success' && (
+              <div className="ai-result" style={{
+                padding: '10px 12px',
+                borderRadius: 8,
+                background: 'rgba(46,204,113,0.08)',
+                border: '1px solid rgba(46,204,113,0.3)',
+                fontSize: 11,
+                color: '#2ecc71',
+                fontWeight: '500',
+                textAlign: 'center',
+              }}>
+                ✓ Article fields populated!
               </div>
             )}
           </div>
@@ -472,27 +318,5 @@ export const AIAssistant: React.FC = () => {
       )}
     </>,
     document.body
-  )
-}
-
-function ResultCard({ label, value, applied, onApply, imageUrl }: {
-  label: string; value: string; applied: boolean; onApply: () => void; imageUrl?: string
-}) {
-  return (
-    <div style={{ padding: 12, borderRadius: 8, background: 'var(--theme-elevation-150, #21262d)', border: '1px solid var(--theme-border-color, #30363d)' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
-      {imageUrl && (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img 
-          src={imageUrl} 
-          alt={label} 
-          style={{ width: '100%', height: 'auto', maxHeight: 120, objectFit: 'cover', borderRadius: 6, marginBottom: 8, border: '1px solid var(--theme-border-color, #30363d)' }} 
-        />
-      )}
-      <p style={{ margin: '0 0 8px', fontSize: 11, color: 'var(--theme-text-color, #f5f0e8)', lineHeight: 1.5, wordBreak: 'break-word' }}>{value}</p>
-      <button className="ai-apply-btn" disabled={applied} onClick={onApply}>
-        {applied ? '✓ Applied' : `Apply ${label}`}
-      </button>
-    </div>
   )
 }
