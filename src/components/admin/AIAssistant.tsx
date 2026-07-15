@@ -135,8 +135,8 @@ export const AIAssistant: React.FC = () => {
     <>
       <style>{`
         @keyframes ai-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.6); }
-          50% { box-shadow: 0 0 0 10px rgba(46,204,113,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(124,106,247,0.6); }
+          50% { box-shadow: 0 0 0 10px rgba(124,106,247,0); }
         }
         @keyframes ai-spin {
           to { transform: rotate(360deg); }
@@ -157,7 +157,7 @@ export const AIAssistant: React.FC = () => {
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+          background: linear-gradient(135deg, #7c6af7 0%, #2085ec 100%);
           border: none;
           cursor: pointer;
           display: flex;
@@ -166,11 +166,11 @@ export const AIAssistant: React.FC = () => {
           font-size: 22px;
           color: white;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
-          box-shadow: 0 4px 20px rgba(46,204,113,0.4);
+          box-shadow: 0 4px 20px rgba(124,106,247,0.5);
         }
         .ai-fab:hover {
           transform: scale(1.1);
-          box-shadow: 0 6px 28px rgba(46,204,113,0.6);
+          box-shadow: 0 6px 28px rgba(124,106,247,0.7);
         }
         .ai-fab.pulse {
           animation: ai-pulse 1.8s ease-in-out infinite;
@@ -183,7 +183,7 @@ export const AIAssistant: React.FC = () => {
           width: 340px;
           border-radius: 16px;
           background: var(--theme-elevation-100, #1c2128);
-          border: 1px solid rgba(46,204,113,0.3);
+          border: 1px solid rgba(124,106,247,0.3);
           box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
           animation: ai-slide-in 0.25s ease forwards;
         }
@@ -191,6 +191,29 @@ export const AIAssistant: React.FC = () => {
           position: fixed;
           inset: 0;
           z-index: 999997;
+        }
+        .import-btn {
+          width: 100%;
+          padding: 10px 14px;
+          border: none;
+          border-radius: 6px;
+          background: #7c6af7;
+          color: #fff;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }
+        .import-btn:hover:not(:disabled) {
+          background: #6558e0;
+        }
+        .import-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
       `}</style>
 
@@ -202,7 +225,7 @@ export const AIAssistant: React.FC = () => {
         title="Direct Link Importer"
         type="button"
       >
-        {open ? '✕' : '🔌'}
+        {open ? '✕' : '✨'}
       </button>
 
       {open && (
@@ -258,23 +281,8 @@ export const AIAssistant: React.FC = () => {
               />
               <button
                 type="submit"
+                className="import-btn"
                 disabled={isLoading || !scrapeUrlValue}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 6,
-                  border: 'none',
-                  background: '#2ecc71',
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'background 0.15s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6
-                }}
               >
                 {isLoading ? (
                   <>
