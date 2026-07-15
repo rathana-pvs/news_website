@@ -115,6 +115,50 @@ async function scrapeUrlDirectly(url: string) {
   
   if (scrapedImageUrl) {
     scrapedImageUrl = resolveUrl(url, scrapedImageUrl)
+  } else {
+    // Fall back to first prominent content image
+    const articleImages = $('article img, main img, .content img, .post img, #content img')
+    let foundImg = ''
+    articleImages.each((_, el) => {
+      const src = $(el).attr('src')
+      if (src) {
+        const resolved = resolveUrl(url, src)
+        if (
+          resolved.startsWith('http') && 
+          !resolved.includes('avatar') && 
+          !resolved.includes('gravatar') && 
+          !resolved.includes('logo') && 
+          !resolved.includes('icon') && 
+          !resolved.includes('spinner') &&
+          !resolved.includes('loader')
+        ) {
+          foundImg = resolved
+          return false // break
+        }
+      }
+    })
+    
+    if (!foundImg) {
+      $('img').each((_, el) => {
+        const src = $(el).attr('src')
+        if (src) {
+          const resolved = resolveUrl(url, src)
+          if (
+            resolved.startsWith('http') && 
+            !resolved.includes('avatar') && 
+            !resolved.includes('gravatar') && 
+            !resolved.includes('logo') && 
+            !resolved.includes('icon') && 
+            !resolved.includes('spinner') &&
+            !resolved.includes('loader')
+          ) {
+            foundImg = resolved
+            return false // break
+          }
+        }
+      })
+    }
+    scrapedImageUrl = foundImg
   }
 
   const metaTitle = title.endsWith(' - Asian Dot') ? title : `${title.substring(0, 45)} - Asian Dot`
