@@ -7,6 +7,7 @@ import { getCategories, getBreakingArticles } from '@/lib/api-server'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { NavigationProgress } from '@/components/layout/NavigationProgress'
 import Script from 'next/script'
+import { MobileStickyFooterAd } from '@/components/ads/MobileStickyFooterAd'
 
 export const dynamic = 'force-dynamic'
 
@@ -71,6 +72,9 @@ export default async function FrontendLayout({
           </main>
           <Footer locale={locale} categories={categories} />
         </div>
+        {process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR && (
+          <MobileStickyFooterAd widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR} />
+        )}
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}

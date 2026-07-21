@@ -144,7 +144,14 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
   if (isMatch === false) return null
 
   if (isDev) {
-    if (adType === 'sidebar') {
+    const isSidebar = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR
+    const isUnderArticle = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE
+    const isInArticle = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 ||
+                        widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 ||
+                        widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
+    const isMobileAnchor = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR
+
+    if (adType === 'sidebar' || isSidebar) {
       return (
         <div className={`ads-container ${className}`}>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-30 block text-center mb-3">
@@ -194,11 +201,30 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       )
     }
 
-    if (widgetId === '2043077') {
+    if (isMobileAnchor) {
+      return (
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded p-2 text-center my-0 flex items-center justify-between gap-4 ${className}`} style={{ height: '70px', width: '100%', maxWidth: '400px' }}>
+          <div className="flex items-center gap-2">
+            <span className="uppercase text-[var(--accent-red)] font-bold text-[9px] px-1 py-0.5 rounded bg-[var(--accent-red-bright)]/10">Ad</span>
+            <div className="text-left">
+              <h3 className="font-card-title text-xs leading-tight text-[var(--text-primary)] line-clamp-1">
+                Local Test Mobile Banner
+              </h3>
+              <p className="text-[10px] text-white/40 leading-none">adskeeper.com/site/1103487</p>
+            </div>
+          </div>
+          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40">
+            Sticky Anchor ({widgetId})
+          </span>
+        </div>
+      )
+    }
+
+    if (isInArticle) {
       return (
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
-            [Local Test Mode] Adskeeper In-Article Top ({widgetId})
+            [Local Test Mode] Adskeeper In-Article ({widgetId})
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {MOCK_ADS.slice(0, 2).map((ad) => (
@@ -224,37 +250,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       )
     }
 
-    if (widgetId === '2044156') {
-      return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
-            [Local Test Mode] Adskeeper In-Article Mid ({widgetId})
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {MOCK_ADS.slice(2, 4).map((ad) => (
-              <article key={ad.id} className="group flex gap-3 border-b border-[var(--border)] pb-4 last:border-0 last:pb-0 cursor-pointer transition-all">
-                <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 72 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="flex flex-col justify-between min-w-0 py-0.5">
-                  <h3 className="font-card-title leading-tight line-clamp-3 text-sm text-[var(--text-primary)]">
-                    <span className="underline-hover pb-[2px]">{ad.title}</span>
-                  </h3>
-                  <div className="font-mono flex items-center gap-2 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    <span className="uppercase text-[var(--accent-red)] font-bold">Sponsored</span>
-                    <span>·</span>
-                    <span className="truncate">{ad.brand}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    if (widgetId === '2043079') {
+    if (isUnderArticle) {
       return (
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-10 ${className}`}>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">

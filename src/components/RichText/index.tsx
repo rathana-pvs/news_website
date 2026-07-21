@@ -12,29 +12,21 @@ export type RichTextProps = {
                             // is skipped entirely (safe fallback).
 }
 
-/**
- * Finds the best injection index for a mid-article ad.
- * Rules:
- *  - Must be at or after `minIndex`
- *  - Must land on a real paragraph (not a heading, image, blockquote etc.)
- *  - Returns -1 if no suitable node is found (short articles get no mid-ad)
- */
-function findInjectIndex(nodes: any[], minIndex: number): number {
-  const BLOCK_TYPES = new Set(['h1', 'h2', 'h3', 'h4', 'upload', 'block', 'quote', 'horizontalrule'])
-  for (let i = minIndex; i < nodes.length; i++) {
-    if (!BLOCK_TYPES.has(nodes[i].type)) return i
-  }
-  return -1
-}
 
-export const RichText = ({ content, className, adWidgetId, secondAdWidgetId }: RichTextProps) => {
+export const RichText = ({ content, className }: RichTextProps) => {
   if (!content) return null
 
   // Lexical content structure: { root: { children: [...] } }
   const nodes = content.root?.children || []
 
-  // No ad widget requested or article too short to split — render plain
-  if (!adWidgetId || nodes.length <= 4) {
+  const inArticleWidgetIds = [
+    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1,
+    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2,
+    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
+  ].filter(Boolean) as string[]
+
+  // If no ads configured or article is too short, render plain
+  if (inArticleWidgetIds.length === 0 || nodes.length <= 4) {
     return (
       <div className={`rich-text ${className || ''}`}>
         {serializeLexical(nodes)}
@@ -42,21 +34,20 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId }: R
     )
   }
 
-  // ── First mid-article injection ──────────────────────────────────────────
-  // Find the first real paragraph at or after index 4 (never land on a
-  // heading or image which would look awkward above an ad unit).
-  const firstInject = findInjectIndex(nodes, 4)
+  // Find dynamic injection indices (space ads at least 5 paragraphs apart)
+  const BLOCK_TYPES = new Set(['h1', 'h2', 'h3', 'h4', 'upload', 'block', 'quote', 'horizontalrule'])
+  const injectIndices: number[] = []
+  let nextTargetIndex = 4
 
-  // ── Second mid-article injection (long reads only) ───────────────────────
-  // Requires BOTH: a dedicated secondAdWidgetId (different Adskeeper widget)
-  // AND article length ≥ 13 nodes.
-  const canShowSecond = !!secondAdWidgetId && nodes.length >= 13
-  const secondInject = canShowSecond
-    ? findInjectIndex(nodes, firstInject + 5)
-    : -1
+  for (let i = 4; i < nodes.length; i++) {
+    if (i >= nextTargetIndex && !BLOCK_TYPES.has(nodes[i].type)) {
+      injectIndices.push(i)
+      nextTargetIndex = i + 5 // space ads 5 nodes apart
+    }
+  }
 
-  // No good injection point found (e.g. article is all headings/images)
-  if (firstInject === -1) {
+  // If no suitable injection point found, render plain
+  if (injectIndices.length === 0) {
     return (
       <div className={`rich-text ${className || ''}`}>
         {serializeLexical(nodes)}
@@ -64,28 +55,31 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId }: R
     )
   }
 
-  // Build segments: [before first ad] → [first ad] → [middle] → [second ad?] → [rest]
-  const seg1 = nodes.slice(0, firstInject)
-  const seg2 = secondInject !== -1 ? nodes.slice(firstInject, secondInject) : nodes.slice(firstInject)
-  const seg3 = secondInject !== -1 ? nodes.slice(secondInject) : []
+  // Assemble dynamic segments with ad widgets cycled in between
+  const elements: React.ReactNode[] = []
+  let lastIndex = 0
+
+  injectIndices.forEach((injectIndex, adIndex) => {
+    const segment = nodes.slice(lastIndex, injectIndex)
+    elements.push(...serializeLexical(segment))
+
+    const widgetId = inArticleWidgetIds[adIndex % inArticleWidgetIds.length]
+    elements.push(
+      <AdskeeperWidget key={`ad-${injectIndex}`} widgetId={widgetId} className="my-8" />
+    )
+
+    lastIndex = injectIndex
+  })
+
+  // Push remaining elements
+  if (lastIndex < nodes.length) {
+    const remainingSegment = nodes.slice(lastIndex)
+    elements.push(...serializeLexical(remainingSegment))
+  }
 
   return (
     <div className={`rich-text ${className || ''}`}>
-      {serializeLexical(seg1)}
-
-      {/* First mid-article ad — widget 2043077, after paragraph ~4 */}
-      <AdskeeperWidget widgetId={adWidgetId} className="my-8" />
-
-      {serializeLexical(seg2)}
-
-      {/* Second mid-article ad — dedicated widget ID required.
-          Skipped entirely if secondAdWidgetId is not provided. */}
-      {secondInject !== -1 && secondAdWidgetId && (
-        <>
-          <AdskeeperWidget widgetId={secondAdWidgetId} className="my-8" />
-          {serializeLexical(seg3)}
-        </>
-      )}
+      {elements}
     </div>
   )
 }
