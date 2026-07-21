@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from '../blocks/VideoEmbed'
+import { TwitterEmbed } from '../blocks/TwitterEmbed'
 import slugify from 'slugify'
 import { revalidateTag } from 'next/cache'
 
@@ -120,7 +121,7 @@ export const Articles: CollectionConfig = {
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
           BlocksFeature({
-            blocks: [VideoEmbed],
+            blocks: [VideoEmbed, TwitterEmbed],
           }),
         ],
       }), 

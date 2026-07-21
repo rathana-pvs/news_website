@@ -13,6 +13,7 @@ import {
   BlocksFeature
 } from '@payloadcms/richtext-lexical'
 import { VideoEmbed } from './src/blocks/VideoEmbed'
+import { TwitterEmbed } from './src/blocks/TwitterEmbed'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import sharp from 'sharp'
 import path from 'path'
@@ -58,7 +59,7 @@ export default buildConfig({
       FixedToolbarFeature(),
       HorizontalRuleFeature(),
       BlocksFeature({
-        blocks: [VideoEmbed],
+        blocks: [VideoEmbed, TwitterEmbed],
       }),
     ],
   }),

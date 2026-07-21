@@ -132,8 +132,8 @@ export const AIAssistant: React.FC = () => {
       dispatchFields({ type: 'UPDATE', path: 'coverImage', value, valid: true })
       dispatchFields({ type: 'UPDATE', path: 'og.ogImage', value, valid: true })
       dispatchFields({ type: 'UPDATE', path: 'meta.image', value, valid: true })
-    } else if (fieldName === 'content' && typeof value === 'string') {
-      const lexicalValue = convertTextToLexicalJson(value)
+    } else if (fieldName === 'content') {
+      const lexicalValue = typeof value === 'string' ? convertTextToLexicalJson(value) : value
       dispatchFields({ type: 'UPDATE', path: 'content', value: lexicalValue, initialValue: lexicalValue, valid: true })
     } else {
       dispatchFields({ type: 'UPDATE', path: fieldName, value, valid: true })
@@ -462,8 +462,13 @@ export const AIAssistant: React.FC = () => {
                 {result.excerpt && (
                   <ResultCard label="Excerpt" value={result.excerpt} applied={!!applied['excerpt']} onApply={() => applyField('excerpt', result.excerpt)} />
                 )}
-                {result.content && (
-                  <ResultCard label="Article Content" value={result.content.substring(0, 160) + '...'} applied={!!applied['content']} onApply={() => applyField('content', result.content)} />
+                 {result.content && (
+                  <ResultCard 
+                    label="Article Content" 
+                    value={typeof result.content === 'string' ? result.content.substring(0, 160) + '...' : 'Beautifully formatted rich text (including paragraphs, headings, blockquotes, lists, images, and videos)'} 
+                    applied={!!applied['content']} 
+                    onApply={() => applyField('content', result.content)} 
+                  />
                 )}
                 {result.tags && (
                   <div style={{ padding: 12, borderRadius: 8, background: 'var(--theme-elevation-150, #21262d)', border: '1px solid var(--theme-border-color, #30363d)' }}>
