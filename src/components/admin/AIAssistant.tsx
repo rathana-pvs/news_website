@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useForm } from '@payloadcms/ui'
+import { useFormFields, useForm } from '@payloadcms/ui'
 
 interface AIResult {
   title?: string
@@ -15,11 +15,16 @@ interface AIResult {
   scrapedImageUrl?: string
 }
 
+type Action = 'full' | 'content_only' | 'seo_only' | 'scrape_direct'
+
 export const AIAssistant: React.FC = () => {
   const { dispatchFields } = useForm()
-  
+  const titleValue = useFormFields(([fields]) => fields?.title?.value as string || '')
+  const excerptValue = useFormFields(([fields]) => fields?.excerpt?.value as string || '')
+
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [activeAction, setActiveAction] = useState<Action | null>(null)
   const [result, setResult] = useState<AIResult | null>(null)
   const [error, setError] = useState('')
   const [applied, setApplied] = useState<Record<string, boolean>>({})
@@ -33,11 +38,9 @@ export const AIAssistant: React.FC = () => {
     return () => clearTimeout(t)
   }, [])
 
-  const handleImport = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
-    if (e) e.preventDefault()
-    if (!scrapeUrlValue) return
-
+  const callAI = async (action: Action) => {
     setStatus('loading')
+    setActiveAction(action)
     setError('')
     setResult(null)
     setApplied({})
@@ -46,7 +49,12 @@ export const AIAssistant: React.FC = () => {
       const res = await fetch('/api/ai/assist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'scrape_direct', url: scrapeUrlValue }),
+        body: JSON.stringify({
+          action,
+          title: titleValue,
+          content: excerptValue,
+          url: action === 'scrape_direct' ? scrapeUrlValue : undefined,
+        }),
       })
       const json = await res.json()
       if (!res.ok || !json.success) {
@@ -55,9 +63,15 @@ export const AIAssistant: React.FC = () => {
       setResult(json.data)
       setStatus('success')
     } catch (err: any) {
-      setError(err?.message || 'Failed to import. Try again.')
+      setError(err?.message || 'Failed to generate. Try again.')
       setStatus('error')
     }
+  }
+
+  const handleImport = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.preventDefault()
+    if (!scrapeUrlValue) return
+    await callAI('scrape_direct')
   }
 
   const convertTextToLexicalJson = (text: string) => {
@@ -126,6 +140,12 @@ export const AIAssistant: React.FC = () => {
     }
     setApplied(prev => ({ ...prev, [fieldName]: true }))
   }
+
+  const buttons: { action: Action; icon: string; label: string; desc: string }[] = [
+    { action: 'full', icon: '✍️', label: 'Full', desc: 'Generate content, excerpt & SEO' },
+    { action: 'content_only', icon: '📝', label: 'Content Only', desc: 'Generate excerpt & content body' },
+    { action: 'seo_only', icon: '🔍', label: 'SEO Only', desc: 'Generate excerpt, OG & Meta fields' },
+  ]
 
   const isLoading = status === 'loading'
 
@@ -220,6 +240,30 @@ export const AIAssistant: React.FC = () => {
           opacity: 0.6;
           cursor: not-allowed;
         }
+        .ai-action-btn {
+          width: 100%;
+          padding: 11px 14px;
+          border: 1px solid var(--theme-border-color, #30363d);
+          border-radius: 8px;
+          background: var(--theme-elevation-150, #21262d);
+          color: var(--theme-text-color, #f5f0e8);
+          cursor: pointer;
+          text-align: left;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.15s ease;
+          font-family: inherit;
+        }
+        .ai-action-btn:hover:not(:disabled) {
+          border-color: #7c6af7;
+          background: rgba(124,106,247,0.1);
+          transform: translateY(-1px);
+        }
+        .ai-action-btn:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
         .ai-apply-btn {
           width: 100%;
           padding: 7px 12px;
@@ -252,7 +296,7 @@ export const AIAssistant: React.FC = () => {
       <button
         className={`ai-fab${pulse && !open ? ' pulse' : ''}`}
         onClick={() => setOpen(o => !o)}
-        title="Direct Link Importer"
+        title="AI Writing Assistant"
         type="button"
       >
         {open ? '✕' : '✨'}
@@ -272,9 +316,9 @@ export const AIAssistant: React.FC = () => {
           }}>
             <div>
               <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--theme-text-color, #f5f0e8)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>🔌</span> Link Importer
+                <span>✨</span> AI Writing Assistant
               </div>
-              <div style={{ fontSize: 9, color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>Scrapes & Auto-Populates Article Fields</div>
+              <div style={{ fontSize: 9, color: 'var(--theme-text-muted, #8b949e)', marginTop: 2 }}>Scrapes URL or Uses Google Gemini AI</div>
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -286,48 +330,96 @@ export const AIAssistant: React.FC = () => {
           </div>
 
           <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <p style={{ margin: 0, fontSize: 11, color: 'var(--theme-text-muted, #8b949e)', lineHeight: 1.4 }}>
-              Enter an article URL below to fetch and fill the title, content, cover image, excerpt, and tags.
-            </p>
+            {/* Section 1: Link Importer */}
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 11, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>
+                🔌 Link Importer
+              </div>
+              <p style={{ margin: '0 0 8px', fontSize: 11, color: 'var(--theme-text-muted, #8b949e)', lineHeight: 1.4 }}>
+                Enter an article URL to scrape and populate fields.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <input
+                  type="url"
+                  placeholder="Paste article or blog link..."
+                  value={scrapeUrlValue}
+                  onChange={(e) => setScrapeUrlValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleImport(e)
+                    }
+                  }}
+                  disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: 6,
+                    border: '1px solid var(--theme-border-color, #30363d)',
+                    background: 'var(--theme-elevation-200, #1c2128)',
+                    color: 'var(--theme-text-color, #f5f0e8)',
+                    fontSize: 11,
+                    fontFamily: 'inherit',
+                  }}
+                />
+                <button
+                  type="button"
+                  className="import-btn"
+                  onClick={handleImport}
+                  disabled={isLoading || !scrapeUrlValue}
+                >
+                  {isLoading && activeAction === 'scrape_direct' ? (
+                    <>
+                      <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
+                      Importing...
+                    </>
+                  ) : 'Import Link'}
+                </button>
+              </div>
+            </div>
 
+            <div style={{ height: '1px', background: 'var(--theme-border-color, #30363d)', margin: '4px 0' }} />
+
+            {/* Section 2: AI Writing */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <input
-                type="url"
-                required
-                placeholder="Paste article or blog link..."
-                value={scrapeUrlValue}
-                onChange={(e) => setScrapeUrlValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleImport(e)
-                  }
-                }}
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  borderRadius: 6,
-                  border: '1px solid var(--theme-border-color, #30363d)',
-                  background: 'var(--theme-elevation-200, #1c2128)',
-                  color: 'var(--theme-text-color, #f5f0e8)',
-                  fontSize: 11,
-                  fontFamily: 'inherit',
-                }}
-              />
-              <button
-                type="button"
-                className="import-btn"
-                onClick={handleImport}
-                disabled={isLoading || !scrapeUrlValue}
-              >
-                {isLoading ? (
-                  <>
-                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
-                    Importing...
-                  </>
-                ) : 'Import Link'}
-              </button>
+              <div style={{ fontWeight: 700, fontSize: 11, color: 'var(--theme-text-muted, #8b949e)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                ✍️ AI Writing Options
+              </div>
+
+              {!titleValue && (
+                <div style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  background: 'rgba(255,193,7,0.08)',
+                  border: '1px solid rgba(255,193,7,0.25)',
+                  fontSize: '11px',
+                  color: '#f0b429',
+                }}>
+                  ⚠️ Enter an article title first.
+                </div>
+              )}
+
+              {buttons.map(({ action, icon, label, desc }) => (
+                <button
+                  key={action}
+                  type="button"
+                  className="ai-action-btn"
+                  disabled={isLoading || !titleValue}
+                  onClick={() => callAI(action)}
+                >
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>
+                    {activeAction === action && isLoading ? (
+                      <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'ai-spin 0.7s linear infinite' }} />
+                    ) : icon}
+                  </span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 12 }}>{label}</div>
+                    <div style={{ fontSize: 10, color: 'var(--theme-text-muted, #8b949e)', marginTop: 1 }}>
+                      {activeAction === action && isLoading ? 'Generating...' : desc}
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
 
             {status === 'error' && (
@@ -353,7 +445,7 @@ export const AIAssistant: React.FC = () => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
                   padding: '4px 0',
-                }}>✅ Scraped — click to apply</div>
+                }}>✅ Ready — click to apply</div>
 
                 {result.title && (
                   <ResultCard label="Title" value={result.title} applied={!!applied['title']} onApply={() => applyField('title', result.title)} />
@@ -389,6 +481,18 @@ export const AIAssistant: React.FC = () => {
                 )}
                 {result.metaDescription && (
                   <ResultCard label="SEO Meta Description" value={result.metaDescription} applied={!!applied['metaDescription']} onApply={() => applyField('metaDescription', result.metaDescription)} />
+                )}
+                
+                {activeAction !== 'scrape_direct' && (
+                  <button
+                    type="button"
+                    onClick={() => activeAction && callAI(activeAction)}
+                    style={{
+                      width: '100%', padding: '8px', border: '1px solid var(--theme-border-color, #30363d)',
+                      borderRadius: 6, background: 'transparent', color: 'var(--theme-text-muted, #8b949e)',
+                      cursor: 'pointer', fontSize: 11, fontFamily: 'inherit',
+                    }}
+                  >🔄 Regenerate</button>
                 )}
               </div>
             )}

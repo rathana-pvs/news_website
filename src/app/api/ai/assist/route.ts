@@ -1,3 +1,5 @@
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { generateText } from 'ai'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayloadClient } from '@/lib/payload'
 import * as cheerio from 'cheerio'
@@ -175,6 +177,23 @@ async function scrapeUrlDirectly(url: string) {
   }
 }
 
+const googleAI = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+})
+
+const primaryModel = googleAI('gemini-3.5-flash')
+const fallbackModel = googleAI('gemini-2.5-flash')
+
+const SYSTEM_PROMPT = `You are an expert news editor and content writer for Asian Dot, a reputable English-language news website covering Asia-Pacific regional news, politics, business, culture, and technology.
+
+Your writing style is:
+- Professional, clear, and authoritative
+- Neutral and objective (journalistic tone)
+- Engaging and reader-friendly
+- Concise yet informative
+
+Always respond with valid JSON only. No markdown, no explanations outside the JSON.`
+
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayloadClient()
@@ -183,58 +202,130 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { action, url } = await req.json()
+    const { action, title, content, url } = await req.json()
 
-    // Support both direct route action scrape_direct and fallback calls
-    if (action !== 'scrape_direct' && action !== undefined) {
-      return NextResponse.json({ error: 'Only link import is supported' }, { status: 400 })
+    if (!action) {
+      return NextResponse.json({ error: 'Action is required' }, { status: 400 })
     }
 
-    if (!url) {
-      return NextResponse.json({ error: 'URL is required' }, { status: 400 })
-    }
-
-    const result = await scrapeUrlDirectly(url) as any
-    
-    // If image URL is found, download it and create a media document in Payload
-    if (result.scrapedImageUrl) {
-      try {
-        const imageRes = await fetch(result.scrapedImageUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
-        })
-        if (imageRes.ok) {
-          const arrayBuffer = await imageRes.arrayBuffer()
-          const buffer = Buffer.from(arrayBuffer)
-          const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
-          let ext = contentType.split('/')[1] || 'jpg'
-          ext = ext.split(';')[0].trim()
-          const filename = `scraped-${Date.now()}.${ext}`
-          
-          const mediaDoc = await payload.create({
-            collection: 'media',
-            data: {
-              alt: result.title || 'Scraped Image',
-            },
-            file: {
-              data: buffer,
-              name: filename,
-              mimetype: contentType,
-              size: buffer.length,
-            }
-          })
-          result.coverImage = mediaDoc.id
-        }
-      } catch (imgErr) {
-        console.error('Failed to download scraped image:', imgErr)
+    if (action === 'scrape_direct') {
+      if (!url) {
+        return NextResponse.json({ error: 'URL is required' }, { status: 400 })
       }
+
+      const result = await scrapeUrlDirectly(url) as any
+      
+      // If image URL is found, download it and create a media document in Payload
+      if (result.scrapedImageUrl) {
+        try {
+          const imageRes = await fetch(result.scrapedImageUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+          })
+          if (imageRes.ok) {
+            const arrayBuffer = await imageRes.arrayBuffer()
+            const buffer = Buffer.from(arrayBuffer)
+            const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
+            let ext = contentType.split('/')[1] || 'jpg'
+            ext = ext.split(';')[0].trim()
+            const filename = `scraped-${Date.now()}.${ext}`
+            
+            const mediaDoc = await payload.create({
+              collection: 'media',
+              data: {
+                alt: result.title || 'Scraped Image',
+              },
+              file: {
+                data: buffer,
+                name: filename,
+                mimetype: contentType,
+                size: buffer.length,
+              }
+            })
+            result.coverImage = mediaDoc.id
+          }
+        } catch (imgErr) {
+          console.error('Failed to download scraped image:', imgErr)
+        }
+      }
+
+      const enforced = enforceSeoLimits(result)
+      return NextResponse.json({ success: true, data: enforced })
     }
 
-    const enforced = enforceSeoLimits(result)
-    return NextResponse.json({ success: true, data: enforced })
+    let prompt = ''
+
+    switch (action) {
+      case 'full':
+        if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+        prompt = `Write a complete, well-structured news article for the title: "${title}"
+
+Return JSON in this exact format:
+{
+  "content": "Full article body in plain text paragraphs separated by double newlines. Write at least 4-5 paragraphs. Do not use markdown.",
+  "excerpt": "A compelling summary of the article in under 255 characters.",
+  "tags": ["tag1", "tag2", "tag3"],
+  "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
+  "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
+}`
+        break
+
+      case 'content_only':
+        if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+        prompt = `Write a news article and excerpt for the title: "${title}"
+
+Return JSON in this exact format:
+{
+  "content": "Full article body in plain text paragraphs separated by double newlines. Write at least 4-5 paragraphs. Do not use markdown.",
+  "excerpt": "A compelling summary of the article in under 255 characters."
+}`
+        break
+
+      case 'seo_only':
+        if (!title && !content) return NextResponse.json({ error: 'Title or content is required' }, { status: 400 })
+        prompt = `Generate excerpt and SEO metadata for this news article:
+Title: "${title || ''}"
+Content snippet: "${content ? content.substring(0, 500) : ''}"
+
+Return JSON in this exact format:
+{
+  "excerpt": "A compelling summary of the article in under 255 characters.",
+  "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
+  "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
+}`
+        break
+
+      default:
+        return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
+    }
+
+    let text = ''
+    try {
+      const response = await generateText({
+        model: primaryModel,
+        system: SYSTEM_PROMPT,
+        prompt,
+      })
+      text = response.text
+    } catch (e: any) {
+      console.warn('Primary model (gemini-3.5-flash) failed, falling back to gemini-2.5-flash:', e)
+      const response = await generateText({
+        model: fallbackModel,
+        system: SYSTEM_PROMPT,
+        prompt,
+      })
+      text = response.text
+    }
+
+    // Parse JSON response from AI
+    const cleanText = text.replace(/```json\n?|\n?```/g, '').trim()
+    let result = JSON.parse(cleanText)
+    result = enforceSeoLimits(result)
+
+    return NextResponse.json({ success: true, data: result })
   } catch (error: any) {
-    console.error('[Import Link Error]', error)
+    console.error('[AI Assist Error]', error)
     return NextResponse.json(
-      { error: error?.message || 'Failed to import link' },
+      { error: error?.message || 'Failed to generate content' },
       { status: 500 }
     )
   }
