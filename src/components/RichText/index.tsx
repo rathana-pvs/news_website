@@ -33,15 +33,37 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
     )
   }
 
-  // Find dynamic injection indices (space ads at least 5 paragraphs apart)
-  const BLOCK_TYPES = new Set(['h1', 'h2', 'h3', 'h4', 'upload', 'block', 'quote', 'horizontalrule'])
-  const injectIndices: number[] = []
-  let nextTargetIndex = 4
+  // Find injection points by counting only PARAGRAPH nodes toward the gap.
+  // This ensures ads appear every ~3 actual paragraphs of reading content,
+  // regardless of how many headings, images, or lists are interspersed.
+  const AD_PARAGRAPH_GAP = 3   // inject an ad after every 3 paragraphs
+  const MIN_FIRST_PARAGRAPH = 2 // skip the first 2 paragraphs before any ad
+  const SKIP_TYPES = new Set(['h1', 'h2', 'h3', 'h4', 'upload', 'block', 'quote', 'horizontalrule'])
 
-  for (let i = 4; i < nodes.length; i++) {
-    if (i >= nextTargetIndex && !BLOCK_TYPES.has(nodes[i].type)) {
-      injectIndices.push(i)
-      nextTargetIndex = i + 5 // space ads 5 nodes apart
+  const injectIndices: number[] = []
+  let paragraphsSinceLastAd = 0
+  let paragraphsTotal = 0
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const isParagraph = node.type === 'paragraph'
+
+    if (isParagraph) paragraphsTotal++
+
+    // Never inject before we've seen MIN_FIRST_PARAGRAPH paragraphs
+    if (paragraphsTotal <= MIN_FIRST_PARAGRAPH) continue
+
+    if (isParagraph) {
+      paragraphsSinceLastAd++
+      // inject AFTER this paragraph if we've hit the gap
+      if (paragraphsSinceLastAd >= AD_PARAGRAPH_GAP) {
+        // inject right after this paragraph node (i + 1)
+        const injectAt = i + 1
+        if (injectAt < nodes.length) {
+          injectIndices.push(injectAt)
+          paragraphsSinceLastAd = 0
+        }
+      }
     }
   }
 
