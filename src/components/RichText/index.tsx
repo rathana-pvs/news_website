@@ -6,23 +6,22 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 export type RichTextProps = {
   content: any
   className?: string
-  adWidgetId?: string       // First mid-article ad (e.g. 2043077)
-  secondAdWidgetId?: string // Second mid-article ad — MUST be a different widget
-                            // ID from Adskeeper. If not provided, the second ad
-                            // is skipped entirely (safe fallback).
+  adWidgetId?: string       // First mid-article ad (e.g. 2050530)
+  secondAdWidgetId?: string // Second mid-article ad (e.g. 2050533)
+  thirdAdWidgetId?: string  // Third mid-article ad (e.g. 2057448)
 }
 
 
-export const RichText = ({ content, className }: RichTextProps) => {
+export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thirdAdWidgetId }: RichTextProps) => {
   if (!content) return null
 
   // Lexical content structure: { root: { children: [...] } }
   const nodes = content.root?.children || []
 
   const inArticleWidgetIds = [
-    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1,
-    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2,
-    process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
+    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1,
+    secondAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2,
+    thirdAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
   ].filter(Boolean) as string[]
 
   // If no ads configured or article is too short, render plain

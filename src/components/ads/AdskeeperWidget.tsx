@@ -144,12 +144,16 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
   if (isMatch === false) return null
 
   if (isDev) {
-    const isSidebar = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR
-    const isUnderArticle = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE
+    const isSidebar = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR ||
+                      ['2050538', '2043076'].includes(widgetId)
+    const isUnderArticle = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE ||
+                           ['2050535', '2043079'].includes(widgetId)
     const isInArticle = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 ||
                         widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 ||
-                        widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
-    const isMobileAnchor = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR
+                        widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 ||
+                        ['2050530', '2050533', '2057448', '2043077', '2044156'].includes(widgetId)
+    const isMobileAnchor = widgetId === process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR ||
+                           widgetId === '2057449'
 
     if (adType === 'sidebar' || isSidebar) {
       return (
