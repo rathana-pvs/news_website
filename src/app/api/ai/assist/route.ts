@@ -394,8 +394,11 @@ function buildLexicalJson(blocks: any[]): any {
               version: 2,
               fields: {
                 url: child.url,
-                newTab: true
+                newTab: true,
+                linkType: 'custom'
               },
+              format: '',
+              indent: 0,
               children: [
                 {
                   type: 'text',
@@ -473,6 +476,9 @@ function buildLexicalJson(blocks: any[]): any {
         children: block.items.map((itemText: string) => ({
           type: 'listitem',
           version: 1,
+          format: '',
+          indent: 0,
+          value: -1,
           children: [
             {
               type: 'text',
