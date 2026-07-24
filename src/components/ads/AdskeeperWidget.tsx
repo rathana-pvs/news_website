@@ -111,11 +111,8 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
           observer.disconnect()
           requestAnimationFrame(() => {
             try {
-              if (!mgcLoadFired) {
-                mgcLoadFired = true
-                window._mgq = window._mgq || []
-                window._mgq.push(['_mgc.load'])
-              }
+              window._mgq = window._mgq || []
+              window._mgq.push(['_mgc.load'])
             } catch (e) {
               console.error('Adskeeper load error:', e)
             }
@@ -127,7 +124,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
                 }
                 return prev
               })
-            }, 4000)
+            }, 8000)
           })
         }
       },

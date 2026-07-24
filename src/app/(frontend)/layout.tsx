@@ -86,6 +86,12 @@ export default async function FrontendLayout({
           src={process.env.NEXT_PUBLIC_ADS_KEEPER_SCRIPT_URL || 'https://jsc.adskeeper.com/site/1101571.js'} 
           strategy="afterInteractive" 
         />
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-2441454515104767'}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   )
