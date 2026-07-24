@@ -1,5 +1,6 @@
 'use client'
 
+import React, { useState } from 'react'
 import { serializeLexical } from './serialize'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 
@@ -11,8 +12,9 @@ export type RichTextProps = {
   thirdAdWidgetId?: string  // Third mid-article ad (e.g. 2057448)
 }
 
-
 export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thirdAdWidgetId }: RichTextProps) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
   if (!content) return null
 
   // Lexical content structure: { root: { children: [...] } }
@@ -38,7 +40,6 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
   // regardless of how many headings, images, or lists are interspersed.
   const AD_PARAGRAPH_GAP = 3   // inject an ad after every 3 paragraphs
   const MIN_FIRST_PARAGRAPH = 2 // skip the first 2 paragraphs before any ad
-  const SKIP_TYPES = new Set(['h1', 'h2', 'h3', 'h4', 'upload', 'block', 'quote', 'horizontalrule'])
 
   const injectIndices: number[] = []
   let paragraphsSinceLastAd = 0
@@ -76,16 +77,28 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
     )
   }
 
-  // Assemble dynamic segments with ad widgets cycled in between
-  const elements: React.ReactNode[] = []
-  let lastIndex = 0
+  // Assemble top elements (up to and including the first injected ad)
+  const topElements: React.ReactNode[] = []
+  const firstInjectIndex = injectIndices[0]
+  const firstSegment = nodes.slice(0, firstInjectIndex)
+  topElements.push(...serializeLexical(firstSegment))
 
-  injectIndices.forEach((injectIndex, adIndex) => {
+  const firstWidgetId = inArticleWidgetIds[0 % inArticleWidgetIds.length]
+  topElements.push(
+    <AdskeeperWidget key={`ad-${firstInjectIndex}`} widgetId={firstWidgetId} className="my-8" />
+  )
+
+  // Assemble remaining elements
+  const bottomElements: React.ReactNode[] = []
+  let lastIndex = firstInjectIndex
+
+  injectIndices.slice(1).forEach((injectIndex, index) => {
+    const adIndex = index + 1 // offset by 1 because we sliced the first item
     const segment = nodes.slice(lastIndex, injectIndex)
-    elements.push(...serializeLexical(segment))
+    bottomElements.push(...serializeLexical(segment))
 
     const widgetId = inArticleWidgetIds[adIndex % inArticleWidgetIds.length]
-    elements.push(
+    bottomElements.push(
       <AdskeeperWidget key={`ad-${injectIndex}`} widgetId={widgetId} className="my-8" />
     )
 
@@ -95,12 +108,31 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
   // Push remaining elements
   if (lastIndex < nodes.length) {
     const remainingSegment = nodes.slice(lastIndex)
-    elements.push(...serializeLexical(remainingSegment))
+    bottomElements.push(...serializeLexical(remainingSegment))
+  }
+
+  if (!isExpanded) {
+    return (
+      <div className={`rich-text relative ${className || ''}`}>
+        {topElements}
+        
+        {/* Read More button layout */}
+        <div className="w-full flex justify-center items-center py-8 mt-2 mb-6 border-b border-white/10">
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="px-12 py-3.5 rounded-md border border-[#c9a84c]/30 hover:border-[#c9a84c] bg-[#1c2128]/40 hover:bg-[#c9a84c]/10 text-[#c9a84c] font-bold text-sm tracking-widest uppercase transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            Read More
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className={`rich-text ${className || ''}`}>
-      {elements}
+      {topElements}
+      {bottomElements}
     </div>
   )
 }
