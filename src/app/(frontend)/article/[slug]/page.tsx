@@ -237,31 +237,6 @@ export default async function ArticlePage({ params }: PageProps) {
                </div>
             )}
 
-            {/* Tags / Topics Section */}
-            {article.tags && article.tags.length > 0 && (
-              <div
-                className="mt-16 pt-8 border-t"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-[3px] h-4" style={{ background: 'var(--accent-red)' }} />
-                  <h3 className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
-                    TOPICS
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {article.tags.map((t, i) => (
-                    <span
-                      key={i}
-                      className="px-4 py-2 font-mono font-bold text-[10px] uppercase tracking-widest border border-[var(--border)] hover:border-[var(--accent-red)] transition-colors cursor-default"
-                      style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)' }}
-                    >
-                      #{t.tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Author Profile Block */}
             {article.author && (
