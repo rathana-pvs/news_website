@@ -31,12 +31,12 @@ export function MobileStickyFooterAd({ widgetId }: MobileStickyFooterAdProps) {
     }
   }, [])
 
-  if (isDismissed) return null
+  if (!isMobile || isDismissed) return null
 
   return (
     <div 
       className={`fixed bottom-0 left-0 right-0 z-[9999] bg-[#0d1117]/95 backdrop-blur-md border-t border-white/10 shadow-[0_-8px_30px_rgb(0,0,0,0.5)] transition-all duration-500 ease-out p-2 pb-safe ${
-        isMobile && isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
     >
       <div className="max-w-md mx-auto relative flex flex-col items-center">
@@ -51,10 +51,12 @@ export function MobileStickyFooterAd({ widgetId }: MobileStickyFooterAdProps) {
         
         {/* Ad Container */}
         <div className="w-full flex justify-center overflow-hidden" style={{ minHeight: 50, maxHeight: 120 }}>
-          <AdskeeperWidget 
-            widgetId={widgetId} 
-            className="!my-0 scale-95 origin-center" 
-          />
+          {isVisible && (
+            <AdskeeperWidget 
+              widgetId={widgetId} 
+              className="!my-0 scale-95 origin-center" 
+            />
+          )}
         </div>
       </div>
     </div>
