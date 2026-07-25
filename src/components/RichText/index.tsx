@@ -112,12 +112,22 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
   }
 
   if (!isExpanded) {
+    const teaserElement = bottomElements[0]
+
     return (
       <div className={`rich-text relative ${className || ''}`}>
         {topElements}
         
+        {/* Teaser element with gradient fade */}
+        {teaserElement && (
+          <div className="relative overflow-hidden max-h-[50px] mb-2 select-none pointer-events-none opacity-50">
+            {teaserElement}
+            <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/70 to-transparent" />
+          </div>
+        )}
+        
         {/* Read More button layout */}
-        <div className="w-full flex justify-center items-center py-8 mt-2 mb-6 border-b border-white/10">
+        <div className="w-full flex justify-center items-center py-6 mt-2 mb-6 border-b border-white/10">
           <button
             onClick={() => setIsExpanded(true)}
             className="px-12 py-3.5 rounded-md border border-[#c9a84c]/30 hover:border-[#c9a84c] bg-[#1c2128]/40 hover:bg-[#c9a84c]/10 text-[#c9a84c] font-bold text-sm tracking-widest uppercase transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
