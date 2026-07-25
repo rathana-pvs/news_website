@@ -205,9 +205,6 @@ export default async function ArticlePage({ params }: PageProps) {
               </p>
             </div>
 
-            <div className="lg:hidden mb-12">
-              <AdskeeperWidget widgetId={widgetSidebar} onlyShowOn="mobile" />
-            </div>
 
             {/* Rich Text Body */}
             <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
