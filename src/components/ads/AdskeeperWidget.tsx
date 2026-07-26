@@ -206,12 +206,12 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       return (
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded p-2 text-center my-0 flex items-center justify-between gap-4 ${className}`} style={{ height: '70px', width: '100%', maxWidth: '400px' }}>
           <div className="flex items-center gap-2">
-            <span className="uppercase text-[var(--accent-red)] font-bold text-[9px] px-1 py-0.5 rounded bg-[var(--accent-red-bright)]/10">Ad</span>
+            <span className="uppercase text-[var(--accent-red)] font-bold text-[9px] px-1 py-0.5 rounded bg-[var(--accent-red-dim)]">Ad</span>
             <div className="text-left">
               <h3 className="font-card-title text-xs leading-tight text-[var(--text-primary)] line-clamp-1">
                 Local Test Mobile Banner
               </h3>
-              <p className="text-[10px] text-white/40 leading-none">adskeeper.com/site/1103487</p>
+              <p className="text-[10px] text-[var(--text-muted)] leading-none">adskeeper.com/site/1103487</p>
             </div>
           </div>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40">

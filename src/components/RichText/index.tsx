@@ -62,12 +62,26 @@ export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichT
     firstInjectIndex = Math.min(2, nodes.length - 1)
   }
 
+  // ─── Post-ad text extension (show exactly 1 readable paragraph after ad before button) ───
+  let postAdIndex = firstInjectIndex
+  let postCount = 0
+  for (let i = firstInjectIndex; i < nodes.length; i++) {
+    if (nodes[i].type === 'paragraph') postCount++
+    if (postCount >= 1) {
+      postAdIndex = i + 1
+      break
+    }
+  }
+  if (postAdIndex === firstInjectIndex) {
+    postAdIndex = Math.min(firstInjectIndex + 1, nodes.length)
+  }
+
   // ─── Injection point #2: feed widget (long articles only) ───
-  // Find a node index roughly in the middle of the article (after para 5-6)
+  // Find a node index roughly in the middle of the article (after para 6-7)
   let feedInjectIndex = -1
 
   if (isLongArticle && resolvedFeedWidgetId) {
-    const FEED_MIN_PARAGRAPH = 5
+    const FEED_MIN_PARAGRAPH = 6
     let pCount = 0
     for (let i = 0; i < nodes.length; i++) {
       if (nodes[i].type === 'paragraph') pCount++
@@ -79,19 +93,20 @@ export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichT
   }
 
   // ─── Assemble topElements (shown before "Continue Reading") ───
-  // Contains: content up to firstInjectIndex + in-article_1 widget
+  // Contains: content before ad + in-article_1 widget + 1 readable paragraph after ad
   const topElements: React.ReactNode[] = []
-  topElements.push(...serializeLexical(nodes.slice(0, firstInjectIndex)))
+  topElements.push(...serializeLexical(nodes.slice(0, firstInjectIndex), 'top-pre'))
   topElements.push(
     <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="my-8" />
   )
+  topElements.push(...serializeLexical(nodes.slice(firstInjectIndex, postAdIndex), 'top-post'))
 
   // ─── Assemble bottomElements (shown after "Continue Reading" expand) ───
   const bottomElements: React.ReactNode[] = []
 
-  if (feedInjectIndex !== -1 && feedInjectIndex > firstInjectIndex) {
+  if (feedInjectIndex !== -1 && feedInjectIndex > postAdIndex) {
     // Long article: content → feed widget → remaining content
-    bottomElements.push(...serializeLexical(nodes.slice(firstInjectIndex, feedInjectIndex)))
+    bottomElements.push(...serializeLexical(nodes.slice(postAdIndex, feedInjectIndex), 'bot-mid'))
     bottomElements.push(
       <AdskeeperWidget
         key={`ad-feed-inline`}
@@ -100,10 +115,10 @@ export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichT
         className="my-8"
       />
     )
-    bottomElements.push(...serializeLexical(nodes.slice(feedInjectIndex)))
+    bottomElements.push(...serializeLexical(nodes.slice(feedInjectIndex), 'bot-rest'))
   } else {
     // Short article: remaining content only
-    bottomElements.push(...serializeLexical(nodes.slice(firstInjectIndex)))
+    bottomElements.push(...serializeLexical(nodes.slice(postAdIndex), 'bot-all'))
   }
 
   // ─── Collapsed state: show teaser + Continue Reading button ───
@@ -114,32 +129,28 @@ export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichT
       <div className={`rich-text relative ${className || ''}`}>
         {topElements}
 
-        {/* Teaser text (1-2 lines) with blur filter and gradient shading mask */}
+        {/* Teaser text (3 lines) with blur filter and gradient shading mask */}
         {teaserElement && (
-          <div className="relative overflow-hidden max-h-[75px] mt-4 mb-2 select-none pointer-events-none">
-            <div className="blur-[1.5px] opacity-60 line-clamp-2">
+          <div className="relative overflow-hidden h-[5.5rem] max-h-[90px] mt-4 mb-2 select-none pointer-events-none">
+            <div className="blur-[1px] opacity-70 line-clamp-3">
               {teaserElement}
             </div>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bg-primary)]/75 to-[var(--bg-primary)]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bg-primary)]/80 to-[var(--bg-primary)]" />
           </div>
         )}
 
-        {/* Continue Reading CTA — optimized for Facebook mobile traffic */}
-        <div className="w-full flex flex-col items-center gap-2 pt-2 pb-8 mt-0">
+        {/* Simple, clean Continue Reading button */}
+        <div className="w-full flex justify-center py-4 my-2">
           <button
             onClick={() => setIsExpanded(true)}
-            className="group relative w-full max-w-sm flex items-center justify-center gap-3 py-4 px-6 rounded-xl cursor-pointer transition-all duration-300 active:scale-[0.97]"
+            className="group inline-flex items-center justify-center gap-2 py-3 px-8 rounded-lg cursor-pointer font-bold text-sm text-white transition-all duration-200 active:scale-[0.98] shadow-md"
             style={{
-              background: 'linear-gradient(135deg, #1877f2 0%, #0d5bbf 100%)',
-              boxShadow: '0 4px 24px rgba(24,119,242,0.35)',
+              background: 'var(--accent-red)',
             }}
           >
-            {/* Pulse ring */}
-            <span className="absolute inset-0 rounded-xl animate-ping opacity-10 bg-[#1877f2]" style={{ animationDuration: '2s' }} />
-
-            {/* Chevron down icon */}
+            <span>Continue Reading</span>
             <svg
-              className="w-5 h-5 text-white flex-shrink-0 transition-transform duration-300 group-hover:translate-y-0.5"
+              className="w-4 h-4 text-white transition-transform duration-200 group-hover:translate-y-0.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -147,21 +158,7 @@ export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichT
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
-
-            <span className="flex flex-col items-start leading-none">
-              <span className="text-white font-bold text-base tracking-wide">
-                Continue Reading
-              </span>
-              <span className="text-white/70 text-[11px] font-medium mt-0.5 tracking-widest uppercase">
-                Free · No Sign-up Required
-              </span>
-            </span>
           </button>
-
-          {/* Reassurance label */}
-          <p className="text-[11px] font-mono text-center" style={{ color: 'var(--text-muted)' }}>
-            🔓 Full article · 100% free
-          </p>
         </div>
       </div>
     )
