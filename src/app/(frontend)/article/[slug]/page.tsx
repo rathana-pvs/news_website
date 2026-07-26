@@ -3,12 +3,13 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Locale } from '@/i18n-config'
 import { i18nStrings } from '@/lib/i18n'
-import { getArticle, getArticles } from '@/lib/api-server'
+import { getArticle, getArticles, getRelatedArticles } from '@/lib/api-server'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { ReadingBar } from '@/components/ui/ReadingBar'
 import { RichText } from '@/components/RichText'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { RelatedArticles } from '@/components/article/RelatedArticles'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -92,6 +93,8 @@ export default async function ArticlePage({ params }: PageProps) {
   
   const article = await getArticle(slug, locale)
   if (!article) notFound()
+
+  const relatedArticles = await getRelatedArticles(article.id, article.category?.id, locale)
 
   const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
 
@@ -226,83 +229,28 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Author Profile Block */}
-            {article.author && (
-              <div
-                className="mt-16 p-10 border border-[var(--border)] relative bg-[var(--bg-surface)]"
-              >
-                <div className="absolute top-0 right-0 w-24 h-24 opacity-5 pointer-events-none" 
-                     style={{ backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)', backgroundSize: '8px 8px' }} />
-                
-                <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-                  <div className="relative w-24 h-24 flex-shrink-0 border border-[var(--border)] p-1">
-                    <div className="relative w-full h-full overflow-hidden">
-                      {article.author.avatar?.url ? (
-                        <Image
-                          src={article.author.avatar.url}
-                          alt={article.author.name}
-                          fill
-                          sizes="96px"
-                          className="object-cover transition-all duration-500"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full flex items-center justify-center text-3xl font-black"
-                          style={{ background: 'var(--accent-red)', color: 'white' }}
-                        >
-                          {article.author.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
-                      <p className="font-display font-black text-2xl uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                        {article.author.name}
-                      </p>
-                      <span className="w-6 h-[1px] bg-[var(--accent-red)] hidden sm:block" />
-                      <p className="font-mono font-bold text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
-                        {article.author.role}
-                      </p>
-                    </div>
-                    {article.author.bio && (
-                      <p className="text-base leading-relaxed mb-4 max-w-2xl" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-                        {article.author.bio}
-                      </p>
-                    )}
-                    {article.author.twitter && (
-                      <a
-                        href={`https://twitter.com/${article.author.twitter}`}
-                        className="font-mono font-bold text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 hover:text-[var(--accent-red)] transition-colors"
-                        style={{ color: 'var(--text-muted)' }}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <span style={{ color: 'var(--accent-red)' }}>@</span>{article.author.twitter}
-                      </a>
-                    )}
-                  </div>
-                </div>
+            {/* Internal Related News Recommendations */}
+            <RelatedArticles articles={relatedArticles} locale={locale} />
+
+            {/* Under Article Native Content Grid - Positioned immediately under article text */}
+            <div className="mt-6 mb-8 border-t border-[var(--border)] pt-6">
+              <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
+                <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
+                  Recommended For You
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
               </div>
-            )}
+              <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
+            </div>
           </div>
 
           {/* Sidebar Area */}
           <aside className="lg:col-span-4 space-y-8">
             <div className="sticky top-24 space-y-8">
-              
-
               {/* Related / Trending Sidebar Ad */}
               <AdskeeperWidget widgetId={widgetSidebar} adType="sidebar" onlyShowOn="desktop" />
             </div>
           </aside>
-        </div>
-
-
-        
-        {/* Under Article Native Content Grid */}
-        <div className="mt-12 mb-8 border-t border-[var(--border)] pt-8">
-           <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
         </div>
 
         {/* Feed Bottom Content Widget - Scaled Viewability */}
