@@ -40,9 +40,9 @@ export function RelatedArticles({ articles, locale = 'en' }: RelatedArticlesProp
         <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Related News</span>
       </div>
 
-      {/* 2-Column Mobile / 3-Column Desktop Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {articles.slice(0, 3).map((article) => {
+      {/* 2-Column Mobile & Desktop Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {articles.slice(0, 2).map((article) => {
           const imgUrl = getImageUrl(article.coverImage)
           const timeAgo = formatDate(article.publishedAt)
 
