@@ -18,9 +18,9 @@ interface PageProps {
 // Allow older articles not in generateStaticParams to be rendered on-demand and cached
 export const dynamicParams = true
 
-// Pre-generate the 20 most recent articles as static pages at deploy time
+// Pre-generate the 40 most recent articles as static pages at deploy time
 export async function generateStaticParams() {
-  const articles = await getArticles({ limit: 20 })
+  const articles = await getArticles({ limit: 40 })
   return articles.docs.map((a) => ({ slug: a.slug }))
 }
 
