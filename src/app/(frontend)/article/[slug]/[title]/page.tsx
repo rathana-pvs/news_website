@@ -326,12 +326,14 @@ export default async function DynamicArticlePage({ params }: PageProps) {
 
 
         
-        <div className="mt-20">
-           <AdskeeperWidget widgetId={widgetUnderArticle} />
+        {/* Under Article Native Content Grid */}
+        <div className="mt-12 mb-8 border-t border-[var(--border)] pt-8">
+           <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
         </div>
 
-        <div className="mt-20">
-           <AdskeeperWidget widgetId={widgetBottomFeed} />
+        {/* Feed Bottom Content Widget - Scaled Viewability */}
+        <div className="mt-8 mb-12 border-t border-[var(--border)] pt-8">
+           <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
         </div>
       </div>
     </>

@@ -10,6 +10,7 @@ import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
+import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 
 type FilterType = 'latest' | 'breaking' | 'opinion'
 
@@ -152,6 +153,13 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
                 </div>
               </Link>
             )}
+
+            {/* Feed Ad Widget (2050525) */}
+            <div className="my-8">
+              <AdskeeperWidget 
+                widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'} 
+              />
+            </div>
 
             {/* Remaining: Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -36,16 +36,18 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
   }
 
   // Find injection points by counting only PARAGRAPH nodes toward the gap.
-  // This ensures ads appear every ~3 actual paragraphs of reading content,
-  // regardless of how many headings, images, or lists are interspersed.
-  const AD_PARAGRAPH_GAP = 2   // inject an ad after every 2 paragraphs
-  const MIN_FIRST_PARAGRAPH = 1 // skip the first 1 paragraph before any ad
+  // We space out ads every ~4 paragraphs and require at least 2 initial paragraphs
+  // to avoid ad clutter and improve viewability of each ad slot.
+  const AD_PARAGRAPH_GAP = 4   // inject an ad after every 4 paragraphs
+  const MIN_FIRST_PARAGRAPH = 2 // skip first 2 paragraphs before injecting first ad
+  const MAX_ADS = 2            // cap max in-article ads per article
 
   const injectIndices: number[] = []
   let paragraphsSinceLastAd = 0
   let paragraphsTotal = 0
 
   for (let i = 0; i < nodes.length; i++) {
+    if (injectIndices.length >= MAX_ADS) break
     const node = nodes[i]
     const isParagraph = node.type === 'paragraph'
 

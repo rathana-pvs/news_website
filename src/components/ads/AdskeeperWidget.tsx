@@ -128,7 +128,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
           })
         }
       },
-      { rootMargin: '200px 0px' }
+      { rootMargin: '350px 0px' }
     )
     observer.observe(el)
     return () => {
