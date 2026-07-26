@@ -72,9 +72,10 @@ export default async function FrontendLayout({
           </main>
           <Footer locale={locale} categories={categories} />
         </div>
-        {process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR && (
+        {/* Mobile sticky ad disabled for performance/vCPM testing */}
+        {/* {process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR && (
           <MobileStickyFooterAd widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_MOBILE_ANCHOR} />
-        )}
+        )} */}
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
