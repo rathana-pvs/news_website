@@ -7,12 +7,14 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 export type RichTextProps = {
   content: any
   className?: string
-  adWidgetId?: string       // First mid-article ad (e.g. 2050530)
-  secondAdWidgetId?: string // Second mid-article ad (e.g. 2050533)
-  thirdAdWidgetId?: string  // Third mid-article ad (e.g. 2057448)
+  adWidgetId?: string    // First mid-article ad (e.g. 2050530) — always injected
+  feedWidgetId?: string  // Feed widget (e.g. 2050525) — injected on long articles only
 }
 
-export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thirdAdWidgetId }: RichTextProps) => {
+// Long article threshold: articles with this many paragraphs get a mid-article feed widget
+const LONG_ARTICLE_THRESHOLD = 8
+
+export const RichText = ({ content, className, adWidgetId, feedWidgetId }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   if (!content) return null
@@ -20,14 +22,14 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
   // Lexical content structure: { root: { children: [...] } }
   const nodes = content.root?.children || []
 
-  const inArticleWidgetIds = [
-    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1,
-    secondAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2,
-    thirdAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
-  ].filter(Boolean) as string[]
+  const primaryWidgetId =
+    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1
 
-  // If no ads configured or article is too short, render plain
-  if (inArticleWidgetIds.length === 0 || nodes.length <= 4) {
+  const resolvedFeedWidgetId =
+    feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED
+
+  // If no primary ad configured or article is too short, render plain
+  if (!primaryWidgetId || nodes.length < 2) {
     return (
       <div className={`rich-text ${className || ''}`}>
         {serializeLexical(nodes)}
@@ -35,112 +37,137 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
     )
   }
 
-  // Find injection points by counting only PARAGRAPH nodes toward the gap.
-  // We space out ads every ~4 paragraphs and require at least 2 initial paragraphs
-  // to avoid ad clutter and improve viewability of each ad slot.
-  const AD_PARAGRAPH_GAP = 4   // inject an ad after every 4 paragraphs
-  const MIN_FIRST_PARAGRAPH = 2 // skip first 2 paragraphs before injecting first ad
-  const MAX_ADS = 2            // cap max in-article ads per article
+  // Count total paragraphs to decide if this is a long article
+  const totalParagraphs = nodes.filter((n: any) => n.type === 'paragraph').length
+  const isLongArticle = totalParagraphs >= LONG_ARTICLE_THRESHOLD
 
-  const injectIndices: number[] = []
-  let paragraphsSinceLastAd = 0
-  let paragraphsTotal = 0
+  // ─── Injection point #1: in-article_1 ───
+  // Find the node index right after MIN_FIRST_PARAGRAPH paragraphs
+  const MIN_FIRST_PARAGRAPH = 1
+  const AD_PARAGRAPH_GAP_1 = 2  // inject in-article_1 after para 2-3
+
+  let firstInjectIndex = -1
+  let paragraphCount = 0
 
   for (let i = 0; i < nodes.length; i++) {
-    if (injectIndices.length >= MAX_ADS) break
-    const node = nodes[i]
-    const isParagraph = node.type === 'paragraph'
+    if (nodes[i].type === 'paragraph') paragraphCount++
+    if (paragraphCount > MIN_FIRST_PARAGRAPH && paragraphCount >= MIN_FIRST_PARAGRAPH + AD_PARAGRAPH_GAP_1) {
+      firstInjectIndex = i + 1
+      break
+    }
+  }
 
-    if (isParagraph) paragraphsTotal++
+  // Fallback: inject after node index 2 if no gap found
+  if (firstInjectIndex === -1) {
+    firstInjectIndex = Math.min(2, nodes.length - 1)
+  }
 
-    // Never inject before we've seen MIN_FIRST_PARAGRAPH paragraphs
-    if (paragraphsTotal <= MIN_FIRST_PARAGRAPH) continue
+  // ─── Injection point #2: feed widget (long articles only) ───
+  // Find a node index roughly in the middle of the article (after para 5-6)
+  let feedInjectIndex = -1
 
-    if (isParagraph) {
-      paragraphsSinceLastAd++
-      // inject AFTER this paragraph if we've hit the gap
-      if (paragraphsSinceLastAd >= AD_PARAGRAPH_GAP) {
-        // inject right after this paragraph node (i + 1)
-        const injectAt = i + 1
-        if (injectAt < nodes.length) {
-          injectIndices.push(injectAt)
-          paragraphsSinceLastAd = 0
-        }
+  if (isLongArticle && resolvedFeedWidgetId) {
+    const FEED_MIN_PARAGRAPH = 5
+    let pCount = 0
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].type === 'paragraph') pCount++
+      if (pCount >= FEED_MIN_PARAGRAPH) {
+        feedInjectIndex = i + 1
+        break
       }
     }
   }
 
-  // If no suitable injection point found, render plain
-  if (injectIndices.length === 0) {
-    return (
-      <div className={`rich-text ${className || ''}`}>
-        {serializeLexical(nodes)}
-      </div>
-    )
-  }
-
-  // Assemble top elements (up to and including the first injected ad)
+  // ─── Assemble topElements (shown before "Continue Reading") ───
+  // Contains: content up to firstInjectIndex + in-article_1 widget
   const topElements: React.ReactNode[] = []
-  const firstInjectIndex = injectIndices[0]
-  const firstSegment = nodes.slice(0, firstInjectIndex)
-  topElements.push(...serializeLexical(firstSegment))
-
-  const firstWidgetId = inArticleWidgetIds[0 % inArticleWidgetIds.length]
+  topElements.push(...serializeLexical(nodes.slice(0, firstInjectIndex)))
   topElements.push(
-    <AdskeeperWidget key={`ad-${firstInjectIndex}`} widgetId={firstWidgetId} className="my-8" />
+    <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="my-8" />
   )
 
-  // Assemble remaining elements
+  // ─── Assemble bottomElements (shown after "Continue Reading" expand) ───
   const bottomElements: React.ReactNode[] = []
-  let lastIndex = firstInjectIndex
 
-  injectIndices.slice(1).forEach((injectIndex, index) => {
-    const adIndex = index + 1 // offset by 1 because we sliced the first item
-    const segment = nodes.slice(lastIndex, injectIndex)
-    bottomElements.push(...serializeLexical(segment))
-
-    const widgetId = inArticleWidgetIds[adIndex % inArticleWidgetIds.length]
+  if (feedInjectIndex !== -1 && feedInjectIndex > firstInjectIndex) {
+    // Long article: content → feed widget → remaining content
+    bottomElements.push(...serializeLexical(nodes.slice(firstInjectIndex, feedInjectIndex)))
     bottomElements.push(
-      <AdskeeperWidget key={`ad-${injectIndex}`} widgetId={widgetId} className="my-8" />
+      <AdskeeperWidget
+        key={`ad-feed-inline`}
+        widgetId={resolvedFeedWidgetId!}
+        adType="feed-inline"
+        className="my-8"
+      />
     )
-
-    lastIndex = injectIndex
-  })
-
-  // Push remaining elements
-  if (lastIndex < nodes.length) {
-    const remainingSegment = nodes.slice(lastIndex)
-    bottomElements.push(...serializeLexical(remainingSegment))
+    bottomElements.push(...serializeLexical(nodes.slice(feedInjectIndex)))
+  } else {
+    // Short article: remaining content only
+    bottomElements.push(...serializeLexical(nodes.slice(firstInjectIndex)))
   }
 
+  // ─── Collapsed state: show teaser + Continue Reading button ───
   if (!isExpanded) {
     const teaserElement = bottomElements[0]
 
     return (
       <div className={`rich-text relative ${className || ''}`}>
         {topElements}
-        
-        {/* Teaser element with gradient fade */}
+
+        {/* Teaser text (1-2 lines) with blur filter and gradient shading mask */}
         {teaserElement && (
-          <div className="relative overflow-hidden max-h-[50px] mb-2 select-none pointer-events-none opacity-50">
-            {teaserElement}
-            <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/70 to-transparent" />
+          <div className="relative overflow-hidden max-h-[75px] mt-4 mb-2 select-none pointer-events-none">
+            <div className="blur-[1.5px] opacity-60 line-clamp-2">
+              {teaserElement}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bg-primary)]/75 to-[var(--bg-primary)]" />
           </div>
         )}
-        
-        {/* Read More button layout */}
-        <div className="w-full flex justify-center items-center py-6 mt-2 mb-6 border-b border-white/10">
+
+        {/* Continue Reading CTA — optimized for Facebook mobile traffic */}
+        <div className="w-full flex flex-col items-center gap-2 pt-2 pb-8 mt-0">
           <button
             onClick={() => setIsExpanded(true)}
-            className="px-12 py-3.5 rounded-md border border-[#c9a84c]/30 hover:border-[#c9a84c] bg-[#1c2128]/40 hover:bg-[#c9a84c]/10 text-[#c9a84c] font-bold text-sm tracking-widest uppercase transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+            className="group relative w-full max-w-sm flex items-center justify-center gap-3 py-4 px-6 rounded-xl cursor-pointer transition-all duration-300 active:scale-[0.97]"
+            style={{
+              background: 'linear-gradient(135deg, #1877f2 0%, #0d5bbf 100%)',
+              boxShadow: '0 4px 24px rgba(24,119,242,0.35)',
+            }}
           >
-            Read More
+            {/* Pulse ring */}
+            <span className="absolute inset-0 rounded-xl animate-ping opacity-10 bg-[#1877f2]" style={{ animationDuration: '2s' }} />
+
+            {/* Chevron down icon */}
+            <svg
+              className="w-5 h-5 text-white flex-shrink-0 transition-transform duration-300 group-hover:translate-y-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+
+            <span className="flex flex-col items-start leading-none">
+              <span className="text-white font-bold text-base tracking-wide">
+                Continue Reading
+              </span>
+              <span className="text-white/70 text-[11px] font-medium mt-0.5 tracking-widest uppercase">
+                Free · No Sign-up Required
+              </span>
+            </span>
           </button>
+
+          {/* Reassurance label */}
+          <p className="text-[11px] font-mono text-center" style={{ color: 'var(--text-muted)' }}>
+            🔓 Full article · 100% free
+          </p>
         </div>
       </div>
     )
   }
 
+  // ─── Expanded state: full article ───
   return (
     <div className={`rich-text ${className || ''}`}>
       {topElements}
@@ -148,3 +175,4 @@ export const RichText = ({ content, className, adWidgetId, secondAdWidgetId, thi
     </div>
   )
 }
+

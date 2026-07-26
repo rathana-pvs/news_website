@@ -1,27 +1,24 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
+import { Locale } from '@/i18n-config'
+import { i18nStrings } from '@/lib/i18n'
 import { getArticle } from '@/lib/api-server'
 import { getPayloadClient } from '@/lib/payload'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { ReadingBar } from '@/components/ui/ReadingBar'
-import { ArticleCard } from '@/components/ui/ArticleCard'
 import { RichText } from '@/components/RichText'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
-import { Article } from '@/types'
 
 interface PageProps {
   params: Promise<{ slug: string; title: string }>
 }
 
-import { Locale } from '@/i18n-config'
-import { i18nStrings } from '@/lib/i18n'
-
 // Force dynamic rendering to ensure click tracking runs on every visit
 export const dynamic = 'force-dynamic'
+
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   // slug = tracking key, title = article slug
@@ -87,8 +84,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   
   const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2043076'
   const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
-  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2044156'
-  const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || '2057448'
+  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'
   const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
   
@@ -234,8 +230,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
                 <RichText
                   content={article.content}
                   adWidgetId={widgetInArticle1}
-                  secondAdWidgetId={widgetInArticle2}
-                  thirdAdWidgetId={widgetInArticle3}
+                  feedWidgetId={widgetFeed}
                 />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">

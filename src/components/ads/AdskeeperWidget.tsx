@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 interface AdskeeperWidgetProps {
   widgetId: string
   className?: string
-  adType?: 'sidebar'
+  adType?: 'sidebar' | 'feed-inline'
   onlyShowOn?: 'desktop' | 'mobile'
 }
 
@@ -217,6 +217,35 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40">
             Sticky Anchor ({widgetId})
           </span>
+        </div>
+      )
+    }
+
+    if (adType === 'feed-inline') {
+      return (
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-5">
+            <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">Recommended For You</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored · Feed ({widgetId})</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {MOCK_ADS.slice(0, 4).map((ad) => (
+              <article key={ad.id} className="group cursor-pointer">
+                <div className="relative w-full overflow-hidden rounded mb-2" style={{ aspectRatio: '16/9' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+                </div>
+                <h3 className="font-card-title leading-tight line-clamp-2 text-[var(--text-primary)] group-hover:text-[var(--accent-red)] transition-colors" style={{ fontSize: '12px' }}>
+                  {ad.title}
+                </h3>
+                <div className="font-mono flex items-center gap-1 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)' }}>
+                  <span className="text-[var(--accent-red)] font-bold">Ad</span>
+                  <span>·</span>
+                  <span className="truncate">{ad.brand}</span>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       )
     }

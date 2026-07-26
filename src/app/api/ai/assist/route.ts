@@ -726,8 +726,30 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 4. Build Lexical JSON tree and assign to content
-      result.content = buildLexicalJson(blocks)
+      // 4. Deduplicate: remove inline images that are the same as the cover image.
+      //    Check by mediaId (same Payload media record) AND by original src URL (catches
+      //    cases where the same image was downloaded into two separate media records).
+      const coverMediaId = result.coverImage
+      const coverSrc = result.scrapedImageUrl
+
+      const dedupedBlocks = blocks.filter((block: any) => {
+        if (block.type !== 'image') return true
+
+        // Remove if same Payload media ID as cover
+        if (coverMediaId && block.mediaId && String(block.mediaId) === String(coverMediaId)) {
+          return false
+        }
+
+        // Remove if same original URL as cover (even if downloaded as a different media record)
+        if (coverSrc && block.src && block.src === coverSrc) {
+          return false
+        }
+
+        return true
+      })
+
+      // 5. Build Lexical JSON tree and assign to content
+      result.content = buildLexicalJson(dedupedBlocks)
       
       delete result.blocks
 

@@ -1,25 +1,18 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Locale } from '@/i18n-config'
+import { i18nStrings } from '@/lib/i18n'
 import { getArticle, getArticles } from '@/lib/api-server'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
-import { BreakingBadge } from '@/components/ui/BreakingBadge'
 import { ReadingBar } from '@/components/ui/ReadingBar'
-import { ArticleCard } from '@/components/ui/ArticleCard'
 import { RichText } from '@/components/RichText'
-import { AdBanner } from '@/components/ads/AdBanner'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
-import { formatDate } from '@/lib/utils'
-import { Article } from '@/types'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
-
-import { Locale } from '@/i18n-config'
-import { i18nStrings } from '@/lib/i18n'
 
 // Allow older articles not in generateStaticParams to be rendered on-demand and cached
 export const dynamicParams = true
@@ -93,8 +86,7 @@ export default async function ArticlePage({ params }: PageProps) {
   
   const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2043076'
   const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
-  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2044156'
-  const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || '2057448'
+  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'
   const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
   
@@ -212,8 +204,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 <RichText
                   content={article.content}
                   adWidgetId={widgetInArticle1}
-                  secondAdWidgetId={widgetInArticle2}
-                  thirdAdWidgetId={widgetInArticle3}
+                  feedWidgetId={widgetFeed}
                 />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">
@@ -309,14 +300,14 @@ export default async function ArticlePage({ params }: PageProps) {
 
 
         
-        {/* Under-article Native Recommendations Widget (ID: 2043079) */}
-        <div className="mt-20">
-           <AdskeeperWidget widgetId={widgetUnderArticle} />
+        {/* Under Article Native Content Grid */}
+        <div className="mt-12 mb-8 border-t border-[var(--border)] pt-8">
+           <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
         </div>
 
-        {/* Bottom Page Feed Widget */}
-        <div className="mt-20">
-           <AdskeeperWidget widgetId={widgetBottomFeed} />
+        {/* Feed Bottom Content Widget - Scaled Viewability */}
+        <div className="mt-8 mb-12 border-t border-[var(--border)] pt-8">
+           <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
         </div>
       </div>
     </>
