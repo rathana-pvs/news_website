@@ -42,8 +42,6 @@ export const RichText = ({
   const tertiaryWidgetId =
     adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
 
-  const resolvedUnderArticleWidgetId =
-    underArticleWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE
 
   const resolvedFeedWidgetId =
     feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED
@@ -154,17 +152,11 @@ export const RichText = ({
     bottomElements.push(...serializeLexical(remainingNodes, 'bot-all'))
   }
 
-  // Append Under Article Ad Grid to end of bottomElements (renders only when expanded)
-  if (resolvedUnderArticleWidgetId) {
+  // Append Under Article Ad Grid to end of bottomElements if explicitly passed
+  if (underArticleWidgetId) {
     bottomElements.push(
       <div key={`ad-under-article-wrap`} className="mt-8 mb-4 border-t border-[var(--border)] pt-6">
-        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
-          <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
-            Recommended For You
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
-        </div>
-        <AdskeeperWidget widgetId={resolvedUnderArticleWidgetId} className="!my-0" />
+        <AdskeeperWidget widgetId={underArticleWidgetId} className="!my-0" />
       </div>
     )
   }

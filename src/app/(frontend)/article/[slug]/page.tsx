@@ -234,12 +234,6 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {/* Under Article Native Content Grid - Positioned immediately under article text */}
             <div className="mt-4 mb-2 border-t border-[var(--border)] pt-4">
-              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-                <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
-                  Recommended For You
-                </span>
-                <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
-              </div>
               <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
             </div>
           </div>
