@@ -256,15 +256,13 @@ export default async function DynamicArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Internal Related News Recommendations - Hidden on mobile to maximize native ad CTR */}
-            <div className="hidden lg:block">
-              <RelatedArticles articles={relatedArticles} locale={locale} />
-            </div>
-
             {/* Under Article Native Content Grid - Positioned immediately under article text */}
             <div className="mt-4 mb-2 border-t border-[var(--border)] pt-4">
               <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
             </div>
+
+            {/* Recommended / Suggested News - Positioned directly below under_article ad */}
+            <RelatedArticles articles={relatedArticles} locale={locale} />
           </div>
 
           {/* Sidebar Area - Hidden on Mobile */}

@@ -20,7 +20,7 @@ const MOCK_ADS = [
   {
     id: 2,
     title: "Unsold SUVs Are Being Cleared Out For Next to Nothing: View Deals!",
-    brand: "SUV Deals | Sponsored",
+    brand: "SUV Deals | Auto News",
     image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80"
   },
   {
@@ -226,7 +226,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
           <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
             <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">Recommended For You</span>
-            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored · Feed ({widgetId})</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Recommended ({widgetId})</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {MOCK_ADS.slice(0, 4).map((ad) => (
@@ -239,7 +239,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
                   {ad.title}
                 </h3>
                 <div className="font-mono flex items-center gap-1 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)' }}>
-                  <span className="text-[var(--accent-red)] font-bold">Ad</span>
+                  <span className="text-[var(--accent-red)] font-bold">News</span>
                   <span>·</span>
                   <span className="truncate">{ad.brand}</span>
                 </div>
@@ -268,7 +268,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
                     <span className="underline-hover pb-[2px]">{ad.title}</span>
                   </h3>
                   <div className="font-mono flex items-center gap-2 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    <span className="uppercase text-[var(--accent-red)] font-bold">Sponsored</span>
+                    <span className="uppercase text-[var(--accent-red)] font-bold">News Wire</span>
                     <span>·</span>
                     <span className="truncate">{ad.brand}</span>
                   </div>
@@ -282,25 +282,28 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
     if (isUnderArticle) {
       return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-3">
-            [Local Test Mode] Adskeeper Under-Article Grid ({widgetId})
-          </span>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {MOCK_ADS.slice(3, 7).map((ad) => (
-              <article key={ad.id} className="group border-b border-[var(--border)] sm:border-0 pb-5 sm:pb-0 cursor-pointer transition-all">
-                <div className="relative w-full overflow-hidden rounded" style={{ aspectRatio: '16/9' }}>
+        <div className={`ads-container my-3 sm:my-6 ${className}`}>
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-4">
+            <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
+              Trending Around The Web
+            </span>
+            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Popular News</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {MOCK_ADS.slice(3, 7).map((ad, idx) => (
+              <article key={ad.id} className="group flex flex-col bg-[var(--bg-surface)] border border-[var(--border)] rounded-md overflow-hidden hover:border-[var(--accent-red)] transition-all duration-300 cursor-pointer">
+                <div className="relative w-full overflow-hidden bg-[var(--bg-card)]" style={{ aspectRatio: '16/9' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
+                  <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
-                <div className="pt-4">
-                  <h3 className="font-card-title leading-tight mb-2 line-clamp-3 text-[var(--text-primary)]" style={{ fontSize: '15px' }}>
-                    <span className="underline-hover pb-[2px]">{ad.title}</span>
+                <div className="p-3 flex flex-col justify-between flex-1">
+                  <h3 className="font-card-title text-sm sm:text-base leading-snug line-clamp-3 text-[var(--text-primary)] group-hover:text-[var(--accent-red)] transition-colors mb-2">
+                    {ad.title}
                   </h3>
-                  <div className="font-mono flex items-center gap-1.5 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-                    <span className="text-[var(--accent-red)] font-bold">Ad</span>
+                  <div className="font-mono flex items-center gap-1.5 mt-auto pt-2 text-[9px] text-[var(--text-muted)] tracking-wider uppercase">
+                    <span className="text-[var(--accent-red)] font-bold">News</span>
                     <span>·</span>
-                    <span className="truncate max-w-[120px]">{ad.brand}</span>
+                    <span className="truncate max-w-[120px]">{idx % 2 === 0 ? '2 hours ago' : '4 hours ago'}</span>
                   </div>
                 </div>
               </article>
@@ -320,7 +323,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
           <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
             Interesting For You
           </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
+          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Trending News</span>
         </div>
 
         <div className="flex flex-col divide-y divide-[var(--border)]">

@@ -12,79 +12,37 @@ interface RelatedArticlesProps {
 export function RelatedArticles({ articles, locale = 'en' }: RelatedArticlesProps) {
   if (!articles || articles.length === 0) return null
 
-  const getImageUrl = (image: any) => {
-    if (!image) return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80'
-    if (typeof image === 'string') return image
-    if (image && typeof image === 'object' && 'url' in image && typeof image.url === 'string') {
-      return image.url
-    }
-    return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80'
-  }
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return ''
-    try {
-      return formatDistanceToNow(parseISO(dateStr), { addSuffix: true })
-    } catch (e) {
-      return ''
-    }
-  }
-
   return (
-    <div className="mt-8 mb-8 border-t border-[var(--border)] pt-6">
+    <div className="mt-4 mb-4 border-t border-[var(--border)] pt-4">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-5">
+      <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
         <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
-          More From Asian Dot
+          Suggested Reading
         </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Related News</span>
+        <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">More News</span>
       </div>
 
-      {/* 2-Column Mobile & Desktop Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {articles.slice(0, 2).map((article) => {
-          const imgUrl = getImageUrl(article.coverImage)
-          const timeAgo = formatDate(article.publishedAt)
-
+      {/* Text-Only Editorial Links */}
+      <ul className="divide-y divide-[var(--border)]">
+        {articles.slice(0, 3).map((article) => {
           return (
-            <Link
-              key={article.id}
-              href={`/article/${article.slug}`}
-              className="group flex flex-col bg-[var(--bg-surface)] border border-[var(--border)] rounded-md overflow-hidden hover:border-[var(--accent-red)] transition-all duration-300"
-            >
-              {/* Image Container */}
-              <div className="relative w-full overflow-hidden bg-[var(--bg-card)]" style={{ aspectRatio: '16/9' }}>
-                <Image
-                  src={imgUrl}
-                  alt={article.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                {article.category && (
-                  <div className="absolute top-2 left-2 z-10">
-                    <CategoryBadge name={article.category.name} size="sm" />
-                  </div>
-                )}
-              </div>
-
-              {/* Content Box */}
-              <div className="p-3.5 flex flex-col justify-between flex-1">
-                <h3
-                  className="font-card-title text-sm leading-tight text-[var(--text-primary)] group-hover:text-[var(--accent-red)] transition-colors line-clamp-2 mb-2"
-                >
+            <li key={article.id} className="py-2.5 first:pt-1 last:pb-1">
+              <Link
+                href={`/article/${article.slug}`}
+                className="group flex items-start justify-between gap-3 text-sm sm:text-base font-bold leading-snug text-[var(--text-primary)] hover:text-[var(--accent-red)] transition-colors"
+                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              >
+                <span className="flex-1 line-clamp-2 group-hover:underline">
                   {article.title}
-                </h3>
-                {timeAgo && (
-                  <span className="font-mono text-[9px] text-[var(--text-muted)] tracking-wider uppercase mt-auto">
-                    {timeAgo}
-                  </span>
-                )}
-              </div>
-            </Link>
+                </span>
+                <span className="font-mono text-[11px] text-[var(--accent-red)] font-bold flex-shrink-0 mt-0.5">
+                  →
+                </span>
+              </Link>
+            </li>
           )
         })}
-      </div>
+      </ul>
     </div>
   )
 }
