@@ -84,11 +84,13 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
   
   const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2043076'
-  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
+  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2050530'
+  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2050533'
+  const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || '2057448'
   const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'
   const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
-  
+
   const article = await getArticle(slug, locale)
   if (!article) notFound()
 
@@ -157,82 +159,82 @@ export default async function DynamicArticlePage({ params }: PageProps) {
       />
       <ReadingBar />
 
-      {/* Hero Image Section */}
-      <div className="relative w-full overflow-hidden" style={{ height: '70vh', minHeight: 500, maxHeight: 800 }}>
-        <Image
-          src={heroImage}
-          alt={article.coverImage?.alt || article.title}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover scale-105"
-        />
-        
-        {/* Subtle Overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to top, var(--bg-primary) 0%, rgba(var(--hero-overlay-rgba), 0.75) 15%, rgba(var(--hero-overlay-rgba), 0) 50%)',
-          }}
-        />
+      {/* Editorial Article Header */}
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-3 sm:pt-6 pb-1">
+        <div className="max-w-[840px] mx-auto">
+          {/* Category & Breaking Badge */}
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {article.category && (
+              <CategoryBadge name={(dict as any)[article.category.slug] || article.category.name} size="md" />
+            )}
+            {article.isBreaking && (
+              <span className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
+                 · {dict.breaking}
+              </span>
+            )}
+          </div>
 
-        {/* Overlay content */}
-        <div className="absolute inset-0 flex flex-col justify-end max-w-[1280px] mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
-           <div className="absolute left-0 top-1/2 bottom-20 w-[4px]" style={{ background: 'var(--accent-red)' }} />
-           
-           <div className="lg:max-w-[1000px]">
-              <div className="flex items-center gap-3 mb-6">
-                {article.category && (
-                  <CategoryBadge name={(dict as any)[article.category.slug] || article.category.name} size="md" />
-                )}
-                {article.isBreaking && (
-                  <span className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
-                     · {dict.breaking}
-                  </span>
-                )}
-              </div>
-              <h1
-                className="font-display font-black leading-tight mb-6 tracking-tighter"
-                style={{ fontSize: 'clamp(28px, 5vw, 48px)', color: 'var(--text-primary)' }}
-              >
-                {article.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-6">
-                 <AuthorChip
-                    author={article.author || null}
-                    date={article.publishedAt}
-                    readTime={article.readTime}
-                    size="lg"
-                    className="article-hero-chip"
-                  />
-              </div>
-           </div>
+          {/* Main Headline */}
+          <h1
+            className="font-display font-black leading-tight mb-2 sm:mb-4 tracking-tighter"
+            style={{ fontSize: 'clamp(22px, 4.5vw, 42px)', color: 'var(--text-primary)' }}
+          >
+            {article.title}
+          </h1>
+
+          {/* Author & Date Chip */}
+          <div className="flex flex-wrap items-center gap-4 mb-3 sm:mb-6">
+             <AuthorChip
+                author={article.author || null}
+                date={article.publishedAt}
+                readTime={article.readTime}
+                size="lg"
+                className="article-hero-chip"
+              />
+          </div>
+
+          {/* Full Uncropped 16:9 Featured Image (Compact Mobile Height) */}
+          <div className="relative w-full aspect-video max-h-[190px] sm:max-h-none rounded-xl overflow-hidden mb-3 sm:mb-6 bg-[var(--bg-secondary)] shadow-sm">
+            <Image
+              src={heroImage}
+              alt={article.coverImage?.alt || article.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 840px"
+              className="object-cover"
+            />
+          </div>
         </div>
       </div>
 
       {/* Article Content Area */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-2 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
           {/* Main Article Body */}
           <div className="lg:col-span-8">
-            <div className="relative mb-12">
-               <div className="absolute -left-6 top-0 bottom-0 w-[2px]" style={{ background: 'var(--accent-red)' }} />
-               <p
-                className="text-xl leading-[1.5] italic"
-                style={{ color: 'var(--text-primary)', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.01em' }}
-              >
-                {article.excerpt}
-              </p>
-            </div>
+            {/* Lead Excerpt */}
+            {article.excerpt && (
+              <div className="relative mb-3 sm:mb-8">
+                 <div className="absolute -left-6 top-0 bottom-0 w-[2px]" style={{ background: 'var(--accent-red)' }} />
+                 <p
+                  className="text-base sm:text-xl leading-[1.4] sm:leading-[1.5] italic"
+                  style={{ color: 'var(--text-primary)', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.01em' }}
+                >
+                  {article.excerpt}
+                </p>
+              </div>
+            )}
 
 
-            {/* Rich Text Body */}
+            {/* Rich Text Body with Phased In-Article Ads */}
             <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
               {article.content ? (
                 <RichText
                   content={article.content}
                   adWidgetId={widgetInArticle1}
+                  adWidgetId2={widgetInArticle2}
+                  adWidgetId3={widgetInArticle3}
                   feedWidgetId={widgetFeed}
                 />
               ) : (

@@ -22,7 +22,7 @@ export function BreakingTicker({ articles }: BreakingTickerProps) {
 
   return (
     <div
-      className="w-full overflow-hidden flex items-center"
+      className="hidden md:flex w-full overflow-hidden items-center"
       style={{
         background: 'var(--accent-red)',
         height: 36,

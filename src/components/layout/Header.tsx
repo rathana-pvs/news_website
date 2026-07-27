@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 export function Header({ categories, locale }: HeaderProps) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('light')
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
@@ -25,26 +25,11 @@ export function Header({ categories, locale }: HeaderProps) {
     // 1. Check for manually saved theme
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light'
     
-    // 2. Check for system preference
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const defaultTheme = systemPrefersDark ? 'dark' : 'light'
-
-    const initialTheme = savedTheme || defaultTheme
+    // 2. Default to 'light' theme for high native ad CTR on mobile traffic
+    const initialTheme = savedTheme || 'light'
     
     setTheme(initialTheme)
     document.documentElement.setAttribute('data-theme', initialTheme)
-
-    // Listen for system changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const newSystemTheme = e.matches ? 'dark' : 'light'
-        setTheme(newSystemTheme)
-        document.documentElement.setAttribute('data-theme', newSystemTheme)
-      }
-    }
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const toggleTheme = () => {
@@ -84,11 +69,11 @@ export function Header({ categories, locale }: HeaderProps) {
 
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative">
           {/* Top Bar: Logo + Actions */}
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-12 sm:h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center group">
               <span
-                className="font-display font-bold text-2xl sm:text-3xl tracking-tight"
+                className="font-display font-bold text-xl sm:text-3xl tracking-tight"
                 style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}
               >
                 Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
