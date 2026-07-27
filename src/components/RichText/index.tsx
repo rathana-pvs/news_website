@@ -101,7 +101,7 @@ export const RichText = ({
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
   topElements.push(
-    <div key={`ad-inarticle-1-wrap`} className="my-3 min-h-[250px] flex justify-center items-center">
+    <div key={`ad-inarticle-1-wrap`} className="my-2 w-full flex justify-center items-center">
       <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
     </div>
   )
@@ -115,7 +115,7 @@ export const RichText = ({
     // Has Mid Ad
     bottomElements.push(...serializeLexical(nodes.slice(postAdIndex, secondAdInjectIndex), 'bot-sec-pre'))
     bottomElements.push(
-      <div key={`ad-inarticle-2-wrap`} className="my-8 min-h-[250px] flex justify-center items-center">
+      <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
         <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
       </div>
     )
@@ -124,7 +124,7 @@ export const RichText = ({
       // Has Lower Ad as well
       bottomElements.push(...serializeLexical(nodes.slice(secondAdInjectIndex, thirdAdInjectIndex), 'bot-tert-pre'))
       bottomElements.push(
-        <div key={`ad-inarticle-3-wrap`} className="my-8 min-h-[250px] flex justify-center items-center">
+        <div key={`ad-inarticle-3-wrap`} className="my-4 w-full flex justify-center items-center">
           <AdskeeperWidget key={`ad-inarticle-3`} widgetId={tertiaryWidgetId} className="!my-0" />
         </div>
       )

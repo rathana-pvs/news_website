@@ -200,7 +200,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
 
             {/* Rich Text Body with Phased In-Article Ads */}
-            <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
+            <div className="article-body prose prose-invert prose-lg max-w-none mb-4 sm:mb-12">
               {article.content ? (
                 <RichText
                   content={article.content}

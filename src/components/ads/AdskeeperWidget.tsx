@@ -223,12 +223,12 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
     if (adType === 'feed-inline') {
       return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
-          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-5">
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
             <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">Recommended For You</span>
             <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored · Feed ({widgetId})</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {MOCK_ADS.slice(0, 4).map((ad) => (
               <article key={ad.id} className="group cursor-pointer">
                 <div className="relative w-full overflow-hidden rounded mb-2" style={{ aspectRatio: '16/9' }}>
@@ -252,13 +252,13 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
     if (isInArticle) {
       return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
+          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-2">
             [Local Test Mode] Adskeeper In-Article ({widgetId})
           </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {MOCK_ADS.slice(0, 2).map((ad) => (
-              <article key={ad.id} className="group flex gap-3 border-b border-[var(--border)] pb-4 last:border-0 last:pb-0 cursor-pointer transition-all">
+              <article key={ad.id} className="group flex gap-3 border-b border-[var(--border)] pb-3 last:border-0 last:pb-0 cursor-pointer transition-all">
                 <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 72 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -282,11 +282,11 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
     if (isUnderArticle) {
       return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-10 ${className}`}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
+          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-3">
             [Local Test Mode] Adskeeper Under-Article Grid ({widgetId})
           </span>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {MOCK_ADS.slice(3, 7).map((ad) => (
               <article key={ad.id} className="group border-b border-[var(--border)] sm:border-0 pb-5 sm:pb-0 cursor-pointer transition-all">
                 <div className="relative w-full overflow-hidden rounded" style={{ aspectRatio: '16/9' }}>
@@ -382,7 +382,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
   return (
     <div
       ref={containerRef}
-      className={`adskeeper-widget-container my-10 w-full flex justify-center ${className}`}
+      className={`adskeeper-widget-container my-3 sm:my-6 w-full flex justify-center ${className}`}
     >
       <div
         ref={slotRef}
