@@ -256,8 +256,10 @@ export default async function DynamicArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Internal Related News Recommendations */}
-            <RelatedArticles articles={relatedArticles} locale={locale} />
+            {/* Internal Related News Recommendations - Hidden on mobile to maximize native ad CTR */}
+            <div className="hidden lg:block">
+              <RelatedArticles articles={relatedArticles} locale={locale} />
+            </div>
 
             {/* Under Article Native Content Grid - Positioned immediately under article text */}
             <div className="mt-4 mb-2 border-t border-[var(--border)] pt-4">
