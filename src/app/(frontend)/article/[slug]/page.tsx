@@ -146,10 +146,10 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Main Headline */}
+          {/* Main Headline (NYT Playfair Serif Style) */}
           <h1
-            className="font-display font-black leading-tight mb-2 sm:mb-4 tracking-tighter"
-            style={{ fontSize: 'clamp(22px, 4.5vw, 42px)', color: 'var(--text-primary)' }}
+            className="article-title-nyt font-display font-black leading-tight mb-2 sm:mb-4 tracking-tighter"
+            style={{ fontSize: 'clamp(24px, 4.5vw, 42px)', color: 'var(--text-primary)' }}
           >
             {article.title}
           </h1>
@@ -181,17 +181,17 @@ export default async function ArticlePage({ params }: PageProps) {
 
       {/* Article Content Area */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-2 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-16">
           
           {/* Main Article Body */}
           <div className="lg:col-span-8">
-            {/* Lead Excerpt */}
+            {/* Lead Excerpt (NYT Serif Italic Style) */}
             {article.excerpt && (
               <div className="relative mb-3 sm:mb-8">
                  <div className="absolute -left-6 top-0 bottom-0 w-[2px]" style={{ background: 'var(--accent-red)' }} />
                  <p
-                  className="text-base sm:text-xl leading-[1.4] sm:leading-[1.5] italic"
-                  style={{ color: 'var(--text-primary)', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.01em' }}
+                  className="article-excerpt-nyt text-base sm:text-xl leading-[1.4] sm:leading-[1.5] italic"
+                  style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
                 >
                   {article.excerpt}
                 </p>
@@ -233,8 +233,8 @@ export default async function ArticlePage({ params }: PageProps) {
             <RelatedArticles articles={relatedArticles} locale={locale} />
 
             {/* Under Article Native Content Grid - Positioned immediately under article text */}
-            <div className="mt-6 mb-8 border-t border-[var(--border)] pt-6">
-              <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
+            <div className="mt-4 mb-2 border-t border-[var(--border)] pt-4">
+              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
                 <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
                   Recommended For You
                 </span>
@@ -244,8 +244,8 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Sidebar Area */}
-          <aside className="lg:col-span-4 space-y-8">
+          {/* Sidebar Area - Hidden on Mobile */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-8">
             <div className="sticky top-24 space-y-8">
               {/* Related / Trending Sidebar Ad */}
               <AdskeeperWidget widgetId={widgetSidebar} adType="sidebar" onlyShowOn="desktop" />
@@ -254,7 +254,7 @@ export default async function ArticlePage({ params }: PageProps) {
         </div>
 
         {/* Feed Bottom Content Widget - Scaled Viewability */}
-        <div className="mt-8 mb-12 border-t border-[var(--border)] pt-8">
+        <div className="mt-0 mb-6 border-t border-[var(--border)] pt-2">
            <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
         </div>
       </div>

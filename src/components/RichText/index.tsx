@@ -7,10 +7,11 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 export type RichTextProps = {
   content: any
   className?: string
-  adWidgetId?: string     // Top in-article ad (before Continue Reading blur)
-  adWidgetId2?: string    // Mid in-article ad (first ad in expanded section)
-  adWidgetId3?: string    // Lower in-article ad (lower ad in expanded section)
-  feedWidgetId?: string   // Feed widget
+  adWidgetId?: string            // Top in-article ad (before Continue Reading blur)
+  adWidgetId2?: string           // Mid in-article ad (first ad in expanded section)
+  adWidgetId3?: string           // Lower in-article ad (lower ad in expanded section)
+  underArticleWidgetId?: string  // Under-article native ad grid (rendered at end of expanded content)
+  feedWidgetId?: string          // Feed widget
 }
 
 // Long article threshold: articles with this many paragraphs get additional in-article ads
@@ -22,6 +23,7 @@ export const RichText = ({
   adWidgetId,
   adWidgetId2,
   adWidgetId3,
+  underArticleWidgetId,
   feedWidgetId,
 }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -40,6 +42,9 @@ export const RichText = ({
   const tertiaryWidgetId =
     adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
 
+  const resolvedUnderArticleWidgetId =
+    underArticleWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE
+
   const resolvedFeedWidgetId =
     feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED
 
@@ -57,7 +62,6 @@ export const RichText = ({
   const isLongArticle = totalParagraphs >= LONG_ARTICLE_THRESHOLD
 
   // ─── Injection point #1: top in-article ad (Ad Slot 1 - Above The Fold) ───
-  // Inject Ad Slot 1 immediately at start of body text so it renders above the fold on mobile
   const firstInjectIndex = 0
 
   // ─── Post-ad text extension (show exactly 1 paragraph after top ad before Read More blur) ───
@@ -98,6 +102,19 @@ export const RichText = ({
     }
   }
 
+  // Filter nodes for top text: only include text paragraphs before postAdIndex, deferring inline images to bottomElements
+  const topTextNodes: any[] = []
+  const deferredImageNodes: any[] = []
+
+  for (let i = 0; i < postAdIndex; i++) {
+    const node = nodes[i]
+    if (node.type === 'upload' || node.type === 'image' || node.type === 'block') {
+      deferredImageNodes.push(node)
+    } else {
+      topTextNodes.push(node)
+    }
+  }
+
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
   topElements.push(
@@ -105,11 +122,11 @@ export const RichText = ({
       <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
     </div>
   )
-  topElements.push(...serializeLexical(nodes.slice(0, postAdIndex), 'top-post'))
+  topElements.push(...serializeLexical(topTextNodes, 'top-post'))
 
   // ─── Assemble bottomElements (shown when expanded) ───
   const bottomElements: React.ReactNode[] = []
-  const remainingNodes = nodes.slice(postAdIndex)
+  const remainingNodes = [...deferredImageNodes, ...nodes.slice(postAdIndex)]
 
   if (secondaryWidgetId && secondAdInjectIndex !== -1 && secondAdInjectIndex > postAdIndex) {
     // Has Mid Ad
@@ -135,6 +152,21 @@ export const RichText = ({
   } else {
     // Plain remaining content
     bottomElements.push(...serializeLexical(remainingNodes, 'bot-all'))
+  }
+
+  // Append Under Article Ad Grid to end of bottomElements (renders only when expanded)
+  if (resolvedUnderArticleWidgetId) {
+    bottomElements.push(
+      <div key={`ad-under-article-wrap`} className="mt-8 mb-4 border-t border-[var(--border)] pt-6">
+        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
+          <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
+            Recommended For You
+          </span>
+          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
+        </div>
+        <AdskeeperWidget widgetId={resolvedUnderArticleWidgetId} className="!my-0" />
+      </div>
+    )
   }
 
   // ─── Collapsed state: teaser preview + Continue Reading button ───
