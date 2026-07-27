@@ -213,13 +213,12 @@ export default async function DynamicArticlePage({ params }: PageProps) {
           
           {/* Main Article Body */}
           <div className="lg:col-span-8">
-            {/* Lead Excerpt (NYT Serif Italic Style) */}
+            {/* Lead Excerpt (BBC/NYT Lead Accent Bar Style) */}
             {article.excerpt && (
-              <div className="relative mb-3 sm:mb-8">
-                 <div className="absolute -left-6 top-0 bottom-0 w-[2px]" style={{ background: 'var(--accent-red)' }} />
-                 <p
-                  className="article-excerpt-nyt text-base sm:text-xl leading-[1.4] sm:leading-[1.5] italic"
-                  style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
+              <div className="border-l-2 sm:border-l-3 border-[var(--accent-red)] pl-3.5 sm:pl-4 py-0.5 mb-3 sm:mb-6">
+                <p
+                  className="article-excerpt-nyt text-base sm:text-lg leading-relaxed font-medium"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   {article.excerpt}
                 </p>
