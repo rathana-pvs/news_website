@@ -413,12 +413,16 @@ async function scrapeUrlDirectly(url: string) {
 function buildLexicalJson(blocks: any[]): any {
   const children = blocks.map(block => {
     if (block.type === 'paragraph') {
+      // Defensive: if block has no children array, build one from text field
+      const blockChildren = Array.isArray(block.children) && block.children.length > 0
+        ? block.children
+        : [{ type: 'text', text: block.text || '' }]
       return {
         type: 'paragraph',
         format: '',
         indent: 0,
         version: 1,
-        children: block.children.map((child: any) => {
+        children: blockChildren.map((child: any) => {
           if (child.type === 'link') {
             return {
               type: 'link',
@@ -600,8 +604,8 @@ const googleAI = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 })
 
-const primaryModel = googleAI('gemini-1.5-flash')
-const fallbackModel = googleAI('gemini-1.5-pro')
+const primaryModel = googleAI('gemini-3.6-flash')
+const fallbackModel = googleAI('gemini-3.5-flash-lite')
 
 const SYSTEM_PROMPT = `You are an expert news editor and content writer for Asian Dot, a reputable English-language news website covering Asia-Pacific regional news, politics, business, culture, and technology.
 
@@ -779,12 +783,27 @@ export async function POST(req: NextRequest) {
         return true
       })
 
-      // 5. Transform raw blocks into AsianDot Custom Mobile Editorial Format using Gemini 2.0 Flash
-      const rawText = dedupedBlocks
+      // Helper to extract text from block whether it uses b.text or b.children
+      const extractBlockText = (b: any): string => {
+        if (!b) return ''
+        if (typeof b.text === 'string') return b.text
+        if (b.children && Array.isArray(b.children)) {
+          return b.children.map((c: any) => c.text || extractBlockText(c)).join(' ')
+        }
+        return ''
+      }
+
+      // 5. Transform raw blocks into AsianDot Custom Mobile Editorial Format using Gemini 3.6 Flash
+      let rawText = dedupedBlocks
         .filter((b: any) => b.type === 'paragraph' || b.type === 'heading')
-        .map((b: any) => b.text)
+        .map((b: any) => extractBlockText(b))
         .filter(Boolean)
         .join('\n\n')
+
+      // Universal Fallback: If block extraction yields short text, use raw scraped content string
+      if ((!rawText || rawText.length < 50) && typeof result.content === 'string') {
+        rawText = result.content
+      }
 
       if (rawText && rawText.length > 50) {
         try {
@@ -868,12 +887,18 @@ Return valid JSON in this exact format:
     switch (action) {
       case 'full':
         if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
-        prompt = `Write a complete, well-structured news article for the title: "${title}"
+        prompt = `Write a high-engagement mobile news article for Asian Dot. Title: "${title}"
+
+RULES:
+1. Do NOT repeat the title in the body.
+2. Write exactly 3 to 4 punchy paragraphs (350-450 words total).
+3. Insert one H2 subheading before paragraph 3.
+4. Write a 2-line engaging excerpt.
 
 Return JSON in this exact format:
 {
-  "content": "Full article body in plain text paragraphs separated by double newlines. Write at least 4-5 paragraphs. Do not use markdown.",
-  "excerpt": "A compelling summary of the article in under 255 characters.",
+  "content": "Paragraph 1.\n\nParagraph 2.\n\n## Subheading\n\nParagraph 3.\n\nParagraph 4.",
+  "excerpt": "A compelling 2-line summary under 255 characters.",
   "tags": ["tag1", "tag2", "tag3"],
   "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
   "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
@@ -882,12 +907,17 @@ Return JSON in this exact format:
 
       case 'content_only':
         if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
-        prompt = `Write a news article and excerpt for the title: "${title}"
+        prompt = `Write a high-engagement mobile news article for Asian Dot. Title: "${title}"
+
+RULES:
+1. Do NOT repeat the title in the body.
+2. Write exactly 3 to 4 punchy paragraphs (350-450 words total).
+3. Insert one H2 subheading before paragraph 3.
 
 Return JSON in this exact format:
 {
-  "content": "Full article body in plain text paragraphs separated by double newlines. Write at least 4-5 paragraphs. Do not use markdown.",
-  "excerpt": "A compelling summary of the article in under 255 characters."
+  "content": "Paragraph 1.\n\nParagraph 2.\n\n## Subheading\n\nParagraph 3.\n\nParagraph 4.",
+  "excerpt": "A compelling 2-line summary under 255 characters."
 }`
         break
 
@@ -918,7 +948,7 @@ Return JSON in this exact format:
       })
       text = response.text
     } catch (e: any) {
-      console.warn('Primary model (gemini-2.0-flash) failed, falling back to gemini-1.5-flash:', e)
+      console.warn('Primary model (gemini-3.6-flash) failed, falling back to gemini-3.5-flash-lite:', e)
       const response = await generateText({
         model: fallbackModel,
         system: SYSTEM_PROMPT,
