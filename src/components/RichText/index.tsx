@@ -86,61 +86,18 @@ export const RichText = ({
     )
   }
 
-  // Count total paragraphs
-  const totalParagraphs = nodes.filter((n: any) => n.type === 'paragraph').length
-  const isLongArticle = totalParagraphs >= LONG_ARTICLE_THRESHOLD
+  // Count total paragraphs and find exact paragraph boundary indices
+  let paragraphCount = 0
+  let p1EndIndex = nodes.length // index after paragraph 1
+  let p2EndIndex = nodes.length // index after paragraph 2
+  let p3EndIndex = nodes.length // index after paragraph 3
 
-  // ─── Injection point #1: top in-article ad (Ad Slot 1 - Above The Fold) ───
-  const firstInjectIndex = 0
-
-  // ─── Post-ad text extension (show exactly 1 paragraph after top ad before Read More blur) ───
-  let postAdIndex = 0
-  let postCount = 0
   for (let i = 0; i < nodes.length; i++) {
-    if (nodes[i].type === 'paragraph') postCount++
-    if (postCount >= 1) {
-      postAdIndex = i + 1
-      break
-    }
-  }
-  if (postAdIndex === 0) {
-    postAdIndex = Math.min(1, nodes.length)
-  }
-
-  // ─── Injection point #2 in expanded section: Ad Slot 2 (Mid) ───
-  let secondAdInjectIndex = -1
-  let postExpandedCount = 0
-  for (let i = postAdIndex; i < nodes.length; i++) {
-    if (nodes[i].type === 'paragraph') postExpandedCount++
-    if (postExpandedCount >= 2) {
-      secondAdInjectIndex = i + 1
-      break
-    }
-  }
-
-  // ─── Injection point #3 in expanded section: Ad Slot 3 / Feed (Lower) ───
-  let thirdAdInjectIndex = -1
-  if (isLongArticle) {
-    let lowerCount = 0
-    for (let i = postAdIndex; i < nodes.length; i++) {
-      if (nodes[i].type === 'paragraph') lowerCount++
-      if (lowerCount >= 5) {
-        thirdAdInjectIndex = i + 1
-        break
-      }
-    }
-  }
-
-  // Filter nodes for top text: only include text paragraphs before postAdIndex, deferring inline images to bottomElements
-  const topTextNodes: any[] = []
-  const deferredImageNodes: any[] = []
-
-  for (let i = 0; i < postAdIndex; i++) {
-    const node = nodes[i]
-    if (node.type === 'upload' || node.type === 'image' || node.type === 'block') {
-      deferredImageNodes.push(node)
-    } else {
-      topTextNodes.push(node)
+    if (nodes[i].type === 'paragraph') {
+      paragraphCount++
+      if (paragraphCount === 1) p1EndIndex = i + 1
+      if (paragraphCount === 2) p2EndIndex = i + 1
+      if (paragraphCount === 3) p3EndIndex = i + 1
     }
   }
 
@@ -151,54 +108,56 @@ export const RichText = ({
       <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
     </div>
   )
-  topElements.push(...serializeLexical(topTextNodes, 'top-post'))
+  topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
 
   // ─── Assemble bottomElements (shown when expanded) ───
   const bottomElements: React.ReactNode[] = []
-  const remainingNodes = [...deferredImageNodes, ...nodes.slice(postAdIndex)]
 
-  if (secondaryWidgetId && secondAdInjectIndex !== -1 && secondAdInjectIndex > postAdIndex) {
-    // Has Mid Ad
-    bottomElements.push(...serializeLexical(nodes.slice(postAdIndex, secondAdInjectIndex), 'bot-sec-pre'))
-    bottomElements.push(
-      <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
-        <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
-      </div>
-    )
+  // Paragraph 2
+  const p2Nodes = nodes.slice(p1EndIndex, p2EndIndex)
+  if (p2Nodes.length > 0) {
+    bottomElements.push(...serializeLexical(p2Nodes, 'bot-p2'))
+    if (secondaryWidgetId) {
+      bottomElements.push(
+        <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
+          <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
+        </div>
+      )
+    }
+  }
 
-    if (tertiaryWidgetId && thirdAdInjectIndex !== -1 && thirdAdInjectIndex > secondAdInjectIndex) {
-      // Has Lower Ad as well
-      bottomElements.push(...serializeLexical(nodes.slice(secondAdInjectIndex, thirdAdInjectIndex), 'bot-tert-pre'))
+  // Paragraph 3
+  const p3Nodes = nodes.slice(p2EndIndex, p3EndIndex)
+  if (p3Nodes.length > 0) {
+    bottomElements.push(...serializeLexical(p3Nodes, 'bot-p3'))
+    if (tertiaryWidgetId) {
       bottomElements.push(
         <div key={`ad-inarticle-3-wrap`} className="my-4 w-full flex justify-center items-center">
           <AdskeeperWidget key={`ad-inarticle-3`} widgetId={tertiaryWidgetId} className="!my-0" />
         </div>
       )
-      bottomElements.push(...serializeLexical(nodes.slice(thirdAdInjectIndex), 'bot-rest'))
-    } else {
-      bottomElements.push(...serializeLexical(nodes.slice(secondAdInjectIndex), 'bot-sec-rest'))
     }
-  } else {
-    // Plain remaining content
-    bottomElements.push(...serializeLexical(remainingNodes, 'bot-all'))
   }
 
-  // Append Feed Widget (2050525) to bottom of expanded content
+  // Paragraph 4 & Paragraph 5 (if present)
+  const restNodes = nodes.slice(p3EndIndex)
+  if (restNodes.length > 0) {
+    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
+  }
+
+  // Feed Ad Widget (2050525) at bottom of expanded content
   if (resolvedFeedWidgetId) {
     bottomElements.push(
-      <div key={`ad-feed-expanded-wrap`} className="mt-8 mb-4 border-t border-[var(--border)] pt-6">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-          INTERESTING FOR YOU
-        </div>
+      <div key={`ad-feed-expanded-wrap`} className="my-4 w-full flex justify-center items-center">
         <AdskeeperWidget widgetId={resolvedFeedWidgetId} className="!my-0" />
       </div>
     )
   }
 
-  // Append Under Article Ad Grid to end of bottomElements if explicitly passed
+  // Append Under Article Ad Grid if explicitly passed
   if (underArticleWidgetId) {
     bottomElements.push(
-      <div key={`ad-under-article-wrap`} className="mt-8 mb-4 border-t border-[var(--border)] pt-6">
+      <div key={`ad-under-article-wrap`} className="my-4 w-full flex justify-center items-center">
         <AdskeeperWidget widgetId={underArticleWidgetId} className="!my-0" />
       </div>
     )

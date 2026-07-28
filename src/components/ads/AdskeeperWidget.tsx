@@ -315,22 +315,15 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
     return (
       <div className={`ads-container ${className}`}>
-        <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-30 block text-center mb-3">
+        <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-30 block text-center mb-2">
           [Local Test Mode] Adskeeper Feed Widget ({widgetId})
         </span>
 
-        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-0">
-          <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
-            Interesting For You
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Trending News</span>
-        </div>
-
-        <div className="flex flex-col divide-y divide-[var(--border)]">
+        <div className="flex flex-col">
           {MOCK_ADS.map((ad) => (
             <article
               key={ad.id}
-              className="group flex gap-4 py-4 cursor-pointer hover:bg-[var(--bg-surface)] transition-colors px-2 -mx-2 rounded"
+              className="group flex gap-4 py-3 cursor-pointer hover:bg-[var(--bg-surface)] transition-colors px-2 -mx-2 rounded"
             >
               <div
                 className="relative flex-shrink-0 overflow-hidden rounded"
@@ -366,15 +359,6 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
               </div>
             </article>
           ))}
-        </div>
-
-        <div className="mt-4 flex justify-center">
-          <button
-            className="font-mono text-[10px] uppercase tracking-widest px-6 py-2 rounded border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--accent-red)] hover:text-[var(--accent-red)] transition-colors"
-            onClick={() => {}}
-          >
-            Load More
-          </button>
         </div>
       </div>
     )

@@ -142,7 +142,7 @@ export const Articles: CollectionConfig = {
       unique: true,
       admin: { position: 'sidebar', description: 'Auto-generated from title.' },
     },
-    { name: 'excerpt', type: 'textarea', required: true, maxLength: 255, localized: true },
+    { name: 'excerpt', type: 'textarea', required: true, maxLength: 160, localized: true },
     { 
       name: 'content', 
       type: 'richText', 

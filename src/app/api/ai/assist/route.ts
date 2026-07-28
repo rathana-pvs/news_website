@@ -604,8 +604,35 @@ const googleAI = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 })
 
-const primaryModel = googleAI('gemini-3.6-flash')
-const fallbackModel = googleAI('gemini-3.5-flash-lite')
+const PRIMARY_MODEL_ID = 'gemini-3.5-flash-lite'
+const FALLBACK_MODEL_ID = 'gemini-2.5-flash'
+
+const primaryModel = googleAI(PRIMARY_MODEL_ID)
+const fallbackModel = googleAI(FALLBACK_MODEL_ID)
+
+// GET /api/ai/assist — health check both models
+export async function GET(req: NextRequest) {
+  const results: Record<string, { ok: boolean; response?: string; error?: string }> = {}
+
+  for (const [name, model] of [
+    [PRIMARY_MODEL_ID, primaryModel],
+    [FALLBACK_MODEL_ID, fallbackModel],
+  ] as [string, any][]) {
+    try {
+      const res = await generateText({
+        model,
+        prompt: 'Reply with exactly: OK',
+        maxOutputTokens: 5,
+      })
+      results[name] = { ok: true, response: res.text.trim() }
+    } catch (e: any) {
+      results[name] = { ok: false, error: e?.message || 'Unknown error' }
+    }
+  }
+
+  const allOk = Object.values(results).every(r => r.ok)
+  return NextResponse.json({ allOk, models: results }, { status: allOk ? 200 : 500 })
+}
 
 const SYSTEM_PROMPT = `You are an expert news editor and content writer for Asian Dot, a reputable English-language news website covering Asia-Pacific regional news, politics, business, culture, and technology.
 
@@ -814,9 +841,11 @@ export async function POST(req: NextRequest) {
 
 RULES FOR ASIANDOT FORMAT:
 1. DO NOT duplicate the article title in the body.
-2. Condense and rewrite the content into 3 to 4 punchy, high-impact paragraphs (350-450 words total).
-3. Insert a clean, bold subheading (H2) before paragraph 3.
-4. Create an engaging 2-line Lead Excerpt.
+2. DO NOT include any H2 or H3 subheadings inside the content. Only write clean, short paragraphs.
+3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
+4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
+5. Write EXACTLY 4 paragraphs (no more, no less).
+6. Create a punchy Lead Excerpt (STRICTLY under 160 characters max).
 
 Raw Article Title: "${result.title}"
 Raw Article Content:
@@ -825,8 +854,8 @@ Raw Article Content:
 Return valid JSON in this exact format:
 {
   "title": "Clean, punchy news title",
-  "excerpt": "Engaging 2-line lead summary",
-  "content": "Paragraph 1 text\\n\\nParagraph 2 text\\n\\n## Key Developments\\n\\nParagraph 3 text\\n\\nParagraph 4 text",
+  "excerpt": "Punchy lead summary strictly under 160 characters",
+  "content": "Paragraph 1 text\\n\\nParagraph 2 text\\n\\nParagraph 3 text\\n\\nParagraph 4 text",
   "metaTitle": "SEO title under 60 chars - Asian Dot",
   "metaDescription": "SEO description between 100 and 150 chars"
 }`,
@@ -891,14 +920,16 @@ Return valid JSON in this exact format:
 
 RULES:
 1. Do NOT repeat the title in the body.
-2. Write exactly 3 to 4 punchy paragraphs (350-450 words total).
-3. Insert one H2 subheading before paragraph 3.
-4. Write a 2-line engaging excerpt.
+2. DO NOT include any H2 or H3 subheadings. Only write clean, short paragraphs.
+3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
+4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
+5. Write EXACTLY 4 paragraphs (no more, no less).
+6. Write a punchy excerpt (STRICTLY under 160 characters max).
 
 Return JSON in this exact format:
 {
-  "content": "Paragraph 1.\n\nParagraph 2.\n\n## Subheading\n\nParagraph 3.\n\nParagraph 4.",
-  "excerpt": "A compelling 2-line summary under 255 characters.",
+  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.",
+  "excerpt": "A punchy lead summary strictly under 160 characters.",
   "tags": ["tag1", "tag2", "tag3"],
   "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
   "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
@@ -911,13 +942,15 @@ Return JSON in this exact format:
 
 RULES:
 1. Do NOT repeat the title in the body.
-2. Write exactly 3 to 4 punchy paragraphs (350-450 words total).
-3. Insert one H2 subheading before paragraph 3.
+2. DO NOT include any H2 or H3 subheadings. Only write clean, short paragraphs.
+3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
+4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
+5. Write EXACTLY 4 paragraphs (no more, no less).
 
 Return JSON in this exact format:
 {
-  "content": "Paragraph 1.\n\nParagraph 2.\n\n## Subheading\n\nParagraph 3.\n\nParagraph 4.",
-  "excerpt": "A compelling 2-line summary under 255 characters."
+  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.",
+  "excerpt": "A punchy lead summary strictly under 160 characters."
 }`
         break
 
@@ -929,7 +962,7 @@ Content snippet: "${content ? content.substring(0, 500) : ''}"
 
 Return JSON in this exact format:
 {
-  "excerpt": "A compelling summary of the article in under 255 characters.",
+  "excerpt": "A punchy summary of the article strictly under 160 characters.",
   "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
   "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
 }`
@@ -948,7 +981,7 @@ Return JSON in this exact format:
       })
       text = response.text
     } catch (e: any) {
-      console.warn('Primary model (gemini-3.6-flash) failed, falling back to gemini-3.5-flash-lite:', e)
+      console.warn(`Primary model (${PRIMARY_MODEL_ID}) failed, falling back to ${FALLBACK_MODEL_ID}:`, e)
       const response = await generateText({
         model: fallbackModel,
         system: SYSTEM_PROMPT,
@@ -1020,14 +1053,14 @@ function enforceSeoLimits(seoData: any) {
 
   if (seoData.excerpt && typeof seoData.excerpt === 'string') {
     let excerpt = seoData.excerpt.trim();
-    if (excerpt.length > 255) {
-      excerpt = excerpt.substring(0, 255);
+    if (excerpt.length > 160) {
+      excerpt = excerpt.substring(0, 160);
       const lastPeriod = excerpt.lastIndexOf('.');
-      if (lastPeriod > 180) {
+      if (lastPeriod > 100) {
         excerpt = excerpt.substring(0, lastPeriod + 1).trim();
       } else {
         const lastSpace = excerpt.lastIndexOf(' ');
-        if (lastSpace > 180) {
+        if (lastSpace > 100) {
           excerpt = excerpt.substring(0, lastSpace).trim() + '...';
         }
       }
