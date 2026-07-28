@@ -103,12 +103,12 @@ export const RichText = ({
 
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
+  topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
   topElements.push(
-    <div key={`ad-inarticle-1-wrap`} className="my-2 w-full flex justify-center items-center">
+    <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
       <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
     </div>
   )
-  topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
 
   // ─── Assemble bottomElements (shown when expanded) ───
   const bottomElements: React.ReactNode[] = []
@@ -130,28 +130,21 @@ export const RichText = ({
   const p3Nodes = nodes.slice(p2EndIndex, p3EndIndex)
   if (p3Nodes.length > 0) {
     bottomElements.push(...serializeLexical(p3Nodes, 'bot-p3'))
-    if (tertiaryWidgetId) {
-      bottomElements.push(
-        <div key={`ad-inarticle-3-wrap`} className="my-4 w-full flex justify-center items-center">
-          <AdskeeperWidget key={`ad-inarticle-3`} widgetId={tertiaryWidgetId} className="!my-0" />
-        </div>
-      )
-    }
   }
 
-  // Paragraph 4 & Paragraph 5 (if present)
-  const restNodes = nodes.slice(p3EndIndex)
-  if (restNodes.length > 0) {
-    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
-  }
-
-  // Feed Ad Widget (2050525) at bottom of expanded content
+  // Feed Ad Widget (2050525) placed right after P3 (replaces low-RPM Ad 3)
   if (resolvedFeedWidgetId) {
     bottomElements.push(
       <div key={`ad-feed-expanded-wrap`} className="my-4 w-full flex justify-center items-center">
         <AdskeeperWidget widgetId={resolvedFeedWidgetId} className="!my-0" />
       </div>
     )
+  }
+
+  // Paragraph 4 & Paragraph 5 (if present, rendered after Feed Ads)
+  const restNodes = nodes.slice(p3EndIndex)
+  if (restNodes.length > 0) {
+    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
   }
 
   // Append Under Article Ad Grid if explicitly passed

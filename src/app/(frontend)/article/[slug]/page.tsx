@@ -235,12 +235,7 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Under Article Native Content Grid - Positioned immediately under article text */}
-            <div className="mt-4 mb-2 border-t border-[var(--border)] pt-4">
-              <AdskeeperWidget widgetId={widgetUnderArticle} className="!my-0" />
-            </div>
-
-            {/* Recommended / Suggested News - Positioned directly below under_article ad */}
+            {/* Recommended / Suggested News - Positioned directly below article body */}
             <RelatedArticles articles={relatedArticles} locale={locale} />
           </div>
 
