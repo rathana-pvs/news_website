@@ -120,7 +120,15 @@ export const AIAssistant: React.FC = () => {
   }
 
   const applyField = (fieldName: string, value: any) => {
-    if (fieldName === 'tags' && Array.isArray(value)) {
+    if (fieldName === 'excerpt' && typeof value === 'string' && result?.title) {
+      let cleanExcerpt = value
+      const cleanT = result.title.trim().toLowerCase()
+      const prefix = cleanT.substring(0, Math.min(25, cleanT.length))
+      if (cleanExcerpt.trim().toLowerCase().startsWith(prefix)) {
+        cleanExcerpt = cleanExcerpt.trim().substring(result.title.length).replace(/^[\s:\-–—\.\,\!]+/, '').trim()
+      }
+      dispatchFields({ type: 'UPDATE', path: 'excerpt', value: cleanExcerpt, valid: true })
+    } else if (fieldName === 'tags' && Array.isArray(value)) {
       dispatchFields({ type: 'UPDATE', path: 'tags', value: value.map((tag: string) => ({ tag })), valid: true })
     } else if (fieldName === 'metaTitle') {
       dispatchFields({ type: 'UPDATE', path: 'og.metaTitle', value, valid: true })
@@ -133,7 +141,34 @@ export const AIAssistant: React.FC = () => {
       dispatchFields({ type: 'UPDATE', path: 'og.ogImage', value, valid: true })
       dispatchFields({ type: 'UPDATE', path: 'meta.image', value, valid: true })
     } else if (fieldName === 'content') {
-      const lexicalValue = typeof value === 'string' ? convertTextToLexicalJson(value) : value
+      let lexicalValue = typeof value === 'string' ? convertTextToLexicalJson(value) : value
+      if (lexicalValue?.root?.children && result?.title) {
+        const cleanT = result.title.trim().toLowerCase()
+        const prefix = cleanT.substring(0, Math.min(25, cleanT.length))
+        
+        const getNodeText = (node: any): string => {
+          if (!node) return ''
+          if (typeof node.text === 'string') return node.text
+          if (node.children && Array.isArray(node.children)) {
+            return node.children.map(getNodeText).join(' ')
+          }
+          return ''
+        }
+
+        lexicalValue.root.children = lexicalValue.root.children.filter((node: any, idx: number) => {
+          if (idx >= 3) return true
+          const text = getNodeText(node).trim().toLowerCase()
+          if (!text) return true
+          if (
+            text === cleanT ||
+            (prefix.length > 5 && text.startsWith(prefix)) ||
+            (text.length > 5 && cleanT.startsWith(text.substring(0, 25)))
+          ) {
+            return false
+          }
+          return true
+        })
+      }
       dispatchFields({ type: 'UPDATE', path: 'content', value: lexicalValue, initialValue: lexicalValue, valid: true })
     } else {
       dispatchFields({ type: 'UPDATE', path: fieldName, value, valid: true })

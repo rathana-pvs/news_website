@@ -7,11 +7,21 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 export type RichTextProps = {
   content: any
   className?: string
+  articleTitle?: string          // Main article title for deduplication
   adWidgetId?: string            // Top in-article ad (before Continue Reading blur)
   adWidgetId2?: string           // Mid in-article ad (first ad in expanded section)
   adWidgetId3?: string           // Lower in-article ad (lower ad in expanded section)
   underArticleWidgetId?: string  // Under-article native ad grid (rendered at end of expanded content)
   feedWidgetId?: string          // Feed widget
+}
+
+function extractNodeText(node: any): string {
+  if (!node) return ''
+  if (typeof node.text === 'string') return node.text
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.map(extractNodeText).join(' ')
+  }
+  return ''
 }
 
 // Long article threshold: articles with this many paragraphs get additional in-article ads
@@ -20,6 +30,7 @@ const LONG_ARTICLE_THRESHOLD = 6
 export const RichText = ({
   content,
   className,
+  articleTitle,
   adWidgetId,
   adWidgetId2,
   adWidgetId3,
@@ -31,7 +42,27 @@ export const RichText = ({
   if (!content) return null
 
   // Lexical content structure: { root: { children: [...] } }
-  const nodes = content.root?.children || []
+  const rawNodes = content.root?.children || []
+
+  // Filter out any top nodes that duplicate articleTitle (checks top 3 blocks)
+  let nodes = rawNodes
+  if (articleTitle && rawNodes.length > 0) {
+    const cleanTitle = articleTitle.trim().toLowerCase()
+    const titlePrefix = cleanTitle.substring(0, Math.min(25, cleanTitle.length))
+    nodes = rawNodes.filter((node: any, idx: number) => {
+      if (idx >= 3) return true
+      const text = extractNodeText(node).trim().toLowerCase()
+      if (!text) return true
+      if (
+        text === cleanTitle || 
+        (titlePrefix.length > 5 && text.startsWith(titlePrefix)) || 
+        (text.length > 5 && cleanTitle.startsWith(text.substring(0, 25)))
+      ) {
+        return false
+      }
+      return true
+    })
+  }
 
   const primaryWidgetId =
     adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1
@@ -150,6 +181,18 @@ export const RichText = ({
   } else {
     // Plain remaining content
     bottomElements.push(...serializeLexical(remainingNodes, 'bot-all'))
+  }
+
+  // Append Feed Widget (2050525) to bottom of expanded content
+  if (resolvedFeedWidgetId) {
+    bottomElements.push(
+      <div key={`ad-feed-expanded-wrap`} className="mt-8 mb-4 border-t border-[var(--border)] pt-6">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+          INTERESTING FOR YOU
+        </div>
+        <AdskeeperWidget widgetId={resolvedFeedWidgetId} className="!my-0" />
+      </div>
+    )
   }
 
   // Append Under Article Ad Grid to end of bottomElements if explicitly passed

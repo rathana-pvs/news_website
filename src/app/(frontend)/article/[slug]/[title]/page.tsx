@@ -213,9 +213,15 @@ export default async function DynamicArticlePage({ params }: PageProps) {
           
           {/* Main Article Body */}
           <div className="lg:col-span-8">
-            {/* Lead Excerpt (BBC/NYT Lead Accent Bar Style) */}
+            {/* Lead Excerpt (Executive Briefing Card Style) */}
             {article.excerpt && (
-              <div className="border-l-2 sm:border-l-3 border-[var(--accent-red)] pl-3.5 sm:pl-4 py-0.5 mb-3 sm:mb-6">
+              <div 
+                className="border-l-4 border-[var(--accent-red)] pl-4 pr-4 py-3 mb-4 sm:mb-6 rounded-r-lg shadow-xs"
+                style={{ background: 'rgba(231, 76, 60, 0.05)' }}
+              >
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--accent-red)] mb-1 block font-sans">
+                  EXECUTIVE SUMMARY
+                </span>
                 <p
                   className="article-excerpt-nyt text-base sm:text-lg leading-relaxed font-medium"
                   style={{ color: 'var(--text-primary)' }}
@@ -231,6 +237,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
               {article.content ? (
                 <RichText
                   content={article.content}
+                  articleTitle={article.title}
                   adWidgetId={widgetInArticle1}
                   adWidgetId2={widgetInArticle2}
                   adWidgetId3={widgetInArticle3}

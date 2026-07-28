@@ -43,6 +43,35 @@ export const Articles: CollectionConfig = {
         }
         
         if (data.content) {
+          // Automatically strip duplicate title nodes from content root
+          if (data.title && data.content?.root?.children && Array.isArray(data.content.root.children)) {
+            const cleanTitle = data.title.trim().toLowerCase()
+            const titlePrefix = cleanTitle.substring(0, Math.min(25, cleanTitle.length))
+            
+            const getNodeText = (node: any): string => {
+              if (!node) return ''
+              if (typeof node.text === 'string') return node.text
+              if (node.children && Array.isArray(node.children)) {
+                return node.children.map(getNodeText).join(' ')
+              }
+              return ''
+            }
+
+            data.content.root.children = data.content.root.children.filter((node: any, idx: number) => {
+              if (idx >= 3) return true
+              const text = getNodeText(node).trim().toLowerCase()
+              if (!text) return true
+              if (
+                text === cleanTitle ||
+                (titlePrefix.length > 5 && text.startsWith(titlePrefix)) ||
+                (text.length > 5 && cleanTitle.startsWith(text.substring(0, 25)))
+              ) {
+                return false
+              }
+              return true
+            })
+          }
+
           const contentStr = JSON.stringify(data.content)
           const wordCount = contentStr.split(/\s+/).length
           data.readTime = Math.max(1, Math.ceil(wordCount / 200))

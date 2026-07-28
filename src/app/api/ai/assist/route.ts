@@ -364,13 +364,44 @@ async function scrapeUrlDirectly(url: string) {
     scrapedImageUrl = foundImg
   }
 
+  // Clean excerpt if it duplicates title at start
+  if (title && excerpt) {
+    const cleanT = title.trim().toLowerCase()
+    const prefix = cleanT.substring(0, Math.min(25, cleanT.length))
+    if (excerpt.trim().toLowerCase().startsWith(prefix)) {
+      excerpt = excerpt.trim().substring(title.length).replace(/^[\s:\-–—\.\,\!]+/, '').trim()
+    }
+  }
+
+  // Clean rawBlocks: remove top blocks that duplicate title
+  if (title && rawBlocks.length > 0) {
+    const cleanT = title.trim().toLowerCase()
+    const prefix = cleanT.substring(0, Math.min(25, cleanT.length))
+    const filteredBlocks = rawBlocks.filter((block: any, idx: number) => {
+      if (idx >= 3) return true
+      const bText = (block.text || '').trim().toLowerCase()
+      if (!bText) return true
+      if (
+        bText === cleanT || 
+        (prefix.length > 5 && bText.startsWith(prefix)) || 
+        (bText.length > 5 && cleanT.startsWith(bText.substring(0, 25)))
+      ) {
+        return false
+      }
+      return true
+    })
+    rawBlocks.length = 0
+    rawBlocks.push(...filteredBlocks)
+  }
+
   const metaTitle = title.endsWith(' - Asian Dot') ? title : `${title.substring(0, 45)} - Asian Dot`
-  const metaDescription = excerpt || (content.length > 140 ? content.substring(0, 140) + '...' : content)
+  const finalExcerpt = excerpt || (content.length > 180 ? content.substring(0, 180) + '...' : content)
+  const metaDescription = finalExcerpt || (content.length > 140 ? content.substring(0, 140) + '...' : content)
 
   return {
     title,
     content,
-    excerpt: excerpt || (content.length > 180 ? content.substring(0, 180) + '...' : content),
+    excerpt: finalExcerpt,
     tags,
     metaTitle,
     metaDescription,
@@ -569,8 +600,8 @@ const googleAI = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 })
 
-const primaryModel = googleAI('gemini-3.5-flash')
-const fallbackModel = googleAI('gemini-2.5-flash')
+const primaryModel = googleAI('gemini-1.5-flash')
+const fallbackModel = googleAI('gemini-1.5-pro')
 
 const SYSTEM_PROMPT = `You are an expert news editor and content writer for Asian Dot, a reputable English-language news website covering Asia-Pacific regional news, politics, business, culture, and technology.
 
@@ -748,9 +779,84 @@ export async function POST(req: NextRequest) {
         return true
       })
 
-      // 5. Build Lexical JSON tree and assign to content
-      result.content = buildLexicalJson(dedupedBlocks)
-      
+      // 5. Transform raw blocks into AsianDot Custom Mobile Editorial Format using Gemini 2.0 Flash
+      const rawText = dedupedBlocks
+        .filter((b: any) => b.type === 'paragraph' || b.type === 'heading')
+        .map((b: any) => b.text)
+        .filter(Boolean)
+        .join('\n\n')
+
+      if (rawText && rawText.length > 50) {
+        try {
+          const aiResponse = await generateText({
+            model: primaryModel,
+            system: SYSTEM_PROMPT,
+            prompt: `You are the lead editor at Asian Dot. Transform the following raw news article into Asian Dot's custom high-engagement mobile editorial format.
+
+RULES FOR ASIANDOT FORMAT:
+1. DO NOT duplicate the article title in the body.
+2. Condense and rewrite the content into 3 to 4 punchy, high-impact paragraphs (350-450 words total).
+3. Insert a clean, bold subheading (H2) before paragraph 3.
+4. Create an engaging 2-line Lead Excerpt.
+
+Raw Article Title: "${result.title}"
+Raw Article Content:
+"${rawText.substring(0, 3500)}"
+
+Return valid JSON in this exact format:
+{
+  "title": "Clean, punchy news title",
+  "excerpt": "Engaging 2-line lead summary",
+  "content": "Paragraph 1 text\\n\\nParagraph 2 text\\n\\n## Key Developments\\n\\nParagraph 3 text\\n\\nParagraph 4 text",
+  "metaTitle": "SEO title under 60 chars - Asian Dot",
+  "metaDescription": "SEO description between 100 and 150 chars"
+}`,
+          })
+
+          const cleanJsonText = aiResponse.text.replace(/```json\n?|\n?```/g, '').trim()
+          const aiData = JSON.parse(cleanJsonText)
+
+          if (aiData.title) result.title = aiData.title
+          if (aiData.excerpt) result.excerpt = aiData.excerpt
+          if (aiData.metaTitle) result.metaTitle = aiData.metaTitle
+          if (aiData.metaDescription) result.metaDescription = aiData.metaDescription
+
+          if (aiData.content) {
+            const formattedParagraphs = aiData.content.split('\n\n')
+            const formattedBlocks: any[] = []
+
+            for (const p of formattedParagraphs) {
+              const trimmed = p.trim()
+              if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) {
+                formattedBlocks.push({
+                  type: 'heading',
+                  tag: 'h2',
+                  text: trimmed.replace(/^#+\s*/, '')
+                })
+              } else if (trimmed.length > 0) {
+                formattedBlocks.push({
+                  type: 'paragraph',
+                  text: trimmed
+                })
+              }
+            }
+
+            // Re-attach non-text media blocks (inline images/embeds)
+            const mediaBlocks = dedupedBlocks.filter((b: any) => b.type !== 'paragraph' && b.type !== 'heading')
+            formattedBlocks.push(...mediaBlocks)
+
+            result.content = buildLexicalJson(formattedBlocks)
+          } else {
+            result.content = buildLexicalJson(dedupedBlocks)
+          }
+        } catch (aiErr) {
+          console.warn('AsianDot AI formatting fallback to raw scraped blocks:', aiErr)
+          result.content = buildLexicalJson(dedupedBlocks)
+        }
+      } else {
+        result.content = buildLexicalJson(dedupedBlocks)
+      }
+
       delete result.blocks
 
       const enforced = enforceSeoLimits(result)
@@ -812,7 +918,7 @@ Return JSON in this exact format:
       })
       text = response.text
     } catch (e: any) {
-      console.warn('Primary model (gemini-3.5-flash) failed, falling back to gemini-2.5-flash:', e)
+      console.warn('Primary model (gemini-2.0-flash) failed, falling back to gemini-1.5-flash:', e)
       const response = await generateText({
         model: fallbackModel,
         system: SYSTEM_PROMPT,
