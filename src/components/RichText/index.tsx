@@ -132,14 +132,6 @@ export const RichText = ({
     bottomElements.push(...serializeLexical(p3Nodes, 'bot-p3'))
   }
 
-  // Feed Ad Widget (2050525) placed right after P3 (replaces low-RPM Ad 3)
-  if (resolvedFeedWidgetId) {
-    bottomElements.push(
-      <div key={`ad-feed-expanded-wrap`} className="my-4 w-full flex justify-center items-center">
-        <AdskeeperWidget widgetId={resolvedFeedWidgetId} className="!my-0" />
-      </div>
-    )
-  }
 
   // Paragraph 4 & Paragraph 5 (if present, rendered after Feed Ads)
   const restNodes = nodes.slice(p3EndIndex)
@@ -147,14 +139,7 @@ export const RichText = ({
     bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
   }
 
-  // Append Under Article Ad Grid if explicitly passed
-  if (underArticleWidgetId) {
-    bottomElements.push(
-      <div key={`ad-under-article-wrap`} className="my-4 w-full flex justify-center items-center">
-        <AdskeeperWidget widgetId={underArticleWidgetId} className="!my-0" />
-      </div>
-    )
-  }
+
 
   // ─── Collapsed state: teaser preview + Continue Reading button ───
   if (!isExpanded) {
