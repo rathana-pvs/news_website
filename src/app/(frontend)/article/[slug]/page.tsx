@@ -235,8 +235,7 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Recommended / Suggested News - Positioned directly below article body */}
-            <RelatedArticles articles={relatedArticles} locale={locale} />
+
           </div>
 
           {/* Sidebar Area - Hidden on Mobile */}

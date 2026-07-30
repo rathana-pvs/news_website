@@ -262,8 +262,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
             )}
 
 
-            {/* Recommended / Suggested News - Positioned directly below article body */}
-            <RelatedArticles articles={relatedArticles} locale={locale} />
+
           </div>
 
           {/* Sidebar Area - Hidden on Mobile */}
