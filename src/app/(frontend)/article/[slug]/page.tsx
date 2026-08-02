@@ -236,6 +236,10 @@ export default async function ArticlePage({ params }: PageProps) {
 
 
 
+            {/* Feed Bottom Content Widget - Inside content layout to avoid empty space */}
+            <div className="mt-6 mb-6 border-t border-[var(--border)] pt-4">
+               <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
+            </div>
           </div>
 
           {/* Sidebar Area - Hidden on Mobile */}
@@ -246,12 +250,8 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
           </aside>
         </div>
-
-        {/* Feed Bottom Content Widget - Scaled Viewability */}
-        <div className="mt-0 mb-6 border-t border-[var(--border)] pt-2">
-           <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
-        </div>
       </div>
     </>
   )
 }
+
