@@ -258,7 +258,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
 
 
             {/* Feed Bottom Content Widget - Inside content layout to avoid empty space */}
-            <div className="mt-6 mb-6 border-t border-[var(--border)] pt-4">
+            <div className="mt-6 mb-6">
                <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
             </div>
           </div>
