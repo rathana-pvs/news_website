@@ -131,60 +131,54 @@ export default async function ArticlePage({ params }: PageProps) {
       />
       <ReadingBar />
 
-      {/* Editorial Article Header */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-3 sm:pt-6 pb-1">
-        <div className="max-w-[840px] mx-auto">
-          {/* Category & Breaking Badge */}
-          <div className="flex items-center gap-2 mb-2 sm:mb-3">
-            {article.category && (
-              <CategoryBadge name={(dict as any)[article.category.slug] || article.category.name} size="md" />
-            )}
-            {article.isBreaking && (
-              <span className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
-                 · {dict.breaking}
-              </span>
-            )}
-          </div>
-
-          {/* Main Headline (NYT Playfair Serif Style) */}
-          <h1
-            className="article-title-nyt font-display font-black leading-tight mb-2 sm:mb-4 tracking-tighter"
-            style={{ fontSize: 'clamp(24px, 4.5vw, 42px)', color: 'var(--text-primary)' }}
-          >
-            {article.title}
-          </h1>
-
-          {/* Author & Date Chip */}
-          <div className="flex flex-wrap items-center gap-4 mb-3 sm:mb-6">
-             <AuthorChip
-                author={article.author || null}
-                date={article.publishedAt}
-                readTime={article.readTime}
-                size="lg"
-                className="article-hero-chip"
-              />
-          </div>
-
-          {/* Full Uncropped 16:9 Featured Image (Compact Mobile Height) */}
-          <div className="relative w-full aspect-video max-h-[190px] sm:max-h-none rounded-xl overflow-hidden mb-3 sm:mb-6 bg-[var(--bg-secondary)] shadow-sm">
-            <Image
-              src={heroImage}
-              alt={article.coverImage?.alt || article.title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 840px"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Article Content Area */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-2 sm:py-12">
+      {/* Main Content & Sidebar Layout */}
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-3 sm:pt-6 pb-6 sm:pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-16">
           
-          {/* Main Article Body */}
+          {/* Main Article Content Column */}
           <div className="lg:col-span-8">
+            {/* Category & Breaking Badge */}
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              {article.category && (
+                <CategoryBadge name={(dict as any)[article.category.slug] || article.category.name} size="md" />
+              )}
+              {article.isBreaking && (
+                <span className="font-mono font-bold text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--accent-red)' }}>
+                   · {dict.breaking}
+                </span>
+              )}
+            </div>
+
+            {/* Main Headline (NYT Playfair Serif Style) */}
+            <h1
+              className="article-title-nyt font-display font-black leading-tight mb-2 sm:mb-4 tracking-tighter"
+              style={{ fontSize: 'clamp(24px, 4.5vw, 42px)', color: 'var(--text-primary)' }}
+            >
+              {article.title}
+            </h1>
+
+            {/* Author & Date Chip */}
+            <div className="flex flex-wrap items-center gap-4 mb-3 sm:mb-6">
+               <AuthorChip
+                  author={article.author || null}
+                  date={article.publishedAt}
+                  readTime={article.readTime}
+                  size="lg"
+                  className="article-hero-chip"
+                />
+            </div>
+
+            {/* Full Uncropped 16:9 Featured Image (Stay in Content Layout) */}
+            <div className="relative w-full aspect-video max-h-[190px] sm:max-h-none rounded-xl overflow-hidden mb-4 sm:mb-8 bg-[var(--bg-secondary)] shadow-sm">
+              <Image
+                src={heroImage}
+                alt={article.coverImage?.alt || article.title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 67vw, 840px"
+                className="object-cover"
+              />
+            </div>
             {/* Lead Excerpt (Executive Briefing Card Style) */}
             {article.excerpt && (
               <div 
