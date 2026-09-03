@@ -98,7 +98,7 @@ export default async function HomePage() {
 
       {/* Ad Spot */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdskeeperWidget widgetId={widgetUnderArticle} />
+        <AdskeeperWidget widgetId={widgetUnderArticle} placement="home_after_hero" />
       </div>
 
       {/* Latest News Divider */}
@@ -115,7 +115,7 @@ export default async function HomePage() {
 
       {/* Second Ad Spot */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdskeeperWidget widgetId={widgetFeed} />
+        <AdskeeperWidget widgetId={widgetFeed} placement="home_feed" />
       </div>
 
       {/* Category Rows */}

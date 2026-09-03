@@ -11,8 +11,6 @@ export type RichTextProps = {
   adWidgetId?: string            // Top in-article ad (before Continue Reading blur)
   adWidgetId2?: string           // Mid in-article ad (first ad in expanded section)
   adWidgetId3?: string           // Lower in-article ad (lower ad in expanded section)
-  underArticleWidgetId?: string  // Under-article native ad grid (rendered at end of expanded content)
-  feedWidgetId?: string          // Feed widget
 }
 
 function extractNodeText(node: any): string {
@@ -34,8 +32,6 @@ export const RichText = ({
   adWidgetId,
   adWidgetId2,
   adWidgetId3,
-  underArticleWidgetId,
-  feedWidgetId,
 }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -74,9 +70,6 @@ export const RichText = ({
     adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
 
 
-  const resolvedFeedWidgetId =
-    feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED
-
   // If no primary ad configured or article is too short, render plain
   if (!primaryWidgetId || nodes.length < 2) {
     return (
@@ -90,14 +83,14 @@ export const RichText = ({
   let paragraphCount = 0
   let p1EndIndex = nodes.length // index after paragraph 1
   let p2EndIndex = nodes.length // index after paragraph 2
-  let p3EndIndex = nodes.length // index after paragraph 3
+  let p6EndIndex = nodes.length // index after paragraph 6
 
   for (let i = 0; i < nodes.length; i++) {
     if (nodes[i].type === 'paragraph') {
       paragraphCount++
       if (paragraphCount === 1) p1EndIndex = i + 1
       if (paragraphCount === 2) p2EndIndex = i + 1
-      if (paragraphCount === 3) p3EndIndex = i + 1
+      if (paragraphCount === LONG_ARTICLE_THRESHOLD) p6EndIndex = i + 1
     }
   }
 
@@ -106,7 +99,12 @@ export const RichText = ({
   topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
   topElements.push(
     <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
-      <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
+      <AdskeeperWidget
+        key={`ad-inarticle-1`}
+        widgetId={primaryWidgetId}
+        placement="article_inline_1"
+        className="!my-0"
+      />
     </div>
   )
 
@@ -120,23 +118,40 @@ export const RichText = ({
     if (secondaryWidgetId) {
       bottomElements.push(
         <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
-          <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
+          <AdskeeperWidget
+            key={`ad-inarticle-2`}
+            widgetId={secondaryWidgetId}
+            placement="article_inline_2"
+            className="!my-0"
+          />
         </div>
       )
     }
   }
 
-  // Paragraph 3
-  const p3Nodes = nodes.slice(p2EndIndex, p3EndIndex)
-  if (p3Nodes.length > 0) {
-    bottomElements.push(...serializeLexical(p3Nodes, 'bot-p3'))
+  // Keep the third unit exclusive to genuinely long articles so ad density
+  // remains proportional to the amount of editorial content.
+  const middleNodes = nodes.slice(p2EndIndex, p6EndIndex)
+  if (middleNodes.length > 0) {
+    bottomElements.push(...serializeLexical(middleNodes, 'bot-p3-p6'))
   }
 
+  if (tertiaryWidgetId && paragraphCount >= LONG_ARTICLE_THRESHOLD) {
+    bottomElements.push(
+      <div key="ad-inarticle-3-wrap" className="my-4 w-full flex justify-center items-center">
+        <AdskeeperWidget
+          key="ad-inarticle-3"
+          widgetId={tertiaryWidgetId}
+          placement="article_inline_3"
+          className="!my-0"
+        />
+      </div>
+    )
+  }
 
-  // Paragraph 4 & Paragraph 5 (if present, rendered after Feed Ads)
-  const restNodes = nodes.slice(p3EndIndex)
+  const restNodes = nodes.slice(p6EndIndex)
   if (restNodes.length > 0) {
-    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
+    bottomElements.push(...serializeLexical(restNodes, 'bot-rest'))
   }
 
 

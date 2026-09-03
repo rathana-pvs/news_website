@@ -158,6 +158,7 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
             <div className="my-8">
               <AdskeeperWidget 
                 widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'} 
+                placement="category_feed"
               />
             </div>
 

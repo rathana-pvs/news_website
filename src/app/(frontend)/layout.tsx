@@ -62,6 +62,13 @@ export default async function FrontendLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <Script
+          src={process.env.NEXT_PUBLIC_ADS_KEEPER_SCRIPT_URL || 'https://jsc.adskeeper.com/site/1101571.js'}
+          strategy="beforeInteractive"
+          async
+        />
+      </head>
       <body>
         <NavigationProgress />
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -83,10 +90,6 @@ export default async function FrontendLayout({
           {`var _wau = _wau || []; _wau.push(["dynamic", "zzpbthitpu", "t8q", "c4302bffffff", "small"]);`}
         </Script>
         <Script src="//waust.at/d.js" strategy="afterInteractive" />
-        <Script 
-          src={process.env.NEXT_PUBLIC_ADS_KEEPER_SCRIPT_URL || 'https://jsc.adskeeper.com/site/1101571.js'} 
-          strategy="afterInteractive" 
-        />
       </body>
     </html>
   )

@@ -89,8 +89,6 @@ export default async function ArticlePage({ params }: PageProps) {
   const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2050530'
   const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2050533'
   const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || '2057448'
-  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'
-  const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
   
   const article = await getArticle(slug, locale)
@@ -207,7 +205,6 @@ export default async function ArticlePage({ params }: PageProps) {
                   adWidgetId={widgetInArticle1}
                   adWidgetId2={widgetInArticle2}
                   adWidgetId3={widgetInArticle3}
-                  feedWidgetId={widgetFeed}
                 />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">
@@ -232,15 +229,26 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {/* Feed Bottom Content Widget - Inside content layout to avoid empty space */}
             <div className="mt-6 mb-6">
-               <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
+               <AdskeeperWidget
+                 widgetId={widgetBottomFeed}
+                 placement="article_bottom"
+                 className="!my-0"
+               />
             </div>
+
+            <RelatedArticles articles={relatedArticles} locale={locale} />
           </div>
 
           {/* Sidebar Area - Hidden on Mobile */}
           <aside className="hidden lg:block lg:col-span-4 space-y-8">
-            <div className="sticky top-24 space-y-8">
-              {/* Related / Trending Sidebar Ad */}
-              <AdskeeperWidget widgetId={widgetSidebar} adType="sidebar" onlyShowOn="desktop" />
+            <div className="space-y-8">
+              {/* Keep this unit in normal document flow for placement compliance. */}
+              <AdskeeperWidget
+                widgetId={widgetSidebar}
+                placement="article_sidebar"
+                adType="sidebar"
+                onlyShowOn="desktop"
+              />
             </div>
           </aside>
         </div>
@@ -248,4 +256,3 @@ export default async function ArticlePage({ params }: PageProps) {
     </>
   )
 }
-

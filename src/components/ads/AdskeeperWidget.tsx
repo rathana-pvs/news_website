@@ -7,6 +7,7 @@ interface AdskeeperWidgetProps {
   className?: string
   adType?: 'sidebar' | 'feed-inline'
   onlyShowOn?: 'desktop' | 'mobile'
+  placement?: string
 }
 
 // Simulated clickbait-style native advertisement mock data
@@ -61,14 +62,34 @@ const MOCK_ADS = [
   }
 ]
 
-let mgcLoadFired = false
+function trackAdEvent(
+  eventName: string,
+  widgetId: string,
+  placement: string,
+  adType?: 'sidebar' | 'feed-inline'
+) {
+  window.gtag?.('event', eventName, {
+    widget_id: widgetId,
+    ad_placement: placement,
+    ad_type: adType || 'native',
+  })
+}
 
-export default function AdskeeperWidget({ widgetId, className = '', adType, onlyShowOn }: AdskeeperWidgetProps) {
+export default function AdskeeperWidget({
+  widgetId,
+  className = '',
+  adType,
+  onlyShowOn,
+  placement = 'unspecified',
+}: AdskeeperWidgetProps) {
   const isDev = process.env.NODE_ENV === 'development'
   const containerRef = useRef<HTMLDivElement>(null)
   const slotRef = useRef<HTMLDivElement>(null)
   const [filled, setFilled] = useState<boolean | null>(null) // null = pending
   const [isMatch, setIsMatch] = useState<boolean | null>(null)
+  const requestedRef = useRef(false)
+  const filledEventRef = useRef(false)
+  const viewableEventRef = useRef(false)
 
   useEffect(() => {
     if (!onlyShowOn) {
@@ -100,6 +121,10 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       const h = slotEl.offsetHeight
       if (h > 0) {
         setFilled(true)
+        if (!filledEventRef.current) {
+          filledEventRef.current = true
+          trackAdEvent('adskeeper_slot_filled', widgetId, placement, adType)
+        }
         resizeObs.disconnect()
       }
     })
@@ -109,6 +134,10 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       ([entry]) => {
         if (entry.isIntersecting) {
           observer.disconnect()
+          if (!requestedRef.current) {
+            requestedRef.current = true
+            trackAdEvent('adskeeper_slot_requested', widgetId, placement, adType)
+          }
           requestAnimationFrame(() => {
             try {
               window._mgq = window._mgq || []
@@ -120,6 +149,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
               setFilled((prev) => {
                 if (prev === null) {
                   resizeObs.disconnect()
+                  trackAdEvent('adskeeper_slot_unfilled', widgetId, placement, adType)
                   return false // unfilled -> hide
                 }
                 return prev
@@ -135,7 +165,37 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       observer.disconnect()
       resizeObs.disconnect()
     }
-  }, [widgetId, isDev, isMatch])
+  }, [widgetId, isDev, isMatch, placement, adType])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || !filled || viewableEventRef.current) return
+
+    let viewabilityTimer: ReturnType<typeof setTimeout> | null = null
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          if (!viewabilityTimer) {
+            viewabilityTimer = setTimeout(() => {
+              viewableEventRef.current = true
+              trackAdEvent('adskeeper_slot_viewable', widgetId, placement, adType)
+              observer.disconnect()
+            }, 1000)
+          }
+        } else if (viewabilityTimer) {
+          clearTimeout(viewabilityTimer)
+          viewabilityTimer = null
+        }
+      },
+      { threshold: [0, 0.5, 1] }
+    )
+
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      if (viewabilityTimer) clearTimeout(viewabilityTimer)
+    }
+  }, [filled, widgetId, placement, adType])
 
   if (isMatch === null) return null
   if (isMatch === false) return null
@@ -369,7 +429,8 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
   return (
     <div
       ref={containerRef}
-      className={`adskeeper-widget-container my-3 sm:my-6 w-full flex justify-center ${className}`}
+      className={`adskeeper-widget-container ${filled === null ? 'adskeeper-widget-pending' : ''} my-3 sm:my-6 w-full flex justify-center ${className}`}
+      data-ad-placement={placement}
     >
       <div
         ref={slotRef}
@@ -385,5 +446,6 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 declare global {
   interface Window {
     _mgq?: any[][]
+    gtag?: (...args: any[]) => void
   }
 }

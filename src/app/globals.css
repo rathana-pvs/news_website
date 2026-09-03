@@ -127,6 +127,33 @@
   color: var(--text-primary) !important;
 }
 
+/* Reserve space while native widgets load to prevent content from jumping. */
+.adskeeper-widget-pending {
+  min-height: 180px;
+}
+
+.adskeeper-widget-pending[data-ad-placement="article_bottom"],
+.adskeeper-widget-pending[data-ad-placement="home_feed"],
+.adskeeper-widget-pending[data-ad-placement="category_feed"] {
+  min-height: 280px;
+}
+
+.adskeeper-widget-pending[data-ad-placement="article_sidebar"] {
+  min-height: 520px;
+}
+
+@media (max-width: 640px) {
+  .adskeeper-widget-pending {
+    min-height: 150px;
+  }
+
+  .adskeeper-widget-pending[data-ad-placement="article_bottom"],
+  .adskeeper-widget-pending[data-ad-placement="home_feed"],
+  .adskeeper-widget-pending[data-ad-placement="category_feed"] {
+    min-height: 220px;
+  }
+}
+
 /* ─── Global Transitions ───────────────────────────────────────── */
 * {
   transition: var(--theme-transition);
