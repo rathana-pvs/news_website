@@ -1,266 +1,111 @@
 import type { Metadata } from 'next'
-import { i18nStrings } from '@/lib/i18n'
-import { Locale } from '@/i18n-config'
+import Link from 'next/link'
 import { ContactForm } from './ContactForm'
 
+const editorialEmail = 'varathana.tech@gmail.com'
+
 export const metadata: Metadata = {
-  title: 'Contact Us — Asian Dot Editorial Office',
-  description: 'Reach the editorial team at Asian Dot. Direct inquiries, confidential tips, corrections, and press correspondence via varathana.tech@gmail.com.',
-  alternates: {
-    canonical: '/contact',
-  },
-  openGraph: {
-    title: 'Contact Us — Asian Dot Editorial Office',
-    description: 'Reach the editorial team at Asian Dot. Direct inquiries, confidential tips, corrections, and press correspondence via varathana.tech@gmail.com.',
-    url: '/contact',
-    siteName: 'Asian Dot',
-    images: [
-      {
-        url: '/logo.png',
-        width: 1200,
-        height: 630,
-        alt: 'Asian Dot Logo',
-      },
-    ],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Contact Us — Asian Dot',
-    description: 'Reach the editorial team at Asian Dot via varathana.tech@gmail.com.',
-    images: ['/logo.png'],
-  },
+  title: 'Contact',
+  description: 'Contact the Asian Dot newsroom with questions, story tips, corrections, press inquiries, or privacy requests.',
+  alternates: { canonical: '/contact' },
 }
 
-export default async function ContactPage() {
-  const locale = 'en'
-  const dict = i18nStrings[locale as Locale] || i18nStrings.en
+const contactRoutes = [
+  {
+    label: 'News tips & pitches',
+    description: 'Share a potential story, source, document, or idea for our editorial team to review.',
+    subject: 'Story tip or pitch',
+  },
+  {
+    label: 'Corrections',
+    description: 'Flag a possible factual error. Please include the article link and supporting information.',
+    subject: 'Correction request',
+  },
+  {
+    label: 'Press & partnerships',
+    description: 'Contact us about interviews, republication, media requests, advertising, or collaboration.',
+    subject: 'Press or partnership inquiry',
+  },
+  {
+    label: 'Privacy & legal',
+    description: 'Submit a privacy request, rights inquiry, copyright notice, or other formal correspondence.',
+    subject: 'Privacy or legal request',
+  },
+]
 
+export default function ContactPage() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
-  const officialEmail = 'varathana.tech@gmail.com'
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
-    name: 'Contact Asian Dot Editorial Office',
-    description: 'Official contact portal and confidential tip line for Asian Dot.',
+    name: 'Contact Asian Dot',
     url: `${siteUrl}/contact`,
     mainEntity: {
       '@type': 'NewsMediaOrganization',
       name: 'Asian Dot',
+      email: editorialEmail,
       url: siteUrl,
-      email: officialEmail,
-      contactPoint: [
-        {
-          '@type': 'ContactPoint',
-          contactType: 'Editorial & News Desk',
-          email: officialEmail,
-          availableLanguage: ['English', 'Khmer'],
-        },
-        {
-          '@type': 'ContactPoint',
-          contactType: 'Corrections & Editorial Standards',
-          email: officialEmail,
-        },
-        {
-          '@type': 'ContactPoint',
-          contactType: 'Legal & Privacy Officer',
-          email: officialEmail,
-        },
-      ],
     },
   }
 
-  const channels = [
-    {
-      icon: '📰',
-      tag: 'EDITORIAL DESK',
-      title: 'General & Editorial Inquiries',
-      description: 'Story pitches, media coverage requests, syndicated republishing, and editorial commentary.',
-      email: officialEmail,
-      subject: 'Editorial Inquiry — Asian Dot',
-      note: 'Response target: Within 24 hours',
-    },
-    {
-      icon: '⚖️',
-      tag: 'INTEGRITY & FACT-CHECKING',
-      title: 'Corrections & Retractions',
-      description: 'We hold our reporting to rigorous standards. If you spot a factual inaccuracy, we will investigate and issue corrections promptly.',
-      email: officialEmail,
-      subject: 'Factual Correction Request',
-      note: 'Priority response: Within 12 hours',
-    },
-    {
-      icon: '🛡️',
-      tag: 'LEGAL & DATA RIGHTS',
-      title: 'Privacy & Legal Compliance',
-      description: 'GDPR, CCPA, DMCA notices, and personal data rights inquiries handled by our data protection team.',
-      email: officialEmail,
-      subject: 'Legal & Privacy Compliance Inquiry',
-      note: 'Standard legal review window',
-    },
-  ]
-
   return (
-    <div className="bg-[var(--bg-primary)] min-h-screen py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Subtle background matrix */}
-      <div
-        className="absolute inset-0 opacity-[0.35] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
-
-      <div className="max-w-[1280px] mx-auto relative z-10">
-        
-        {/* Header Section */}
-        <div className="max-w-3xl mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 border mb-6 text-[10px] font-mono font-bold tracking-[0.25em] uppercase"
-               style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)', background: 'rgba(232,0,45,0.05)' }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-red)' }} />
-            Official Communications Desk
-          </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tight mb-6" style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-            {dict.getInTouch}
-          </h1>
-          <p className="text-lg sm:text-xl leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-            Asian Dot operates an open, accountable newsroom. For breaking stories, press releases, corrections, or rights inquiries, our direct editorial channel is:
-          </p>
-          <div className="mt-6 flex items-center gap-3">
-            <a
-              href={`mailto:${officialEmail}`}
-              className="inline-flex items-center gap-3 px-6 py-3 font-mono font-bold text-sm border transition-all hover:bg-[var(--accent-red)] hover:text-white"
-              style={{
-                borderColor: 'var(--accent-red)',
-                color: 'var(--accent-red)',
-                background: 'var(--bg-card)',
-              }}
-            >
-              <span>✉️</span>
-              <span>{officialEmail}</span>
-            </a>
-            <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-              (Primary Editorial Inbox)
-            </span>
+      <header className="border-b border-[var(--border)] px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-[1180px]">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-red)]">Contact</p>
+          <div className="mt-5 grid items-end gap-8 lg:grid-cols-[1fr_0.7fr]">
+            <h1 className="max-w-3xl font-display text-5xl font-black leading-[0.98] tracking-[-0.04em] sm:text-7xl">Let’s start a conversation.</h1>
+            <p className="max-w-xl text-lg leading-8 text-[var(--text-secondary)]">Whether you have a news tip, a correction, or a business inquiry, your message will reach the right place.</p>
           </div>
         </div>
+      </header>
 
-        {/* 2-Column Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
-          {/* Left Column: Structured Contact Channels */}
-          <div className="lg:col-span-6 space-y-8">
-            <div className="space-y-6">
-              {channels.map((channel, i) => (
-                <div
-                  key={i}
-                  className="p-6 sm:p-8 border transition-all duration-200 group hover:border-[var(--accent-red)]"
-                  style={{
-                    background: 'var(--bg-card)',
-                    borderColor: 'var(--border)',
-                  }}
+      <section className="px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+          <div>
+            <div className="border-t-2 border-[var(--text-primary)] py-6">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">General inbox</p>
+              <a href={`mailto:${editorialEmail}`} className="mt-3 block break-all font-display text-2xl font-bold underline decoration-[var(--accent-red)] decoration-2 underline-offset-4 sm:text-3xl">{editorialEmail}</a>
+              <p className="mt-4 max-w-md text-sm leading-6 text-[var(--text-secondary)]">We read every message. Response times vary by request, and we may not be able to reply to every submission.</p>
+            </div>
+
+            <div className="mt-8 border-t border-[var(--border)]">
+              {contactRoutes.map((route, index) => (
+                <a
+                  key={route.label}
+                  href={`mailto:${editorialEmail}?subject=${encodeURIComponent(route.subject)}`}
+                  className="group grid grid-cols-[32px_1fr_auto] gap-3 border-b border-[var(--border)] py-6"
                 >
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{channel.icon}</span>
-                      <div>
-                        <span className="font-mono font-bold text-[9px] uppercase tracking-[0.25em]" style={{ color: 'var(--accent-red)' }}>
-                          {channel.tag}
-                        </span>
-                        <h3 className="font-display font-bold text-lg sm:text-xl" style={{ color: 'var(--text-primary)' }}>
-                          {channel.title}
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-                    {channel.description}
-                  </p>
-
-                  <div className="pt-4 border-t flex flex-wrap items-center justify-between gap-3" style={{ borderColor: 'var(--border)' }}>
-                    <a
-                      href={`mailto:${channel.email}?subject=${encodeURIComponent(channel.subject)}`}
-                      className="inline-flex items-center gap-2 font-mono text-xs font-bold transition-colors group-hover:text-[var(--accent-red)]"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      <span>{channel.email}</span>
-                      <span className="text-xs">↗</span>
-                    </a>
-                    <span className="font-mono text-[10px] tracking-wider" style={{ color: 'var(--text-muted)' }}>
-                      {channel.note}
-                    </span>
-                  </div>
-                </div>
+                  <span className="pt-1 font-mono text-[10px] text-[var(--accent-red)]">0{index + 1}</span>
+                  <span>
+                    <strong className="font-display text-xl">{route.label}</strong>
+                    <span className="mt-2 block text-sm leading-6 text-[var(--text-secondary)]">{route.description}</span>
+                  </span>
+                  <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                </a>
               ))}
             </div>
 
-            {/* Secure Whistleblower & Confidential Tips Box */}
-            <div
-              className="p-8 border-l-4"
-              style={{
-                borderColor: 'var(--border)',
-                borderLeftColor: 'var(--accent-red)',
-                background: 'var(--bg-card)',
-              }}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--accent-red)', color: 'white' }}>
-                  !
-                </span>
-                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
-                  Confidential Whistleblower Protocol
-                </h3>
-              </div>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-                We uphold strict source protection. For high-risk documents or non-public intelligence, contact our desk via encrypted correspondence with subject &quot;CONFIDENTIAL TIP&quot; to <strong style={{ color: 'var(--text-primary)' }}>{officialEmail}</strong>.
-              </p>
-              <div className="p-3.5 font-mono text-[11px] tracking-wider border" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-                PGP KEY IDENTIFIER: 4A7B 9931 2C09 0E3F 2218 (ASIAN-DOT-CORE)
-              </div>
-            </div>
-
-            {/* Social & Syndication Feeds */}
-            <div className="pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
-              <span className="font-mono font-bold text-[10px] uppercase tracking-[0.25em] block mb-4" style={{ color: 'var(--text-muted)' }}>
-                Verified Broadcast Channels
-              </span>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  { name: 'Twitter / X', href: 'https://twitter.com/asiandot', icon: '𝕏' },
-                  { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61570774830775', icon: 'f' },
-                  { name: 'Telegram', href: '#', icon: '✈' },
-                ].map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    target={item.href !== '#' ? '_blank' : undefined}
-                    rel={item.href !== '#' ? 'noopener noreferrer' : undefined}
-                    className="flex items-center gap-2.5 px-4 py-2 border font-mono text-xs tracking-wider uppercase transition-all hover:border-[var(--accent-red)]"
-                    style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
-                  >
-                    <span className="font-bold text-sm" style={{ color: 'var(--accent-red)' }}>{item.icon}</span>
-                    <span>{item.name}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
+            <aside className="mt-8 bg-[var(--bg-surface)] p-6">
+              <h2 className="font-display text-xl font-bold">Sending sensitive information?</h2>
+              <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">Standard email is not a secure channel for confidential documents. Make initial contact without attaching sensitive material so we can discuss an appropriate next step.</p>
+            </aside>
           </div>
 
-          {/* Right Column: Interactive Dispatch Form */}
-          <div className="lg:col-span-6 sticky top-24">
+          <div className="lg:sticky lg:top-36 lg:self-start">
             <ContactForm />
           </div>
-
         </div>
+      </section>
 
-      </div>
+      <section className="border-t border-[var(--border)] bg-[var(--bg-surface)] px-5 py-12 sm:px-8">
+        <div className="mx-auto flex max-w-[1180px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-[var(--text-secondary)]">Want to understand how we work before getting in touch?</p>
+          <Link href="/about" className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-[var(--accent-red)]">Read about our editorial approach →</Link>
+        </div>
+      </section>
     </div>
   )
 }
