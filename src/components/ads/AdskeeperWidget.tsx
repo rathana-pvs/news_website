@@ -72,6 +72,8 @@ function trackAdEvent(
     widget_id: widgetId,
     ad_placement: placement,
     ad_type: adType || 'native',
+    page_path: window.location.pathname,
+    device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
   })
 }
 
@@ -90,6 +92,7 @@ export default function AdskeeperWidget({
   const requestedRef = useRef(false)
   const filledEventRef = useRef(false)
   const viewableEventRef = useRef(false)
+  const reachedEventRef = useRef(false)
 
   useEffect(() => {
     if (!onlyShowOn) {
@@ -158,7 +161,7 @@ export default function AdskeeperWidget({
           })
         }
       },
-      { rootMargin: '350px 0px' }
+      { rootMargin: placement.endsWith('_bottom') ? '800px 0px' : '350px 0px' }
     )
     observer.observe(el)
     return () => {
@@ -166,6 +169,21 @@ export default function AdskeeperWidget({
       resizeObs.disconnect()
     }
   }, [widgetId, isDev, isMatch, placement, adType])
+
+  useEffect(() => {
+    const element = containerRef.current
+    if (!element || !placement.endsWith('_bottom')) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || reachedEventRef.current) return
+      reachedEventRef.current = true
+      trackAdEvent('bottom_feed_reached', widgetId, placement, adType)
+      observer.disconnect()
+    })
+
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [widgetId, placement, adType, isMatch])
 
   useEffect(() => {
     const el = containerRef.current

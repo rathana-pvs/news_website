@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { serializeLexical } from './serialize'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 
 export type RichTextProps = {
   content: any
   className?: string
+  analyticsId?: string
   articleTitle?: string          // Main article title for deduplication
   adWidgetId?: string            // Top in-article ad (before Continue Reading blur)
   adWidgetId2?: string           // Mid in-article ad (first ad in expanded section)
@@ -23,17 +24,57 @@ function extractNodeText(node: any): string {
 }
 
 // Long article threshold: articles with this many paragraphs get additional in-article ads
-const LONG_ARTICLE_THRESHOLD = 6
+const LONG_ARTICLE_THRESHOLD = 8
 
 export const RichText = ({
   content,
   className,
   articleTitle,
+  analyticsId,
   adWidgetId,
   adWidgetId2,
   adWidgetId3,
 }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const progressEventsRef = useRef(new Set<number>())
+
+  useEffect(() => {
+    if (!isExpanded) return
+
+    let frame = 0
+    const measureProgress = () => {
+      frame = 0
+      const element = contentRef.current
+      if (!element || element.offsetHeight === 0) return
+
+      const articleTop = element.getBoundingClientRect().top + window.scrollY
+      const viewportBottom = window.scrollY + window.innerHeight
+      const progress = Math.max(0, Math.min(100, ((viewportBottom - articleTop) / element.offsetHeight) * 100))
+
+      for (const threshold of [25, 50, 75, 100]) {
+        if (progress < threshold || progressEventsRef.current.has(threshold)) continue
+        progressEventsRef.current.add(threshold)
+        window.gtag?.('event', threshold === 100 ? 'article_complete' : `article_${threshold}_percent`, {
+          article_id: analyticsId || articleTitle || 'unknown',
+          device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
+        })
+      }
+    }
+
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(measureProgress)
+    }
+
+    measureProgress()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [isExpanded, analyticsId, articleTitle])
 
   if (!content) return null
 
@@ -81,22 +122,22 @@ export const RichText = ({
 
   // Count total paragraphs and find exact paragraph boundary indices
   let paragraphCount = 0
-  let p1EndIndex = nodes.length // index after paragraph 1
   let p2EndIndex = nodes.length // index after paragraph 2
-  let p6EndIndex = nodes.length // index after paragraph 6
+  let p4EndIndex = nodes.length // index after paragraph 4
+  let p8EndIndex = nodes.length // index after paragraph 8
 
   for (let i = 0; i < nodes.length; i++) {
     if (nodes[i].type === 'paragraph') {
       paragraphCount++
-      if (paragraphCount === 1) p1EndIndex = i + 1
       if (paragraphCount === 2) p2EndIndex = i + 1
-      if (paragraphCount === LONG_ARTICLE_THRESHOLD) p6EndIndex = i + 1
+      if (paragraphCount === 4) p4EndIndex = i + 1
+      if (paragraphCount === LONG_ARTICLE_THRESHOLD) p8EndIndex = i + 1
     }
   }
 
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
-  topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
+  topElements.push(...serializeLexical(nodes.slice(0, p2EndIndex), 'top-p1-p2'))
   topElements.push(
     <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
       <AdskeeperWidget
@@ -111,11 +152,11 @@ export const RichText = ({
   // ─── Assemble bottomElements (shown when expanded) ───
   const bottomElements: React.ReactNode[] = []
 
-  // Paragraph 2
-  const p2Nodes = nodes.slice(p1EndIndex, p2EndIndex)
-  if (p2Nodes.length > 0) {
-    bottomElements.push(...serializeLexical(p2Nodes, 'bot-p2'))
-    if (secondaryWidgetId) {
+  // Paragraphs 3-4
+  const p3ToP4Nodes = nodes.slice(p2EndIndex, p4EndIndex)
+  if (p3ToP4Nodes.length > 0) {
+    bottomElements.push(...serializeLexical(p3ToP4Nodes, 'bot-p3-p4'))
+    if (secondaryWidgetId && paragraphCount >= 4) {
       bottomElements.push(
         <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
           <AdskeeperWidget
@@ -131,9 +172,9 @@ export const RichText = ({
 
   // Keep the third unit exclusive to genuinely long articles so ad density
   // remains proportional to the amount of editorial content.
-  const middleNodes = nodes.slice(p2EndIndex, p6EndIndex)
+  const middleNodes = nodes.slice(p4EndIndex, p8EndIndex)
   if (middleNodes.length > 0) {
-    bottomElements.push(...serializeLexical(middleNodes, 'bot-p3-p6'))
+    bottomElements.push(...serializeLexical(middleNodes, 'bot-p5-p8'))
   }
 
   if (tertiaryWidgetId && paragraphCount >= LONG_ARTICLE_THRESHOLD) {
@@ -149,7 +190,7 @@ export const RichText = ({
     )
   }
 
-  const restNodes = nodes.slice(p6EndIndex)
+  const restNodes = nodes.slice(p8EndIndex)
   if (restNodes.length > 0) {
     bottomElements.push(...serializeLexical(restNodes, 'bot-rest'))
   }
@@ -157,11 +198,11 @@ export const RichText = ({
 
 
   // ─── Collapsed state: teaser preview + Continue Reading button ───
-  if (!isExpanded) {
+  if (!isExpanded && bottomElements.length > 0) {
     const teaserElement = bottomElements[0]
 
     return (
-      <div className={`rich-text relative ${className || ''}`}>
+      <div ref={contentRef} className={`rich-text relative ${className || ''}`}>
         {topElements}
 
         {/* Teaser text with blur filter and gradient shading mask */}
@@ -177,7 +218,13 @@ export const RichText = ({
         {/* Option 1 Chosen: Sleek Solid Red Pill Continue Reading CTA */}
         <div className="w-full flex justify-center pt-2 pb-3 mt-2 mb-1">
           <button
-            onClick={() => setIsExpanded(true)}
+            onClick={() => {
+              window.gtag?.('event', 'article_read_more_clicked', {
+                article_id: analyticsId || articleTitle || 'unknown',
+                device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
+              })
+              setIsExpanded(true)
+            }}
             className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full cursor-pointer font-semibold text-sm text-white transition-all duration-200 active:scale-[0.98] shadow-md hover:shadow-lg hover:brightness-110"
             style={{
               background: 'var(--accent-red)',
@@ -201,7 +248,7 @@ export const RichText = ({
 
   // ─── Expanded state: full article with phased ads ───
   return (
-    <div className={`rich-text ${className || ''}`}>
+    <div ref={contentRef} className={`rich-text ${className || ''}`}>
       {topElements}
       {bottomElements}
     </div>

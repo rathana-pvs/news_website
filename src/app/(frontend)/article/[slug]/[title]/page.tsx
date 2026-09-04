@@ -12,6 +12,7 @@ import { ReadingBar } from '@/components/ui/ReadingBar'
 import { RichText } from '@/components/RichText'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
+import { adskeeper } from '@/lib/ads'
 
 interface PageProps {
   params: Promise<{ slug: string; title: string }>
@@ -83,12 +84,6 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
   
-  const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2043076'
-  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2050530'
-  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2050533'
-  const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || '2057448'
-  const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || '2050539'
-
   const article = await getArticle(slug, locale)
   if (!article) notFound()
 
@@ -225,14 +220,15 @@ export default async function DynamicArticlePage({ params }: PageProps) {
 
 
             {/* Rich Text Body with Phased In-Article Ads */}
-            <div className="article-body prose prose-invert prose-lg max-w-none mb-4 sm:mb-12">
+            <div className="article-body prose prose-invert prose-lg max-w-none mb-4 sm:mb-12" data-article-content>
               {article.content ? (
                 <RichText
                   content={article.content}
                   articleTitle={article.title}
-                  adWidgetId={widgetInArticle1}
-                  adWidgetId2={widgetInArticle2}
-                  adWidgetId3={widgetInArticle3}
+                  analyticsId={article.slug}
+                  adWidgetId={adskeeper.articleInline1}
+                  adWidgetId2={adskeeper.articleInline2}
+                  adWidgetId3={adskeeper.articleInline3}
                 />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">
@@ -255,13 +251,15 @@ export default async function DynamicArticlePage({ params }: PageProps) {
 
 
             {/* Feed Bottom Content Widget - Inside content layout to avoid empty space */}
-            <div className="mt-6 mb-6">
-               <AdskeeperWidget
-                 widgetId={widgetBottomFeed}
-                 placement="article_bottom"
-                 className="!my-0"
-               />
-            </div>
+            {adskeeper.articleBottom && (
+              <div className="mt-6 mb-6" data-article-end>
+                <AdskeeperWidget
+                  widgetId={adskeeper.articleBottom}
+                  placement="article_bottom"
+                  className="!my-0"
+                />
+              </div>
+            )}
 
             <RelatedArticles articles={relatedArticles} locale={locale} />
           </div>
@@ -269,12 +267,14 @@ export default async function DynamicArticlePage({ params }: PageProps) {
           {/* Sidebar Area - Hidden on Mobile */}
           <aside className="hidden lg:block lg:col-span-4 space-y-8">
             <div className="space-y-8">
-              <AdskeeperWidget
-                widgetId={widgetSidebar}
-                placement="article_sidebar"
-                adType="sidebar"
-                onlyShowOn="desktop"
-              />
+              {adskeeper.articleSidebar && (
+                <AdskeeperWidget
+                  widgetId={adskeeper.articleSidebar}
+                  placement="article_sidebar"
+                  adType="sidebar"
+                  onlyShowOn="desktop"
+                />
+              )}
             </div>
           </aside>
         </div>

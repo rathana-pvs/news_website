@@ -11,6 +11,7 @@ import { AuthorChip } from '@/components/ui/AuthorChip'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { adskeeper } from '@/lib/ads'
 
 type FilterType = 'latest' | 'breaking' | 'opinion'
 
@@ -154,13 +155,14 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
               </Link>
             )}
 
-            {/* Feed Ad Widget (2050525) */}
-            <div className="my-8">
-              <AdskeeperWidget 
-                widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2050525'} 
-                placement="category_feed"
-              />
-            </div>
+            {adskeeper.categoryFeed && (
+              <div className="my-8">
+                <AdskeeperWidget
+                  widgetId={adskeeper.categoryFeed}
+                  placement="category_feed"
+                />
+              </div>
+            )}
 
             {/* Remaining: Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -168,6 +170,15 @@ export function CategoryPageClient({ category, initialArticles }: CategoryPageCl
                 <ArticleCard key={article.id} article={article} size="md" index={i} />
               ))}
             </div>
+
+            {adskeeper.categoryBottom && (
+              <div className="mt-12">
+                <AdskeeperWidget
+                  widgetId={adskeeper.categoryBottom}
+                  placement="category_bottom"
+                />
+              </div>
+            )}
 
             {/* Load More */}
             {hasMore && (

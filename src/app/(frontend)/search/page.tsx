@@ -10,6 +10,8 @@ import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
+import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { adskeeper } from '@/lib/ads'
 
 type DateRange = 'all' | 'today' | 'week' | 'month'
 
@@ -296,6 +298,15 @@ export default function SearchPage() {
                 </Link>
               ))}
             </div>
+
+            {adskeeper.searchFeed && (
+              <div className="mt-12">
+                <AdskeeperWidget
+                  widgetId={adskeeper.searchFeed}
+                  placement="search_feed"
+                />
+              </div>
+            )}
 
             {/* Pagination / Load More */}
             {results.length > visibleCount && (

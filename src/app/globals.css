@@ -134,7 +134,10 @@
 
 .adskeeper-widget-pending[data-ad-placement="article_bottom"],
 .adskeeper-widget-pending[data-ad-placement="home_feed"],
-.adskeeper-widget-pending[data-ad-placement="category_feed"] {
+.adskeeper-widget-pending[data-ad-placement="home_bottom"],
+.adskeeper-widget-pending[data-ad-placement="category_feed"],
+.adskeeper-widget-pending[data-ad-placement="category_bottom"],
+.adskeeper-widget-pending[data-ad-placement="search_feed"] {
   min-height: 280px;
 }
 
@@ -149,7 +152,10 @@
 
   .adskeeper-widget-pending[data-ad-placement="article_bottom"],
   .adskeeper-widget-pending[data-ad-placement="home_feed"],
-  .adskeeper-widget-pending[data-ad-placement="category_feed"] {
+  .adskeeper-widget-pending[data-ad-placement="home_bottom"],
+  .adskeeper-widget-pending[data-ad-placement="category_feed"],
+  .adskeeper-widget-pending[data-ad-placement="category_bottom"],
+  .adskeeper-widget-pending[data-ad-placement="search_feed"] {
     min-height: 220px;
   }
 }

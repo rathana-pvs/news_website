@@ -3,8 +3,8 @@ import { HeroSection } from '@/components/sections/HeroSection'
 import { CategoryRow } from '@/components/sections/CategoryRow'
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
-import { AdBanner } from '@/components/ads/AdBanner'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { adskeeper } from '@/lib/ads'
 import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
 import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
@@ -43,9 +43,6 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const locale = 'en'
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
-
-  const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || '2043079'
-  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2043075'
 
   const [{ hero, secondary }, allArticles, categories] = await Promise.all([
     getFeatured(locale),
@@ -96,11 +93,6 @@ export default async function HomePage() {
       {/* Hero */}
       <HeroSection hero={hero} secondary={secondary} />
 
-      {/* Ad Spot */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdskeeperWidget widgetId={widgetUnderArticle} placement="home_after_hero" />
-      </div>
-
       {/* Latest News Divider */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center gap-4 py-8">
@@ -114,9 +106,11 @@ export default async function HomePage() {
       <LatestNewsGrid articles={articles.slice(0, 8)} />
 
       {/* Second Ad Spot */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <AdskeeperWidget widgetId={widgetFeed} placement="home_feed" />
-      </div>
+      {adskeeper.homeFeed && (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <AdskeeperWidget widgetId={adskeeper.homeFeed} placement="home_feed" />
+        </div>
+      )}
 
       {/* Category Rows */}
       {cats.slice(0, 2).map((cat) => (
@@ -142,6 +136,12 @@ export default async function HomePage() {
 
       {/* Most Read + Editor's Picks */}
       <MostRead editorPicks={editorPicks} mostRead={mostRead} />
+
+      {adskeeper.homeBottom && (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pb-8">
+          <AdskeeperWidget widgetId={adskeeper.homeBottom} placement="home_bottom" />
+        </div>
+      )}
     </>
   )
 }
