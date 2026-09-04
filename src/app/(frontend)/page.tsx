@@ -3,8 +3,6 @@ import { HeroSection } from '@/components/sections/HeroSection'
 import { CategoryRow } from '@/components/sections/CategoryRow'
 import { MostRead } from '@/components/sections/MostRead'
 import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
-import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
-import { adskeeper } from '@/lib/ads'
 import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
 import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
@@ -105,13 +103,6 @@ export default async function HomePage() {
 
       <LatestNewsGrid articles={articles.slice(0, 8)} />
 
-      {/* Second Ad Spot */}
-      {adskeeper.homeFeed && (
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <AdskeeperWidget widgetId={adskeeper.homeFeed} placement="home_feed" />
-        </div>
-      )}
-
       {/* Category Rows */}
       {cats.slice(0, 2).map((cat) => (
         <CategoryRow
@@ -120,8 +111,6 @@ export default async function HomePage() {
           articles={articlesByCategory[cat.slug] || articles.slice(0, 4)}
         />
       ))}
-
-
 
       {/* Rest of Categories */}
       {cats.slice(2).map((cat) => (
@@ -132,16 +121,8 @@ export default async function HomePage() {
         />
       ))}
 
-
-
       {/* Most Read + Editor's Picks */}
       <MostRead editorPicks={editorPicks} mostRead={mostRead} />
-
-      {adskeeper.homeBottom && (
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pb-8">
-          <AdskeeperWidget widgetId={adskeeper.homeBottom} placement="home_bottom" />
-        </div>
-      )}
     </>
   )
 }
