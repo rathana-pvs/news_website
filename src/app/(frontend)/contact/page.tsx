@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
+import { ContactForm } from './ContactForm'
 
 export const metadata: Metadata = {
-  title: 'Contact Us',
-  description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+  title: 'Contact Us — Asian Dot Editorial Office',
+  description: 'Reach the editorial team at Asian Dot. Direct inquiries, confidential tips, corrections, and press correspondence via varathana.tech@gmail.com.',
   alternates: {
     canonical: '/contact',
   },
   openGraph: {
-    title: 'Contact Us — Asian Dot',
-    description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+    title: 'Contact Us — Asian Dot Editorial Office',
+    description: 'Reach the editorial team at Asian Dot. Direct inquiries, confidential tips, corrections, and press correspondence via varathana.tech@gmail.com.',
     url: '/contact',
     siteName: 'Asian Dot',
     images: [
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Contact Us — Asian Dot',
-    description: 'Get in touch with the editorial team at Asian Dot. Submit secure tips, general inquiries, press releases, or feedback.',
+    description: 'Reach the editorial team at Asian Dot via varathana.tech@gmail.com.',
     images: ['/logo.png'],
   },
 }
@@ -36,29 +37,80 @@ export default async function ContactPage() {
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
+  const officialEmail = 'varathana.tech@gmail.com'
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
-    name: 'Contact Asian Dot',
-    description: 'Contact form and secure tips submission options for Asian Dot.',
+    name: 'Contact Asian Dot Editorial Office',
+    description: 'Official contact portal and confidential tip line for Asian Dot.',
     url: `${siteUrl}/contact`,
     mainEntity: {
       '@type': 'NewsMediaOrganization',
       name: 'Asian Dot',
       url: siteUrl,
-      email: 'hello@asiandot.com',
-    }
+      email: officialEmail,
+      contactPoint: [
+        {
+          '@type': 'ContactPoint',
+          contactType: 'Editorial & News Desk',
+          email: officialEmail,
+          availableLanguage: ['English', 'Khmer'],
+        },
+        {
+          '@type': 'ContactPoint',
+          contactType: 'Corrections & Editorial Standards',
+          email: officialEmail,
+        },
+        {
+          '@type': 'ContactPoint',
+          contactType: 'Legal & Privacy Officer',
+          email: officialEmail,
+        },
+      ],
+    },
   }
 
+  const channels = [
+    {
+      icon: '📰',
+      tag: 'EDITORIAL DESK',
+      title: 'General & Editorial Inquiries',
+      description: 'Story pitches, media coverage requests, syndicated republishing, and editorial commentary.',
+      email: officialEmail,
+      subject: 'Editorial Inquiry — Asian Dot',
+      note: 'Response target: Within 24 hours',
+    },
+    {
+      icon: '⚖️',
+      tag: 'INTEGRITY & FACT-CHECKING',
+      title: 'Corrections & Retractions',
+      description: 'We hold our reporting to rigorous standards. If you spot a factual inaccuracy, we will investigate and issue corrections promptly.',
+      email: officialEmail,
+      subject: 'Factual Correction Request',
+      note: 'Priority response: Within 12 hours',
+    },
+    {
+      icon: '🛡️',
+      tag: 'LEGAL & DATA RIGHTS',
+      title: 'Privacy & Legal Compliance',
+      description: 'GDPR, CCPA, DMCA notices, and personal data rights inquiries handled by our data protection team.',
+      email: officialEmail,
+      subject: 'Legal & Privacy Compliance Inquiry',
+      note: 'Standard legal review window',
+    },
+  ]
+
   return (
-    <div className="bg-[var(--bg-primary)] min-h-screen py-20 px-4 sm:px-6 relative overflow-hidden">
+    <div className="bg-[var(--bg-primary)] min-h-screen py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Background dot matrix */}
+
+      {/* Subtle background matrix */}
       <div
-        className="absolute inset-0 opacity-[0.4] pointer-events-none"
+        className="absolute inset-0 opacity-[0.35] pointer-events-none"
         style={{
           backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
@@ -66,156 +118,148 @@ export default async function ContactPage() {
       />
 
       <div className="max-w-[1280px] mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+        
+        {/* Header Section */}
+        <div className="max-w-3xl mb-16 sm:mb-20">
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 border mb-6 text-[10px] font-mono font-bold tracking-[0.25em] uppercase"
+               style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)', background: 'rgba(232,0,45,0.05)' }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-red)' }} />
+            Official Communications Desk
+          </div>
+          <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tight mb-6" style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
+            {dict.getInTouch}
+          </h1>
+          <p className="text-lg sm:text-xl leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
+            Asian Dot operates an open, accountable newsroom. For breaking stories, press releases, corrections, or rights inquiries, our direct editorial channel is:
+          </p>
+          <div className="mt-6 flex items-center gap-3">
+            <a
+              href={`mailto:${officialEmail}`}
+              className="inline-flex items-center gap-3 px-6 py-3 font-mono font-bold text-sm border transition-all hover:bg-[var(--accent-red)] hover:text-white"
+              style={{
+                borderColor: 'var(--accent-red)',
+                color: 'var(--accent-red)',
+                background: 'var(--bg-card)',
+              }}
+            >
+              <span>✉️</span>
+              <span>{officialEmail}</span>
+            </a>
+            <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+              (Primary Editorial Inbox)
+            </span>
+          </div>
+        </div>
+
+        {/* 2-Column Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* Left: Contact Info */}
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-[4px] h-10 flex-shrink-0" style={{ background: 'var(--accent-red)' }} />
-              <h1 className="font-display text-5xl md:text-6xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>
-                {dict.getInTouch}
-              </h1>
-            </div>
-            
-            <p className="text-xl leading-relaxed mb-12 max-w-md" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-              Have a question, a press inquiry, or a confidential tip? We want to hear from you.
-            </p>
-
-            <div className="space-y-12">
-              <div className="flex gap-6 group">
-                <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 border border-[var(--border)] group-hover:border-[var(--accent-red)] transition-colors" style={{ background: 'var(--bg-card)' }}>
-                  <span className="text-xl">📧</span>
-                </div>
-                <div>
-                  <h3 className="font-mono font-bold text-xs uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--accent-red)' }}>General Inquiries</h3>
-                  <p className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>hello@asiandot.com</p>
-                </div>
-              </div>
-
-              <div className="flex gap-6 group">
-                <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 border border-[var(--border)] group-hover:border-[var(--accent-red)] transition-colors" style={{ background: 'var(--bg-card)' }}>
-                  <span className="text-xl">⚖️</span>
-                </div>
-                <div>
-                  <h3 className="font-mono font-bold text-xs uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--accent-red)' }}>Legal & Privacy</h3>
-                  <p className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>legal@asiandot.com</p>
-                </div>
-              </div>
-
-              <div className="p-8 border-l-4 border-[var(--accent-red)] bg-[#e8002d]/05 border-[var(--border)] border-l-[var(--accent-red)] border">
-                <div className="flex gap-6 mb-4">
-                   <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ background: 'var(--accent-red)', color: 'white' }}>
-                    <span className="text-xl font-bold">!</span>
+          {/* Left Column: Structured Contact Channels */}
+          <div className="lg:col-span-6 space-y-8">
+            <div className="space-y-6">
+              {channels.map((channel, i) => (
+                <div
+                  key={i}
+                  className="p-6 sm:p-8 border transition-all duration-200 group hover:border-[var(--accent-red)]"
+                  style={{
+                    background: 'var(--bg-card)',
+                    borderColor: 'var(--border)',
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{channel.icon}</span>
+                      <div>
+                        <span className="font-mono font-bold text-[9px] uppercase tracking-[0.25em]" style={{ color: 'var(--accent-red)' }}>
+                          {channel.tag}
+                        </span>
+                        <h3 className="font-display font-bold text-lg sm:text-xl" style={{ color: 'var(--text-primary)' }}>
+                          {channel.title}
+                        </h3>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>Submit a Secure Tip</h3>
-                </div>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
-                  For highly sensitive documents or leaks, please use our secure Signal address or contact us via our PGP-encrypted mail.
-                </p>
-                <div className="p-3 bg-black/50 font-mono text-[10px] tracking-wider border border-white/10" style={{ color: 'var(--text-muted)' }}>
-                  PGP FINGERPRINT: 4A7B 9931 2C09 0E3F 2218
-                </div>
-              </div>
 
-              {/* Social Connections */}
-              <div className="pt-10 border-t border-[var(--border)]">
-                <h3 className="font-mono font-bold text-[10px] uppercase tracking-[0.3em] mb-6" style={{ color: 'var(--text-muted)' }}>Follow Our Coverage</h3>
-                <div className="flex flex-wrap gap-4">
-                  {[
-                    { name: 'Twitter / X', icon: '𝕏', color: '#ffffff' },
-                    { name: 'Telegram', icon: '✈', color: '#ffffff' },
-                    { name: 'Facebook', icon: 'f', color: '#ffffff' }
-                  ].map((social) => (
-                    <a 
-                      key={social.name}
-                      href="#" 
-                      className="flex items-center gap-3 px-6 py-3 border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--accent-red)] transition-all group"
+                  <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
+                    {channel.description}
+                  </p>
+
+                  <div className="pt-4 border-t flex flex-wrap items-center justify-between gap-3" style={{ borderColor: 'var(--border)' }}>
+                    <a
+                      href={`mailto:${channel.email}?subject=${encodeURIComponent(channel.subject)}`}
+                      className="inline-flex items-center gap-2 font-mono text-xs font-bold transition-colors group-hover:text-[var(--accent-red)]"
+                      style={{ color: 'var(--text-primary)' }}
                     >
-                      <span className="font-bold group-hover:scale-110 group-hover:text-[var(--accent-red)] transition-all" style={{ color: social.color }}>{social.icon}</span>
-                      <span className="font-mono font-bold text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>{social.name}</span>
+                      <span>{channel.email}</span>
+                      <span className="text-xs">↗</span>
                     </a>
-                  ))}
+                    <span className="font-mono text-[10px] tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                      {channel.note}
+                    </span>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Secure Whistleblower & Confidential Tips Box */}
+            <div
+              className="p-8 border-l-4"
+              style={{
+                borderColor: 'var(--border)',
+                borderLeftColor: 'var(--accent-red)',
+                background: 'var(--bg-card)',
+              }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--accent-red)', color: 'white' }}>
+                  !
+                </span>
+                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
+                  Confidential Whistleblower Protocol
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)', fontFamily: 'Syne, sans-serif' }}>
+                We uphold strict source protection. For high-risk documents or non-public intelligence, contact our desk via encrypted correspondence with subject &quot;CONFIDENTIAL TIP&quot; to <strong style={{ color: 'var(--text-primary)' }}>{officialEmail}</strong>.
+              </p>
+              <div className="p-3.5 font-mono text-[11px] tracking-wider border" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+                PGP KEY IDENTIFIER: 4A7B 9931 2C09 0E3F 2218 (ASIAN-DOT-CORE)
+              </div>
+            </div>
+
+            {/* Social & Syndication Feeds */}
+            <div className="pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+              <span className="font-mono font-bold text-[10px] uppercase tracking-[0.25em] block mb-4" style={{ color: 'var(--text-muted)' }}>
+                Verified Broadcast Channels
+              </span>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { name: 'Twitter / X', href: 'https://twitter.com/asiandot', icon: '𝕏' },
+                  { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61570774830775', icon: 'f' },
+                  { name: 'Telegram', href: '#', icon: '✈' },
+                ].map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target={item.href !== '#' ? '_blank' : undefined}
+                    rel={item.href !== '#' ? 'noopener noreferrer' : undefined}
+                    className="flex items-center gap-2.5 px-4 py-2 border font-mono text-xs tracking-wider uppercase transition-all hover:border-[var(--accent-red)]"
+                    style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+                  >
+                    <span className="font-bold text-sm" style={{ color: 'var(--accent-red)' }}>{item.icon}</span>
+                    <span>{item.name}</span>
+                  </a>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right: Contact Form */}
-          <div className="p-10 border border-[var(--border)] bg-[var(--bg-card)] relative">
-             {/* Decorative dot matrix corner */}
-             <div
-              className="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: 'radial-gradient(var(--accent-red) 1px, transparent 1px)',
-                backgroundSize: '8px 8px',
-              }}
-            />
-
-            <form className="space-y-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="font-mono font-bold text-[10px] uppercase tracking-[0.2em] block" style={{ color: 'var(--text-muted)' }}>Full Name</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-5 py-4 outline-none border transition-all focus:border-[var(--accent-red)]" 
-                    placeholder="John Doe"
-                    style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="font-mono font-bold text-[10px] uppercase tracking-[0.2em] block" style={{ color: 'var(--text-muted)' }}>Email Address</label>
-                  <input 
-                    type="email" 
-                    className="w-full px-5 py-4 outline-none border transition-all focus:border-[var(--accent-red)]" 
-                    placeholder="john@example.com"
-                    style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="font-mono font-bold text-[10px] uppercase tracking-[0.2em] block" style={{ color: 'var(--text-muted)' }}>Subject</label>
-                <div className="relative">
-                  <select 
-                    className="w-full px-5 py-4 outline-none border transition-all appearance-none focus:border-[var(--accent-red)]" 
-                    style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                  >
-                    <option>General Editorial Question</option>
-                    <option>Press Inquiry</option>
-                    <option>Advertising & Sponsorship</option>
-                    <option>Technical Issue</option>
-                    <option>Confidential Tip</option>
-                  </select>
-                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="font-mono font-bold text-[10px] uppercase tracking-[0.2em] block" style={{ color: 'var(--text-muted)' }}>Your Message</label>
-                <textarea 
-                  rows={6}
-                  className="w-full px-5 py-4 outline-none border transition-all resize-none focus:border-[var(--accent-red)]" 
-                  placeholder="Tell us what's on your mind..."
-                  style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full py-5 font-mono font-bold text-xs uppercase tracking-[0.3em] transition-all relative group overflow-hidden"
-                style={{ background: 'var(--accent-red)', color: 'white' }}
-              >
-                <span className="relative z-10">Send Message</span>
-                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
-              </button>
-            </form>
+          {/* Right Column: Interactive Dispatch Form */}
+          <div className="lg:col-span-6 sticky top-24">
+            <ContactForm />
           </div>
 
         </div>
+
       </div>
     </div>
   )
