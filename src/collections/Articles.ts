@@ -193,7 +193,7 @@ export const Articles: CollectionConfig = {
       },
     },
     { name: 'isBreaking', type: 'checkbox', defaultValue: true, admin: { position: 'sidebar' } },
-    { name: 'isFeatured', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar' } },
+    { name: 'isFeatured', type: 'checkbox', defaultValue: true, admin: { position: 'sidebar' } },
     {
       name: 'publishedAt',
       type: 'date',

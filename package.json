@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "next lint",
     "generate:types": "payload generate:types",
-    "seed": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts tsx src/lib/seed.ts"
+    "seed": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts tsx src/lib/seed.ts",
+    "expand:articles": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts tsx src/scripts/expand-short-articles.ts",
+    "update:latest:http": "tsx src/scripts/http-update-latest-articles.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.0",

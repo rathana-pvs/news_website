@@ -12,6 +12,62 @@ function resolveUrl(baseUrl: string, relativeUrl: string): string {
   }
 }
 
+interface RelatedNewsSource {
+  title: string
+  source: string
+  url?: string
+  snippet?: string
+}
+
+async function fetchRelatedNewsSources(headline: string): Promise<RelatedNewsSource[]> {
+  try {
+    const cleanQuery = headline
+      .replace(/^(BREAKING|EXCLUSIVE|WATCH|UPDATE|JUST IN)[:\s-]+/i, '')
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !['the', 'and', 'for', 'with', 'from', 'this', 'that', 'make', 'makes', 'about', 'after', 'before', 'will', 'have'].includes(w.toLowerCase()))
+      .slice(0, 6)
+      .join(' ')
+
+    if (!cleanQuery || cleanQuery.length < 4) return []
+
+    const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(cleanQuery)}&hl=en-US&gl=US&ceid=US:en`
+    const res = await fetch(feedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      signal: AbortSignal.timeout(6000)
+    })
+
+    if (!res.ok) return []
+
+    const xml = await res.text()
+    const $ = cheerio.load(xml, { xmlMode: true })
+    const sources: RelatedNewsSource[] = []
+
+    $('item').slice(0, 3).each((_, el) => {
+      const itemTitle = $(el).find('title').text().trim()
+      const itemSource = $(el).find('source').text().trim() || 'News Wire'
+      const rawDesc = $(el).find('description').text().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+      const itemUrl = $(el).find('link').text().trim()
+
+      if (itemTitle && itemTitle.length > 10) {
+        sources.push({
+          title: itemTitle,
+          source: itemSource,
+          url: itemUrl,
+          snippet: rawDesc
+        })
+      }
+    })
+
+    return sources
+  } catch (err) {
+    console.warn('[Related News Fetcher] Failed to query Google News RSS:', err)
+    return []
+  }
+}
+
 async function scrapeUrlDirectly(url: string) {
   const res = await fetch(url, {
     headers: {
@@ -364,12 +420,19 @@ async function scrapeUrlDirectly(url: string) {
     scrapedImageUrl = foundImg
   }
 
-  // Clean excerpt if it duplicates title at start
+  // Clean excerpt if it duplicates title at start (prevent mid-sentence cuts)
   if (title && excerpt) {
     const cleanT = title.trim().toLowerCase()
-    const prefix = cleanT.substring(0, Math.min(25, cleanT.length))
-    if (excerpt.trim().toLowerCase().startsWith(prefix)) {
-      excerpt = excerpt.trim().substring(title.length).replace(/^[\s:\-–—\.\,\!]+/, '').trim()
+    const cleanE = excerpt.trim().toLowerCase()
+    if (cleanE === cleanT || cleanE.length < 20) {
+      excerpt = ''
+    } else if (cleanE.startsWith(cleanT)) {
+      const remaining = excerpt.trim().substring(title.length).replace(/^[\s:\-–—\.\,\!]+/, '').trim()
+      if (remaining.length > 30 && /^[A-Z]/.test(remaining)) {
+        excerpt = remaining
+      } else {
+        excerpt = ''
+      }
     }
   }
 
@@ -834,28 +897,48 @@ export async function POST(req: NextRequest) {
 
       if (rawText && rawText.length > 50) {
         try {
+          // 4.5. Multi-Source Discovery: Fetch complementary news coverage from Google News RSS
+          const relatedSources = await fetchRelatedNewsSources(result.title)
+          const relatedContext = relatedSources && relatedSources.length > 0
+            ? relatedSources.map((s, i) => `Source ${i + 1} (${s.source}): "${s.title}" — Summary/Snippet: ${s.snippet}`).join('\n')
+            : 'No secondary news feeds discovered.'
+
+          // 4.6. Fetch available categories for intelligent auto-classification
+          const categoriesRes = await payload.find({ collection: 'categories', limit: 50 })
+          const categoryList = categoriesRes.docs.map((c: any) => ({ id: c.id, name: c.name, slug: c.slug }))
+          const categoryOptions = categoryList.map((c: any) => c.name).join(', ')
+
           const aiResponse = await generateText({
             model: primaryModel,
             system: SYSTEM_PROMPT,
-            prompt: `You are the lead editor at Asian Dot. Transform the following raw news article into Asian Dot's custom high-engagement mobile editorial format.
+            prompt: `You are the lead editor at Asian Dot, an independent news publication. Synthesize the provided primary news report and complementary sources into an authoritative, in-depth news article.
 
-RULES FOR ASIANDOT FORMAT:
-1. DO NOT duplicate the article title in the body.
-2. DO NOT include any H2 or H3 subheadings inside the content. Only write clean, short paragraphs.
-3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
-4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
-5. Write EXACTLY 4 paragraphs (no more, no less).
-6. Create a punchy Lead Excerpt (STRICTLY under 160 characters max).
-
-Raw Article Title: "${result.title}"
-Raw Article Content:
+PRIMARY ARTICLE HEADLINE: "${result.title}"
+PRIMARY ARTICLE CONTENT:
 "${rawText.substring(0, 3500)}"
+
+COMPLEMENTARY NEWS COVERAGE (FOR MULTI-PERSPECTIVE FACT CHECKING, BACKGROUND & CITATION):
+${relatedContext}
+
+RULES FOR ASIANDOT MULTI-SOURCE EDITORIAL FORMAT:
+1. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 300 and 450 words total.
+2. DO NOT duplicate the article title in the body.
+3. DO NOT include any markdown headers (no ## or ###). Write only clean, cohesive paragraphs separated by blank lines.
+4. PARAGRAPH STRUCTURE: Write 6 to 8 paragraphs:
+   - Paragraphs 1-2 (The Breaking Lead): Report the core factual developments clearly with key figures, dates, locations, and actions.
+   - Paragraphs 3-4 (Background Context & History): Provide essential historical context, prior related events, and timeline explaining how this situation developed.
+   - Paragraphs 5-6 (Official Statements & Journalistic Attribution): Synthesize official reactions, government filings, or verified reporting (e.g. "According to reports first corroborated by...", "Agency officials stated...").
+   - Paragraphs 7-8 (Broader Geopolitical & Regional Impact): Explain what this means for national or international policy, and what developments or proceedings are expected next.
+5. 100% ORIGINAL SYNTHESIS: Synthesize all facts into an original, analytical journalistic narrative. NEVER copy verbatim sentences from any single source to ensure full copyright independence.
+6. LEAD EXCERPT: Write a COMPLETE, punchy summary sentence strictly between 120 and 160 characters long. It MUST be a complete, grammatically sound sentence ending with a period.
+7. CATEGORY CLASSIFICATION: Choose the single best category for this story from this list: [${categoryOptions}].
 
 Return valid JSON in this exact format:
 {
   "title": "Clean, punchy news title",
-  "excerpt": "Punchy lead summary strictly under 160 characters",
-  "content": "Paragraph 1 text\\n\\nParagraph 2 text\\n\\nParagraph 3 text\\n\\nParagraph 4 text",
+  "category": "One of [${categoryOptions}]",
+  "excerpt": "A punchy, complete lead summary sentence strictly under 160 characters.",
+  "content": "Paragraph 1 text\\n\\nParagraph 2 text\\n\\nParagraph 3 text\\n\\nParagraph 4 text\\n\\nParagraph 5 text\\n\\nParagraph 6 text",
   "metaTitle": "SEO title under 60 chars - Asian Dot",
   "metaDescription": "SEO description between 100 and 150 chars"
 }`,
@@ -868,6 +951,23 @@ Return valid JSON in this exact format:
           if (aiData.excerpt) result.excerpt = aiData.excerpt
           if (aiData.metaTitle) result.metaTitle = aiData.metaTitle
           if (aiData.metaDescription) result.metaDescription = aiData.metaDescription
+
+          // Auto-assign matched category
+          if (aiData.category && categoryList.length > 0) {
+            const chosen = (aiData.category || '').toLowerCase().trim()
+            const matched = categoryList.find((c: any) =>
+              c.name.toLowerCase() === chosen ||
+              c.slug.toLowerCase() === chosen ||
+              chosen.includes(c.name.toLowerCase()) ||
+              chosen.includes(c.slug.toLowerCase())
+            ) || categoryList[0]
+
+            if (matched) {
+              result.category = matched.id
+              result.categoryName = matched.name
+            }
+          }
+          result.isFeatured = true
 
           if (aiData.content) {
             const formattedParagraphs = aiData.content.split('\n\n')
@@ -916,20 +1016,19 @@ Return valid JSON in this exact format:
     switch (action) {
       case 'full':
         if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
-        prompt = `Write a high-engagement mobile news article for Asian Dot. Title: "${title}"
+        prompt = `Write an authoritative, in-depth news article for Asian Dot. Title: "${title}"
 
 RULES:
 1. Do NOT repeat the title in the body.
-2. DO NOT include any H2 or H3 subheadings. Only write clean, short paragraphs.
-3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
-4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
-5. Write EXACTLY 4 paragraphs (no more, no less).
-6. Write a punchy excerpt (STRICTLY under 160 characters max).
+2. DO NOT include any H2 or H3 subheadings. Write clean, cohesive paragraphs separated by double line breaks.
+3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 300 and 450 words total.
+4. Structure: Write 6 to 8 paragraphs covering The Breaking Lead, Background History & Context, Key Statements & Quotations, and Geopolitical Significance/Next Steps.
+5. Write a punchy lead excerpt (a complete, grammatically sound sentence strictly under 160 characters ending with a period).
 
 Return JSON in this exact format:
 {
-  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.",
-  "excerpt": "A punchy lead summary strictly under 160 characters.",
+  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.\n\nParagraph 5.\n\nParagraph 6.",
+  "excerpt": "A complete, punchy lead summary strictly under 160 characters.",
   "tags": ["tag1", "tag2", "tag3"],
   "metaTitle": "SEO optimized title, strictly between 50 and 60 characters long (including ' - Asian Dot' suffix)",
   "metaDescription": "SEO meta description, strictly between 100 and 150 characters long"
@@ -938,19 +1037,17 @@ Return JSON in this exact format:
 
       case 'content_only':
         if (!title) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
-        prompt = `Write a high-engagement mobile news article for Asian Dot. Title: "${title}"
+        prompt = `Write an authoritative, in-depth news article for Asian Dot. Title: "${title}"
 
 RULES:
 1. Do NOT repeat the title in the body.
-2. DO NOT include any H2 or H3 subheadings. Only write clean, short paragraphs.
-3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 120 and 140 words total.
-4. Paragraph length: Each paragraph MUST be AT MOST 35 words long.
-5. Write EXACTLY 4 paragraphs (no more, no less).
+2. DO NOT include any H2 or H3 subheadings. Write clean, cohesive paragraphs separated by double line breaks.
+3. TOTAL WORD COUNT: The ENTIRE article content body MUST be between 300 and 450 words total across 6 to 8 paragraphs.
 
 Return JSON in this exact format:
 {
-  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.",
-  "excerpt": "A punchy lead summary strictly under 160 characters."
+  "content": "Paragraph 1.\n\nParagraph 2.\n\nParagraph 3.\n\nParagraph 4.\n\nParagraph 5.\n\nParagraph 6.",
+  "excerpt": "A complete, punchy lead summary strictly under 160 characters."
 }`
         break
 

@@ -13,6 +13,9 @@ interface AIResult {
   metaDescription?: string
   coverImage?: number | string
   scrapedImageUrl?: string
+  category?: number | string
+  categoryName?: string
+  isFeatured?: boolean
 }
 
 type Action = 'full' | 'content_only' | 'seo_only' | 'scrape_direct'
@@ -170,10 +173,28 @@ export const AIAssistant: React.FC = () => {
         })
       }
       dispatchFields({ type: 'UPDATE', path: 'content', value: lexicalValue, initialValue: lexicalValue, valid: true })
+    } else if (fieldName === 'category') {
+      dispatchFields({ type: 'UPDATE', path: 'category', value, valid: true })
+    } else if (fieldName === 'isFeatured') {
+      dispatchFields({ type: 'UPDATE', path: 'isFeatured', value: true, valid: true })
     } else {
       dispatchFields({ type: 'UPDATE', path: fieldName, value, valid: true })
     }
     setApplied(prev => ({ ...prev, [fieldName]: true }))
+  }
+
+  const applyAll = () => {
+    if (!result) return
+    if (result.title) applyField('title', result.title)
+    if (result.coverImage) applyField('coverImage', result.coverImage)
+    if (result.category) applyField('category', result.category)
+    if (result.excerpt) applyField('excerpt', result.excerpt)
+    if (result.content) applyField('content', result.content)
+    if (result.tags) applyField('tags', result.tags)
+    if (result.metaTitle) applyField('metaTitle', result.metaTitle)
+    if (result.metaDescription) applyField('metaDescription', result.metaDescription)
+    dispatchFields({ type: 'UPDATE', path: 'isFeatured', value: true, valid: true })
+    setApplied(prev => ({ ...prev, isFeatured: true, all: true }))
   }
 
   const buttons: { action: Action; icon: string; label: string; desc: string }[] = [
@@ -482,8 +503,40 @@ export const AIAssistant: React.FC = () => {
                   padding: '4px 0',
                 }}>✅ Ready — click to apply</div>
 
+                <button
+                  type="button"
+                  onClick={applyAll}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    boxShadow: '0 2px 10px rgba(46,204,113,0.3)',
+                    marginBottom: 4,
+                  }}
+                >
+                  {applied['all'] ? '✓ All Fields Applied' : '⚡ Apply All to Article'}
+                </button>
+
                 {result.title && (
                   <ResultCard label="Title" value={result.title} applied={!!applied['title']} onApply={() => applyField('title', result.title)} />
+                )}
+                {result.category && (
+                  <ResultCard
+                    label="Category"
+                    value={result.categoryName ? `${result.categoryName}` : `Category ID: ${result.category}`}
+                    applied={!!applied['category']}
+                    onApply={() => applyField('category', result.category)}
+                  />
                 )}
                 {result.coverImage && (
                   <ResultCard 
