@@ -10,7 +10,7 @@ import path from 'node:path'
 process.env.DATABASE_URI = 'postgresql://studio_test:studio-test-only@127.0.0.1:55439/studio_test'
 process.env.PAYLOAD_SECRET = 'studio-integration-test-secret-never-used-in-production'
 process.env.NEXT_PUBLIC_SITE_URL = 'http://127.0.0.1:55440'
-process.env.NODE_ENV = 'test'
+;(process.env as any).NODE_ENV = 'test'
 process.env.DISABLE_PAYLOAD_HMR = 'true'
 const mediaDir = await mkdtemp(path.join(tmpdir(), 'studio-test-media-'))
 let payload: any
