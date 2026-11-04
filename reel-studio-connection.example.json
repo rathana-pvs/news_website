@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "name": "Asian Dot",
+  "baseUrl": "https://asiandot.com",
+  "adapter": "payload-news-v1",
+  "email": "",
+  "password": ""
+}

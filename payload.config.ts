@@ -25,6 +25,7 @@ import { Authors } from './src/collections/Authors'
 import { Media } from './src/collections/Media'
 import { Users } from './src/collections/Users'
 import { ShareLinks } from './src/collections/ShareLinks'
+import { StudioPublications } from './src/collections/StudioPublications'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -51,7 +52,7 @@ export default buildConfig({
       titleSuffix: '— Asian Dot CMS',
     },
   },
-  collections: [Articles, Categories, Authors, Media, Users, ShareLinks],
+  collections: [Articles, Categories, Authors, Media, Users, ShareLinks, StudioPublications],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,

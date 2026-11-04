@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import type { CollectionConfig } from 'payload'
 
 export const ShareLinks: CollectionConfig = {
@@ -24,8 +25,8 @@ export const ShareLinks: CollectionConfig = {
           let isUnique = false
           let attempts = 0
           while (!isUnique && attempts < 10) {
-            // Generate a 5-char alphanumeric key
-            uniqueKey = Math.random().toString(36).substring(2, 7)
+            // Generate an opaque random tracking key
+            uniqueKey = randomBytes(12).toString('hex')
             const existing = await req.payload.find({
               collection: 'share-links' as any,
               where: { key: { equals: uniqueKey } },
@@ -47,12 +48,13 @@ export const ShareLinks: CollectionConfig = {
     ],
   },
   fields: [
+    { name: 'studioKey', type: 'text', unique: true, admin: { hidden: true } },
     {
       name: 'key',
       type: 'text',
       unique: true,
       admin: {
-        description: 'Auto-generated 5-character unique key.',
+        description: 'Auto-generated random tracking key.',
         readOnly: true,
       },
     },

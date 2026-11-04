@@ -57,14 +57,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: seoTitle,
     description: seoDescription,
     alternates: {
-      canonical: `/article/${key}/${slug}`,
+      canonical: `/article/${slug}`,
     },
     openGraph: {
       title: seoTitle,
       description: seoDescription,
       images: ogImageUrl ? [ogImageUrl] : [],
       type: 'article',
-      url: `${siteUrl}/article/${key}/${slug}`,
+      url: `${siteUrl}/article/${slug}`,
       publishedTime: article.publishedAt,
       authors: [article.author?.name || 'Asian Dot Staff'],
     },
@@ -87,6 +87,12 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   const article = await getArticle(slug, locale)
   if (!article) notFound()
 
+  // A tracking key must resolve to this article, including for crawler previews.
+  const payload = await getPayloadClient()
+  const resolved = await payload.find({ collection: 'share-links' as any,
+    where: { and: [{ key: { equals: key } }, { article: { equals: article.id } }] }, limit: 1, depth: 0 })
+  if (!resolved.docs.length) notFound()
+
   const relatedArticles = await getRelatedArticles(article.id, article.category?.id, locale)
 
   // Track the click on the server side
@@ -104,7 +110,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
       })
 
       const shareLink = shareLinkResult.docs[0]
-      if (shareLink) {
+      if (shareLink && String(typeof shareLink.article === 'object' ? shareLink.article.id : shareLink.article) === String(article.id)) {
         await payload.update({
           collection: 'share-links' as any,
           id: shareLink.id,

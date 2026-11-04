@@ -1,3 +1,4 @@
+import * as website_studio from './20261104_website_studio';
 import * as migration_20260709_194304_add_share_links_collection from './20260709_194304_add_share_links_collection';
 
 export const migrations = [
@@ -6,4 +7,5 @@ export const migrations = [
     down: migration_20260709_194304_add_share_links_collection.down,
     name: '20260709_194304_add_share_links_collection'
   },
+  { up: website_studio.up, down: website_studio.down, name: '20261104_website_studio' },
 ];
