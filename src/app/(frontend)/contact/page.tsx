@@ -1,3 +1,4 @@
+import { jsonLdString } from '@/lib/utils'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ContactForm } from './ContactForm'
@@ -50,7 +51,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
 
       <header className="border-b border-[var(--border)] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-[1180px]">

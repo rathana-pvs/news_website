@@ -97,7 +97,7 @@ export default async function FrontendLayout({
         <Script id="wau-init" strategy="afterInteractive">
           {`var _wau = _wau || []; _wau.push(["dynamic", "zzpbthitpu", "t8q", "c4302bffffff", "small"]);`}
         </Script>
-        <Script src="//waust.at/d.js" strategy="afterInteractive" />
+        <Script src="https://waust.at/d.js" strategy="afterInteractive" />
       </body>
     </html>
   )

@@ -30,15 +30,25 @@ export async function GET(
     if (ext === '.png') contentType = 'image/png'
     else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg'
     else if (ext === '.gif') contentType = 'image/gif'
-    else if (ext === '.svg') contentType = 'image/svg+xml'
     else if (ext === '.webp') contentType = 'image/webp'
-    
-    return new NextResponse(fileBuffer, {
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    })
+    else if (ext === '.avif') contentType = 'image/avif'
+    else if (ext === '.mp4') contentType = 'video/mp4'
+    else if (ext === '.webm') contentType = 'video/webm'
+    else if (ext === '.mov') contentType = 'video/quicktime'
+
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff',
+      // Never let an uploaded file run scripts on this origin (e.g. a legacy SVG).
+      'Content-Security-Policy': "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; sandbox",
+    }
+    // Anything not explicitly whitelisted above (including .svg/.html) is downloaded, not rendered.
+    if (contentType === 'application/octet-stream') {
+      headers['Content-Disposition'] = 'attachment'
+    }
+
+    return new NextResponse(fileBuffer, { headers })
   } catch (error) {
     return new NextResponse('Internal Server Error', { status: 500 })
   }

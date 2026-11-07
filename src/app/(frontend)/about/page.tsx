@@ -1,3 +1,4 @@
+import { jsonLdString } from '@/lib/utils'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -58,7 +59,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
 
       <section className="border-b border-[var(--border)]">
         <div className="mx-auto grid max-w-[1280px] lg:grid-cols-2">

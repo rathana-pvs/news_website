@@ -1,3 +1,4 @@
+google.com, pub-6217525480433926, DIRECT, f08c47fec0942fa0
 google.com, pub-2441454515104767, DIRECT, f08c47fec0942fa0
 smartadserver.com, 4577, RESELLER, 060d053dcf45cbf3
 improvedigital.com, 1944, RESELLER

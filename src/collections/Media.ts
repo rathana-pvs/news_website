@@ -9,7 +9,17 @@ export const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticDir: path.resolve(dirname, '../../public/media'),
-    mimeTypes: ['image/*', 'video/*'],
+    // SVG is excluded: it can carry scripts that run on this origin.
+    mimeTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/avif',
+      'image/gif',
+      'video/mp4',
+      'video/webm',
+      'video/quicktime',
+    ],
     imageSizes: [
       {
         name: 'thumbnail',

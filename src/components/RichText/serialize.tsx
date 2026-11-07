@@ -2,6 +2,21 @@ import { Fragment, JSX } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
+// Third-party embeds may run their own player scripts, but cannot redirect
+// the reader's page, submit forms, or download files.
+const EMBED_SANDBOX = 'allow-scripts allow-same-origin allow-presentation allow-popups'
+
+/** Returns the URL only if it is a valid https URL (blocks javascript:, data:, etc.). */
+function safeEmbedUrl(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null
+  try {
+    const u = new URL(raw.trim())
+    return u.protocol === 'https:' ? u.toString() : null
+  } catch {
+    return null
+  }
+}
+
 type Node = {
   type: string
   value?: any
@@ -102,12 +117,22 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
           return (
             <div key={elKey} className="my-10">
               <div className="rounded-xl overflow-hidden shadow-2xl border border-white/5 aspect-video bg-black">
-                <iframe
-                  src={ytId ? `https://www.youtube.com/embed/${ytId}` : embedUrl}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {ytId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${ytId}`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : safeEmbedUrl(embedUrl) ? (
+                  <iframe
+                    src={safeEmbedUrl(embedUrl)!}
+                    className="w-full h-full"
+                    sandbox={EMBED_SANDBOX}
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                ) : null}
               </div>
               {block.caption && (
                 <p className="text-sm text-center mt-3 text-white/50 italic">{block.caption}</p>
@@ -229,15 +254,17 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
           )
         }
 
-        // Fallback for other iframes (Facebook, etc)
-        // Note: Facebook embeds usually require their own SDK/Embed code, 
-        // but if it's an iframe URL we can attempt to render it.
+        // Fallback for other iframes (Facebook, etc). Only https URLs, sandboxed.
+        const fallbackSrc = safeEmbedUrl(url)
+        if (!fallbackSrc) return null
         return (
           <div key={elKey} className="my-10 rounded-xl overflow-hidden shadow-2xl border border-white/5 aspect-video bg-black">
-             <iframe 
-               src={url} 
-               className="w-full h-full" 
-               allowFullScreen 
+             <iframe
+               src={fallbackSrc}
+               className="w-full h-full"
+               sandbox={EMBED_SANDBOX}
+               referrerPolicy="strict-origin-when-cross-origin"
+               allowFullScreen
              />
           </div>
         )

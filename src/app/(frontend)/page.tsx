@@ -1,3 +1,4 @@
+import { jsonLdString } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { CategoryRow } from '@/components/sections/CategoryRow'
@@ -86,7 +87,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       {/* Hero */}
       <HeroSection hero={hero} secondary={secondary} />

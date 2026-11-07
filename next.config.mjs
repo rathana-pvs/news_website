@@ -56,6 +56,22 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    // Uploaded files are served from /media (public/media) on this origin.
+    // Sandbox them so a stored SVG/HTML file can never run scripts here.
+    return [
+      {
+        source: '/media/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; sandbox",
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default withPayload(nextConfig)

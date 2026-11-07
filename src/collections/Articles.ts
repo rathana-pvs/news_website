@@ -22,12 +22,34 @@ export const Articles: CollectionConfig = {
     update: ({ req }) => {
       if (!req.user) return false
       if ((req.user as any).role === 'admin' || (req.user as any).role === 'editor') return true
-      return { author: { equals: req.user.id } }
+      // Writers may only edit articles they created. `author` points to the
+      // public Authors collection (not users), so it cannot be used for ownership.
+      return { createdBy: { equals: req.user.id } }
     },
     delete: ({ req }) => (req.user as any)?.role === 'admin',
   },
   hooks: {
     beforeChange: [
+      ({ data, originalDoc, req, operation }) => {
+        const user = req.user as any
+        // Local API calls without a user (seed/scripts) are trusted system writes.
+        if (!user) return data
+
+        if (operation === 'create') {
+          data.createdBy = user.id
+        } else if (originalDoc) {
+          // Ownership is set once and never reassigned through the API.
+          data.createdBy = originalDoc.createdBy ?? data.createdBy
+        }
+
+        // Only editors and admins can publish. Writers' new articles start as
+        // drafts, and writers cannot change the status of an existing article.
+        const canPublish = user.role === 'admin' || user.role === 'editor'
+        if (!canPublish) {
+          data.status = operation === 'create' ? 'draft' : (originalDoc?.status ?? 'draft')
+        }
+        return data
+      },
       async ({ data, originalDoc }) => {
         if (!data.slug && data.title) {
           // Note: slugify with strict:true returns "" for Khmer text.
@@ -157,6 +179,12 @@ export const Articles: CollectionConfig = {
     { name: 'credit', type: 'text', localized: false, admin: { description: 'News source or attribution (e.g. CNN, AP, Reuters).' } },
     { name: 'category', type: 'relationship', relationTo: 'categories', admin: { position: 'sidebar' } },
     { name: 'author', type: 'relationship', relationTo: 'authors', admin: { position: 'sidebar' } },
+    {
+      name: 'createdBy',
+      type: 'relationship',
+      relationTo: 'users',
+      admin: { position: 'sidebar', readOnly: true, description: 'CMS user who created this article.' },
+    },
     { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text', localized: true }] },
     {
       name: 'status',

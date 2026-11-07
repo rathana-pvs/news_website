@@ -12,6 +12,10 @@ echo -e "${GREEN}🚀 Deploying Asian Dot (Hybrid VPS PM2)...${NC}"
 echo "📥 Pulling latest code..."
 git pull origin main || { echo -e "${RED}❌ Error: git pull failed.${NC}"; exit 1; }
 
+# 1b. Apply database migrations (the new code may need new columns)
+echo "🗄️  Running database migrations..."
+npx payload migrate --force || { echo -e "${RED}❌ Error: migration failed.${NC}"; exit 1; }
+
 # 2. Build production Next.js assets with memory limit
 echo "🔨 Building production Next.js app..."
 NODE_OPTIONS="--max-old-space-size=1536" npm run build
