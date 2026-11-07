@@ -79,6 +79,11 @@ export const ShareLinks: CollectionConfig = {
       name: 'clicks',
       type: 'number',
       defaultValue: 0,
+      // Counted by the server only; nobody can edit it through the API.
+      access: {
+        create: () => false,
+        update: () => false,
+      },
       admin: {
         readOnly: true,
       },

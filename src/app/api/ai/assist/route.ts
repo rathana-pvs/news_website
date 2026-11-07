@@ -3,6 +3,7 @@ import { generateText } from 'ai'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayloadClient } from '@/lib/payload'
 import * as cheerio from 'cheerio'
+import { safeFetch, UnsafeUrlError } from '@/lib/safe-fetch'
 
 function resolveUrl(baseUrl: string, relativeUrl: string): string {
   try {
@@ -69,7 +70,7 @@ async function fetchRelatedNewsSources(headline: string): Promise<RelatedNewsSou
 }
 
 async function scrapeUrlDirectly(url: string) {
-  const res = await fetch(url, {
+  const res = await safeFetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -732,7 +733,7 @@ export async function POST(req: NextRequest) {
       // 1. Download cover image
       if (result.scrapedImageUrl) {
         try {
-          const imageRes = await fetch(result.scrapedImageUrl, {
+          const imageRes = await safeFetch(result.scrapedImageUrl, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
           })
           if (imageRes.ok) {
@@ -781,7 +782,7 @@ export async function POST(req: NextRequest) {
       for (const block of blocks) {
         if (block.type === 'image' && block.src) {
           try {
-            const imageRes = await fetch(block.src, {
+            const imageRes = await safeFetch(block.src, {
               headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
             })
             if (imageRes.ok) {
@@ -1094,6 +1095,9 @@ Return JSON in this exact format:
 
     return NextResponse.json({ success: true, data: result })
   } catch (error: any) {
+    if (error instanceof UnsafeUrlError) {
+      return NextResponse.json({ error: `URL not allowed: ${error.message}` }, { status: 400 })
+    }
     console.error('[AI Assist Error]', error)
     return NextResponse.json(
       { error: error?.message || 'Failed to generate content' },

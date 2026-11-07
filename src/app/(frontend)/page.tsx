@@ -8,6 +8,8 @@ import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
 import { Article, Category } from '@/types'
 import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
+import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { adskeeper } from '@/lib/ads'
 
 export const dynamic = 'force-dynamic'
 
@@ -104,6 +106,12 @@ export default async function HomePage() {
 
       <LatestNewsGrid articles={articles.slice(0, 8)} />
 
+      {adskeeper.homeFeed && (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 my-8">
+          <AdskeeperWidget widgetId={adskeeper.homeFeed} placement="home_feed" />
+        </div>
+      )}
+
       {/* Category Rows */}
       {cats.slice(0, 2).map((cat) => (
         <CategoryRow
@@ -124,6 +132,12 @@ export default async function HomePage() {
 
       {/* Most Read + Editor's Picks */}
       <MostRead editorPicks={editorPicks} mostRead={mostRead} />
+
+      {adskeeper.homeBottom && (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mt-12 mb-8">
+          <AdskeeperWidget widgetId={adskeeper.homeBottom} placement="home_bottom" />
+        </div>
+      )}
     </>
   )
 }

@@ -10,7 +10,7 @@ export type RichTextProps = {
   analyticsId?: string
   articleTitle?: string          // Main article title for deduplication
   adWidgetId?: string            // Top in-article ad (before Continue Reading blur)
-  adWidgetId2?: string           // Mid in-article ad (first ad in expanded section)
+  adWidgetId2?: string           // Mid in-article ad (after paragraph 4, before Continue Reading)
   adWidgetId3?: string           // Lower in-article ad (lower ad in expanded section)
 }
 
@@ -135,7 +135,7 @@ export const RichText = ({
     }
   }
 
-  // ─── Assemble topElements (shown before "Continue Reading") ───
+  // ─── Assemble topElements (shown before "Continue Reading": paragraphs 1-4) ───
   const topElements: React.ReactNode[] = []
   topElements.push(...serializeLexical(nodes.slice(0, p2EndIndex), 'top-p1-p2'))
   topElements.push(
@@ -149,15 +149,13 @@ export const RichText = ({
     </div>
   )
 
-  // ─── Assemble bottomElements (shown when expanded) ───
-  const bottomElements: React.ReactNode[] = []
-
-  // Paragraphs 3-4
+  // Paragraphs 3-4 and the second ad are also shown before "Continue Reading",
+  // so the second unit is seen by every reader, not only those who expand.
   const p3ToP4Nodes = nodes.slice(p2EndIndex, p4EndIndex)
   if (p3ToP4Nodes.length > 0) {
-    bottomElements.push(...serializeLexical(p3ToP4Nodes, 'bot-p3-p4'))
+    topElements.push(...serializeLexical(p3ToP4Nodes, 'top-p3-p4'))
     if (secondaryWidgetId && paragraphCount >= 4) {
-      bottomElements.push(
+      topElements.push(
         <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
           <AdskeeperWidget
             key={`ad-inarticle-2`}
@@ -169,6 +167,9 @@ export const RichText = ({
       )
     }
   }
+
+  // ─── Assemble bottomElements (shown when expanded) ───
+  const bottomElements: React.ReactNode[] = []
 
   // Keep the third unit exclusive to genuinely long articles so ad density
   // remains proportional to the amount of editorial content.

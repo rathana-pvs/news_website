@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
+import { sql } from '@payloadcms/db-postgres'
 import { Locale } from '@/i18n-config'
 import { i18nStrings } from '@/lib/i18n'
 import { getArticle, getRelatedArticles } from '@/lib/api-server'
@@ -100,26 +101,20 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   try {
     const headersList = await headers()
     const userAgent = headersList.get('user-agent') || ''
-    const isBot = /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit/i.test(userAgent)
+    const isPrefetch =
+      headersList.get('next-router-prefetch') === '1' ||
+      /prefetch|prerender/i.test(headersList.get('purpose') || headersList.get('sec-purpose') || '')
+    // Link-preview fetchers and scripts. In-app browsers (Facebook, LinkedIn,
+    // Pinterest...) are real readers and are still counted.
+    const isBot =
+      !userAgent ||
+      /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|^whatsapp\/|vkshare|headless|lighthouse|curl|wget|python|go-http|java\/|okhttp|axios|node-fetch/i.test(userAgent)
 
-    if (!isBot) {
-      const payload = await getPayloadClient()
-      const shareLinkResult = await payload.find({
-        collection: 'share-links' as any,
-        where: { key: { equals: key } },
-        limit: 1,
-      })
-
-      const shareLink = shareLinkResult.docs[0]
-      if (shareLink && String(typeof shareLink.article === 'object' ? shareLink.article.id : shareLink.article) === String(article.id)) {
-        await payload.update({
-          collection: 'share-links' as any,
-          id: shareLink.id,
-          data: {
-            clicks: (shareLink.clicks || 0) + 1,
-          },
-        })
-      }
+    if (!isBot && !isPrefetch) {
+      // Atomic increment, so simultaneous visits are all counted.
+      await (payload.db as any).drizzle.execute(
+        sql`UPDATE share_links SET clicks = COALESCE(clicks, 0) + 1, updated_at = now() WHERE id = ${resolved.docs[0].id}`
+      )
     }
   } catch (e) {
     console.error('Error tracking share link click:', e)

@@ -31,6 +31,20 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
+// Login tokens are signed with this secret. In production, refuse to run with
+// a missing or known placeholder value, since anyone could then forge logins.
+// (Skipped during `next build`, where the Dockerfile uses a placeholder.)
+const PLACEHOLDER_SECRETS = ['fallback-secret-change-me', 'build-time-secret-replace-at-runtime']
+function resolvePayloadSecret(): string {
+  const secret = process.env.PAYLOAD_SECRET
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  const isProd = process.env.NODE_ENV === 'production'
+  if (isProd && !isBuild && (!secret || PLACEHOLDER_SECRETS.includes(secret))) {
+    throw new Error('PAYLOAD_SECRET must be set to a strong random value in production')
+  }
+  return secret || 'fallback-secret-change-me'
+}
+
 export default buildConfig({
   sharp,
   localization: {
@@ -64,7 +78,7 @@ export default buildConfig({
       }),
     ],
   }),
-  secret: process.env.PAYLOAD_SECRET || 'fallback-secret-change-me',
+  secret: resolvePayloadSecret(),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

@@ -65,10 +65,11 @@ export default async function FrontendLayout({
     <html lang={locale}>
       <head>
         {adskeeper.scriptUrl && (
+          // Widgets queue `_mgc.load` in window._mgq, which the script processes
+          // when it arrives, so it doesn't need to block the first render.
           <Script
             src={adskeeper.scriptUrl}
-            strategy="beforeInteractive"
-            async
+            strategy="afterInteractive"
           />
         )}
         <Script
