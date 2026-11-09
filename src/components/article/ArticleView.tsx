@@ -20,12 +20,17 @@ export function ArticleView({ article, related }: { article: Article; related: A
     : ''
   const authorName = article.author && typeof article.author === 'object' ? article.author.name : ''
 
+  const articleUrl = `${siteUrl}/article/${article.slug}`
+  const absoluteHeroImage = heroImage.startsWith('/') ? `${siteUrl}${heroImage}` : heroImage
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': articleUrl },
+    url: articleUrl,
     headline: article.title,
     description: article.excerpt,
-    image: [heroImage],
+    image: [absoluteHeroImage],
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     author: [{
@@ -36,6 +41,7 @@ export function ArticleView({ article, related }: { article: Article; related: A
     publisher: {
       '@type': 'Organization',
       name: 'Asian Dot',
+      url: siteUrl,
       logo: { '@type': 'ImageObject', url: `${siteUrl}/logo.png` },
     },
   }

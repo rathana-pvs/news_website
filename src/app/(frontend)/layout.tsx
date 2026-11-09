@@ -23,6 +23,18 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  // Large image previews are required for Google Discover cards.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     siteName: 'Asian Dot',
     title: 'Asian Dot — Independent Political Reporting',
