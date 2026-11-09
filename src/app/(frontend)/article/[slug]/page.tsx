@@ -9,6 +9,7 @@ interface PageProps {
 
 // Allow older articles not in generateStaticParams to be rendered on-demand and cached
 export const dynamicParams = true
+export const revalidate = 60
 
 // Pre-generate the 40 most recent articles as static pages at deploy time
 export async function generateStaticParams() {

@@ -12,7 +12,7 @@ import { Article, Category } from '@/types'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { adskeeper } from '@/lib/ads'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Asian Dot — Independent Political Reporting',

@@ -10,7 +10,11 @@ import Script from 'next/script'
 import { MobileSiteWidget } from '@/components/ads/MobileSiteWidget'
 import { adskeeper } from '@/lib/ads'
 
-export const dynamic = 'force-dynamic'
+// Pages are cached and rebuilt at most once a minute; publishing an article
+// clears them sooner through revalidateTag('articles') in the Articles hooks.
+// The site is built on the server with the real database (deploy.sh), so
+// these pages can be prerendered at build time.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'),

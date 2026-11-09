@@ -150,6 +150,20 @@ export const Articles: CollectionConfig = {
         return doc
       },
     ],
+    // Pages are cached now, so a deleted article must clear them too.
+    afterDelete: [
+      async ({ doc }) => {
+        try {
+          revalidateTag('articles')
+          if (doc?.category && typeof doc.category === 'object' && doc.category.slug) {
+            revalidateTag(`category-${doc.category.slug}`)
+          }
+        } catch (e) {
+          // Ignore revalidation errors during seeding/CLI
+        }
+        return doc
+      },
+    ],
   },
   fields: [
     { name: 'studioKey', type: 'text', unique: true, admin: { hidden: true } },

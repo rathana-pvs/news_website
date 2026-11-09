@@ -8,6 +8,16 @@ interface PageProps {
   params: Promise<{ slug: string }>
 }
 
+// Cache category pages like the rest of the site (see the frontend layout).
+// New categories are rendered on first visit and cached from then on.
+export const dynamicParams = true
+export const revalidate = 60
+
+export async function generateStaticParams() {
+  const categories = await getCategories('en')
+  return (categories as Category[]).map((c) => ({ slug: c.slug }))
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const locale = 'en'
