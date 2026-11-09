@@ -23,17 +23,18 @@ const config: Config = {
         'border-subtle': 'var(--border-subtle)',
       },
       fontFamily: {
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        serif: ['Source Serif 4', 'Georgia', 'serif'],
         'source-serif': ['Source Serif 4', 'Georgia', 'serif'],
-        mono: ['IBM Plex Mono', 'monospace'],
+        sans: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        mono: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       typography: {
         DEFAULT: {
           css: {
             color: 'var(--text-primary)',
             fontFamily: 'Source Serif 4, Georgia, serif',
-            fontSize: '18px',
-            lineHeight: '1.85',
+            fontSize: '19px',
+            lineHeight: '1.6',
           },
         },
       },

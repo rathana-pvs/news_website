@@ -1,13 +1,14 @@
 import { jsonLdString } from '@/lib/utils'
 import type { Metadata } from 'next'
-import { HeroSection } from '@/components/sections/HeroSection'
-import { CategoryRow } from '@/components/sections/CategoryRow'
-import { MostRead } from '@/components/sections/MostRead'
-import { LatestNewsGrid } from '@/components/sections/LatestNewsGrid'
+import {
+  TopStories,
+  StoryRow,
+  InBrief,
+  SectionBlock,
+  PicksAndPopular,
+} from '@/components/home/HomeBlocks'
 import { getArticles, getCategories, getFeatured } from '@/lib/api-server'
 import { Article, Category } from '@/types'
-import { i18nStrings } from '@/lib/i18n'
-import { Locale } from '@/i18n-config'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { adskeeper } from '@/lib/ads'
 
@@ -43,32 +44,43 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const locale = 'en'
-  const dict = i18nStrings[locale as Locale] || i18nStrings.en
 
   const [{ hero, secondary }, allArticles, categories] = await Promise.all([
     getFeatured(locale),
-    getArticles({ limit: 40, locale }),
+    getArticles({ limit: 60, locale }),
     getCategories(locale),
   ])
 
   const articles = allArticles.docs as Article[]
   const cats = categories as Category[]
 
+  // Hand out stories top to bottom so the same one never appears twice.
+  const used = new Set<Article['id']>()
+  const take = (pool: Article[], n: number) => {
+    const picked: Article[] = []
+    for (const a of pool) {
+      if (picked.length >= n) break
+      if (!a || used.has(a.id)) continue
+      used.add(a.id)
+      picked.push(a)
+    }
+    return picked
+  }
 
+  const lead = take(hero ? [hero, ...articles] : articles, 1)[0]
+  const secondaryStories = take([...secondary, ...articles.filter((a) => a.isFeatured), ...articles], 2)
+  const latest = take(articles, 6)
+  const row = take(articles, 4)
+  const brief = take(articles, 6)
 
-  // Editor's picks (first 3 non-featured)
-  const editorPicks = articles.filter((a) => !a.isFeatured).slice(0, 3)
+  const sections = cats.map((cat) => ({
+    category: cat,
+    articles: take(articles.filter((a) => a.category?.slug === cat.slug), 5),
+  }))
 
-  // Mock "most read" as top 5
+  const picks = take(articles.filter((a) => !a.isFeatured), 3)
+  // No view counts yet, so "most read" is the most recent stories.
   const mostRead = articles.slice(0, 5)
-
-  // Build articles per category map
-  const articlesByCategory: Record<string, Article[]> = {}
-  cats.forEach((cat) => {
-    articlesByCategory[cat.slug] = articles.filter((a) => a.category?.slug === cat.slug)
-  })
-
-
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
   const jsonLd = {
@@ -91,50 +103,26 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
-      {/* Hero */}
-      <HeroSection hero={hero} secondary={secondary} />
+      {lead && <TopStories lead={lead} secondary={secondaryStories} latest={latest} />}
 
-      {/* Latest News Divider */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4">
-        <div className="flex items-center gap-4 py-8">
-          <h2 className="label-caps !text-[var(--accent-red)] tracking-[0.2em] whitespace-nowrap">
-            {dict.latestNews}
-          </h2>
-          <div className="h-[1px] w-full bg-gradient-to-r from-[var(--accent-red)]/30 to-transparent" />
-        </div>
-      </div>
+      <StoryRow articles={row} />
 
-      <LatestNewsGrid articles={articles.slice(0, 8)} />
+      <InBrief articles={brief} />
 
       {adskeeper.homeFeed && (
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 my-8">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 my-10">
           <AdskeeperWidget widgetId={adskeeper.homeFeed} placement="home_feed" />
         </div>
       )}
 
-      {/* Category Rows */}
-      {cats.slice(0, 2).map((cat) => (
-        <CategoryRow
-          key={cat.id}
-          category={cat}
-          articles={articlesByCategory[cat.slug] || articles.slice(0, 4)}
-        />
+      {sections.map(({ category, articles: list }) => (
+        <SectionBlock key={category.id} category={category} articles={list} />
       ))}
 
-      {/* Rest of Categories */}
-      {cats.slice(2).map((cat) => (
-        <CategoryRow
-          key={cat.id}
-          category={cat}
-          articles={articlesByCategory[cat.slug] || articles.slice(0, 4)}
-        />
-      ))}
-
-      {/* Most Read + Editor's Picks */}
-      <MostRead editorPicks={editorPicks} mostRead={mostRead} />
+      <PicksAndPopular picks={picks} popular={mostRead} />
 
       {adskeeper.homeBottom && (
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mt-12 mb-8">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mt-12">
           <AdskeeperWidget widgetId={adskeeper.homeBottom} placement="home_bottom" />
         </div>
       )}

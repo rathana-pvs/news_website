@@ -13,11 +13,11 @@ export function CategoryBadge({ name, size = 'md', className }: CategoryBadgePro
   return (
     <span
       className={cn(
-        'inline-flex items-center font-mono font-bold uppercase tracking-widest',
-        size === 'sm' ? 'text-[9px] px-0 py-0' : 'text-[10px] px-0 py-0',
+        'inline-flex items-center font-sans font-semibold',
+        size === 'sm' ? 'text-[12px]' : 'text-[13px]',
         className,
       )}
-      style={{ color: 'var(--accent-red)', letterSpacing: '0.15em' }}
+      style={{ color: 'var(--accent-red)' }}
     >
       {name}
     </span>

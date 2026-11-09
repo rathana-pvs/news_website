@@ -3,151 +3,101 @@ import { i18nStrings } from '@/lib/i18n'
 import { Locale } from '@/i18n-config'
 import { Category } from '@/types'
 
-export function Footer({ 
+const SOCIAL = [
+  { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61570774830775' },
+  { name: 'X', href: '#' },
+  { name: 'YouTube', href: '#' },
+  { name: 'Telegram', href: '#' },
+]
+
+export function Footer({
   locale = 'en',
-  categories = []
-}: { 
-  locale?: string,
+  categories = [],
+}: {
+  locale?: string
   categories?: Category[]
 }) {
   const dict = i18nStrings[locale as Locale] || i18nStrings.en
+  const linkClass = 'text-[14px] hover:underline underline-offset-4'
+  const headClass = 'text-[13px] font-bold uppercase tracking-[0.06em] mb-4 pb-2'
 
   return (
-    <footer style={{ borderTop: '1px solid var(--border)' }}>
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-10 md:py-14">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-10">
-          {/* Col 1: Logo + Tagline */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            <Link href="/">
-              <h2
-                className="font-display text-2xl font-bold mb-4 tracking-tight"
-                style={{ color: 'var(--text-primary)', letterSpacing: '-0.03em' }}
-              >
-                Asian<span style={{ color: 'var(--accent-red)' }}>dot</span>
-              </h2>
-            </Link>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
+    <footer className="mt-16" style={{ background: 'var(--bg-footer)', color: '#e6e6e6' }}>
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-10 pb-8">
+        <div className="pb-8 mb-8" style={{ borderBottom: '1px solid #3a3a3a' }}>
+          <Link href="/" aria-label="Asian Dot home" className="inline-block">
+            <span
+              className="inline-block"
+              style={{
+                background: 'var(--accent-red)',
+                color: '#fff',
+                fontFamily: 'var(--font-serif)',
+                fontWeight: 600,
+                fontSize: 22,
+                lineHeight: 1,
+                padding: '10px 14px',
+              }}
             >
-              {dict.footerTagline}
-            </p>
-          </div>
+              Asian Dot
+            </span>
+          </Link>
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed" style={{ color: '#b3b3b3', fontFamily: 'var(--font-serif)' }}>
+            {dict.footerTagline}
+          </p>
+        </div>
 
-          {/* Col 2: Category Links */}
-          <div>
-            <h3
-              className="label-caps mb-4"
-              style={{ color: 'var(--accent-red)', fontSize: 13, letterSpacing: '0.12em' }}
-            >
-              {dict.category}
-            </h3>
-            <div className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="col-span-2">
+            <h3 className={headClass} style={{ borderBottom: '1px solid #3a3a3a' }}>{dict.category}</h3>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
               {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {cat.name}
-                </Link>
+                <li key={cat.id}>
+                  <Link href={`/category/${cat.slug}`} className={linkClass}>
+                    {(dict as any)[cat.slug] || cat.name}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-
-
-          {/* Col 4: Organization */}
           <div>
-            <h3
-              className="label-caps mb-4"
-              style={{ color: 'var(--accent-red)', fontSize: 13, letterSpacing: '0.12em' }}
-            >
-              {dict.organization || 'Organization'}
-            </h3>
-            <div className="flex flex-col gap-1.5">
-              <Link
-                href="/about"
-                className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                {dict.aboutUs}
-              </Link>
-              <Link
-                href="/contact"
-                className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                {dict.contactUs}
-              </Link>
-              <Link
-                href="/privacy"
-                className="text-sm py-1 hover:text-[var(--accent-red)] transition-colors"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                {dict.privacyPolicy || 'Privacy Policy'}
-              </Link>
-            </div>
+            <h3 className={headClass} style={{ borderBottom: '1px solid #3a3a3a' }}>{dict.organization || 'Asian Dot'}</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="/about" className={linkClass}>{dict.aboutUs}</Link></li>
+              <li><Link href="/contact" className={linkClass}>{dict.contactUs}</Link></li>
+              <li><Link href="/privacy" className={linkClass}>{dict.privacyPolicy || 'Privacy Policy'}</Link></li>
+              <li><Link href="/search" className={linkClass}>{dict.search}</Link></li>
+            </ul>
           </div>
 
-          {/* Col 5: Social Links */}
-          <div className="col-span-2 md:col-span-1">
-            <h3
-              className="label-caps mb-4"
-              style={{ color: 'var(--accent-red)', fontSize: 13, letterSpacing: '0.12em' }}
-            >
-              {dict.followUs}
-            </h3>
-            <div className="flex flex-col gap-2">
-              {[
-                { name: 'Twitter / X', href: '#', icon: '𝕏' },
-                { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61570774830775', icon: 'f' },
-                { name: 'YouTube', href: '#', icon: '▶' },
-                { name: 'Telegram', href: '#', icon: '✈' },
-              ].map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target={social.href !== '#' ? '_blank' : undefined}
-                  rel={social.href !== '#' ? 'noopener noreferrer' : undefined}
-                  className="flex items-center gap-2.5 text-sm hover:text-[var(--accent-red)] transition-colors"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  <span
-                    className="w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors"
-                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+          <div>
+            <h3 className={headClass} style={{ borderBottom: '1px solid #3a3a3a' }}>{dict.followUs}</h3>
+            <ul className="flex flex-col gap-2">
+              {SOCIAL.map((s) => (
+                <li key={s.name}>
+                  <a
+                    href={s.href}
+                    target={s.href !== '#' ? '_blank' : undefined}
+                    rel={s.href !== '#' ? 'noopener noreferrer' : undefined}
+                    className={linkClass}
                   >
-                    {social.icon}
-                  </span>
-                  {social.name}
-                </a>
+                    {s.name}
+                  </a>
+                </li>
               ))}
-            </div>
-
+            </ul>
           </div>
         </div>
-        
-        {/* Bottom Bar: Copyright */}
-        <div 
-          className="mt-12 md:mt-16 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4"
-          style={{ borderColor: 'var(--border)' }}
+
+        <div
+          className="mt-10 pt-6 flex flex-col md:flex-row justify-between gap-3 text-[12px]"
+          style={{ borderTop: '1px solid #3a3a3a', color: '#999' }}
         >
-          <div
-            className="label-caps text-[10px] tracking-widest"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            © {new Date().getFullYear()} ASIANDOT — {dict.copyright}
-          </div>
-          
-          <div className="flex gap-6 text-[10px] label-caps tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            <Link href="/privacy" className="hover:text-[var(--accent-red)] transition-colors">
-              {dict.privacyPolicy || 'Privacy'}
-            </Link>
-            <Link href="/contact" className="hover:text-[var(--accent-red)] transition-colors">
-              {dict.contactUs}
-            </Link>
-          </div>
+          <span>© {new Date().getFullYear()} Asian Dot. {dict.copyright}</span>
+          <span className="flex gap-5">
+            <Link href="/privacy" className="hover:underline">{dict.privacyPolicy || 'Privacy'}</Link>
+            <Link href="/contact" className="hover:underline">{dict.contactUs}</Link>
+          </span>
         </div>
       </div>
     </footer>

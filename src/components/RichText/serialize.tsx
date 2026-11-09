@@ -116,7 +116,7 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
 
           return (
             <div key={elKey} className="my-10">
-              <div className="rounded-xl overflow-hidden shadow-2xl border border-white/5 aspect-video bg-black">
+              <div className="overflow-hidden aspect-video bg-black">
                 {ytId ? (
                   <iframe
                     src={`https://www.youtube.com/embed/${ytId}`}
@@ -135,7 +135,7 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
                 ) : null}
               </div>
               {block.caption && (
-                <p className="text-sm text-center mt-3 text-white/50 italic">{block.caption}</p>
+                <figcaption>{block.caption}</figcaption>
               )}
             </div>
           )
@@ -197,41 +197,29 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
 
         if (isVideo) {
           return (
-            <div key={elKey} className="my-10 rounded-xl overflow-hidden shadow-2xl border border-white/5 bg-black">
+            <figure key={elKey} className="my-8 bg-black">
               <video
                 src={media.url || ''}
                 controls
                 className="w-full aspect-video"
                 playsInline
               />
-              {media.caption && (
-                <div className="p-4 bg-muted/30">
-                  <p className="text-sm text-white/70 italic font-serif">
-                    {media.caption}
-                  </p>
-                </div>
-              )}
-            </div>
+              {media.caption && <figcaption className="bg-white pt-2">{media.caption}</figcaption>}
+            </figure>
           )
         }
 
         return (
-          <div key={elKey} className="my-10 relative rounded-xl overflow-hidden shadow-2xl border border-white/5 group">
+          <figure key={elKey} className="my-8">
             <Image
               src={media.url || ''}
               alt={media.alt || ''}
               width={media.width || 1200}
               height={media.height || 800}
-              className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+              className="w-full h-auto object-cover"
             />
-            {media.caption && (
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                <p className="text-sm text-white/90 italic font-serif">
-                  {media.caption}
-                </p>
-              </div>
-            )}
-          </div>
+            {media.caption && <figcaption>{media.caption}</figcaption>}
+          </figure>
         )
       case 'embed':
       case 'youtube':
@@ -243,7 +231,7 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
         
         if (youtubeId) {
           return (
-            <div key={elKey} className="my-10 rounded-xl overflow-hidden shadow-2xl border border-white/5 aspect-video bg-black">
+            <div key={elKey} className="my-10 overflow-hidden aspect-video bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${youtubeId}`}
                 className="w-full h-full"
@@ -258,7 +246,7 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = ''): JSX.Ele
         const fallbackSrc = safeEmbedUrl(url)
         if (!fallbackSrc) return null
         return (
-          <div key={elKey} className="my-10 rounded-xl overflow-hidden shadow-2xl border border-white/5 aspect-video bg-black">
+          <div key={elKey} className="my-10 overflow-hidden aspect-video bg-black">
              <iframe
                src={fallbackSrc}
                className="w-full h-full"

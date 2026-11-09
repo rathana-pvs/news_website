@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { serializeLexical } from './serialize'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
+import { GateVariant, gateVariantParam, getGateVariant, setGateTestEligible } from '@/lib/experiments'
 
 export type RichTextProps = {
   content: any
@@ -23,8 +24,28 @@ function extractNodeText(node: any): string {
   return ''
 }
 
-// Long article threshold: articles with this many paragraphs get additional in-article ads
-const LONG_ARTICLE_THRESHOLD = 8
+/** Drop top blocks that repeat the article title (checks the first 3 blocks). */
+function withoutTitleNodes(rawNodes: any[], articleTitle?: string) {
+  if (!articleTitle || rawNodes.length === 0) return rawNodes
+  const cleanTitle = articleTitle.trim().toLowerCase()
+  const titlePrefix = cleanTitle.substring(0, Math.min(25, cleanTitle.length))
+  return rawNodes.filter((node: any, idx: number) => {
+    if (idx >= 3) return true
+    const text = extractNodeText(node).trim().toLowerCase()
+    if (!text) return true
+    return !(
+      text === cleanTitle ||
+      (titlePrefix.length > 5 && text.startsWith(titlePrefix)) ||
+      (text.length > 5 && cleanTitle.startsWith(text.substring(0, 25)))
+    )
+  })
+}
+
+// The gate sits right after the second ad (paragraph 4), as on the live site,
+// so both early units are seen by every reader. Live articles are short
+// (median 4 paragraphs), so it only shows when at least 2 paragraphs remain.
+const GATE_AFTER = 4
+const GATE_MIN_PARAGRAPHS = GATE_AFTER + 2
 
 export const RichText = ({
   content,
@@ -36,11 +57,47 @@ export const RichText = ({
   adWidgetId3,
 }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  // null until mounted; the server always renders the gated version.
+  const [variant, setVariant] = useState<GateVariant | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const progressEventsRef = useRef(new Set<number>())
 
+  // Lexical content structure: { root: { children: [...] } }
+  const nodes: any[] = withoutTitleNodes(content?.root?.children || [], articleTitle)
+
+  const primaryWidgetId =
+    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1
+
+  const secondaryWidgetId =
+    adWidgetId2 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2
+
+  const tertiaryWidgetId =
+    adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
+
+  const paragraphCount = nodes.filter((n: any) => n.type === 'paragraph').length
+  const gateEligible = !!primaryWidgetId && nodes.length >= 2 && paragraphCount >= GATE_MIN_PARAGRAPHS
+  const showGate = gateEligible && variant !== 'no_gate'
+  const fullyShown = !showGate || isExpanded
+  const articleId = analyticsId || articleTitle || 'unknown'
+
+  // Assign the visitor's group and record that they saw a test article.
   useEffect(() => {
-    if (!isExpanded) return
+    const v = getGateVariant()
+    setVariant(v)
+    setGateTestEligible(gateEligible)
+    if (gateEligible) {
+      window.gtag?.('event', 'read_more_test_exposure', {
+        article_id: articleId,
+        gate_variant: v,
+        device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
+      })
+    }
+    return () => setGateTestEligible(undefined)
+  }, [gateEligible, articleId])
+
+  // Scroll-depth events, measured once the whole article is on the page.
+  useEffect(() => {
+    if (variant === null || !fullyShown) return
 
     let frame = 0
     const measureProgress = () => {
@@ -56,7 +113,8 @@ export const RichText = ({
         if (progress < threshold || progressEventsRef.current.has(threshold)) continue
         progressEventsRef.current.add(threshold)
         window.gtag?.('event', threshold === 100 ? 'article_complete' : `article_${threshold}_percent`, {
-          article_id: analyticsId || articleTitle || 'unknown',
+          article_id: articleId,
+          gate_variant: gateVariantParam(),
           device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
         })
       }
@@ -74,132 +132,71 @@ export const RichText = ({
       window.removeEventListener('resize', onScroll)
       if (frame) window.cancelAnimationFrame(frame)
     }
-  }, [isExpanded, analyticsId, articleTitle])
+  }, [variant, fullyShown, articleId])
 
   if (!content) return null
-
-  // Lexical content structure: { root: { children: [...] } }
-  const rawNodes = content.root?.children || []
-
-  // Filter out any top nodes that duplicate articleTitle (checks top 3 blocks)
-  let nodes = rawNodes
-  if (articleTitle && rawNodes.length > 0) {
-    const cleanTitle = articleTitle.trim().toLowerCase()
-    const titlePrefix = cleanTitle.substring(0, Math.min(25, cleanTitle.length))
-    nodes = rawNodes.filter((node: any, idx: number) => {
-      if (idx >= 3) return true
-      const text = extractNodeText(node).trim().toLowerCase()
-      if (!text) return true
-      if (
-        text === cleanTitle || 
-        (titlePrefix.length > 5 && text.startsWith(titlePrefix)) || 
-        (text.length > 5 && cleanTitle.startsWith(text.substring(0, 25)))
-      ) {
-        return false
-      }
-      return true
-    })
-  }
-
-  const primaryWidgetId =
-    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1
-
-  const secondaryWidgetId =
-    adWidgetId2 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2
-
-  const tertiaryWidgetId =
-    adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
-
 
   // If no primary ad configured or article is too short, render plain
   if (!primaryWidgetId || nodes.length < 2) {
     return (
-      <div className={`rich-text ${className || ''}`}>
+      <div ref={contentRef} className={`rich-text rich-text--complete ${className || ''}`}>
         {serializeLexical(nodes)}
       </div>
     )
   }
 
-  // Count total paragraphs and find exact paragraph boundary indices
-  let paragraphCount = 0
-  let p2EndIndex = nodes.length // index after paragraph 2
-  let p4EndIndex = nodes.length // index after paragraph 4
-  let p8EndIndex = nodes.length // index after paragraph 8
+  // ─── Ad and "Continue Reading" placement ───
+  // Set from the live articles (median 4 short paragraphs, ~134 words): an ad
+  // goes in only when at least 2 paragraphs follow it, so short articles get
+  // fewer units and the text is never just ads.
+  const adSlots = [
+    { after: 2, minParagraphs: 3, widgetId: primaryWidgetId, placement: 'article_inline_1' },
+    { after: 4, minParagraphs: 6, widgetId: secondaryWidgetId, placement: 'article_inline_2' },
+    { after: 8, minParagraphs: 10, widgetId: tertiaryWidgetId, placement: 'article_inline_3' },
+  ].filter((slot) => slot.widgetId && paragraphCount >= slot.minParagraphs)
 
-  for (let i = 0; i < nodes.length; i++) {
-    if (nodes[i].type === 'paragraph') {
-      paragraphCount++
-      if (paragraphCount === 2) p2EndIndex = i + 1
-      if (paragraphCount === 4) p4EndIndex = i + 1
-      if (paragraphCount === LONG_ARTICLE_THRESHOLD) p8EndIndex = i + 1
-    }
+  const topElements: React.ReactNode[] = []
+  const bottomElements: React.ReactNode[] = []
+  let target = topElements
+  let segment: any[] = []
+  let segmentIndex = 0
+  let seen = 0
+
+  const flush = () => {
+    if (segment.length === 0) return
+    target.push(...serializeLexical(segment, `seg-${segmentIndex++}`))
+    segment = []
   }
 
-  // ─── Assemble topElements (shown before "Continue Reading": paragraphs 1-4) ───
-  const topElements: React.ReactNode[] = []
-  topElements.push(...serializeLexical(nodes.slice(0, p2EndIndex), 'top-p1-p2'))
-  topElements.push(
-    <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
-      <AdskeeperWidget
-        key={`ad-inarticle-1`}
-        widgetId={primaryWidgetId}
-        placement="article_inline_1"
-        className="!my-0"
-      />
-    </div>
-  )
+  for (const node of nodes) {
+    segment.push(node)
+    if (node.type !== 'paragraph') continue
+    seen++
 
-  // Paragraphs 3-4 and the second ad are also shown before "Continue Reading",
-  // so the second unit is seen by every reader, not only those who expand.
-  const p3ToP4Nodes = nodes.slice(p2EndIndex, p4EndIndex)
-  if (p3ToP4Nodes.length > 0) {
-    topElements.push(...serializeLexical(p3ToP4Nodes, 'top-p3-p4'))
-    if (secondaryWidgetId && paragraphCount >= 4) {
-      topElements.push(
-        <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
+    const slot = adSlots.find((s) => s.after === seen)
+    if (slot) {
+      flush()
+      target.push(
+        <div key={`ad-${slot.placement}-wrap`} className="my-6 w-full">
           <AdskeeperWidget
-            key={`ad-inarticle-2`}
-            widgetId={secondaryWidgetId}
-            placement="article_inline_2"
+            key={`ad-${slot.placement}`}
+            widgetId={slot.widgetId as string}
+            placement={slot.placement}
             className="!my-0"
           />
         </div>
       )
     }
+
+    if (showGate && seen === GATE_AFTER) {
+      flush()
+      target = bottomElements
+    }
   }
-
-  // ─── Assemble bottomElements (shown when expanded) ───
-  const bottomElements: React.ReactNode[] = []
-
-  // Keep the third unit exclusive to genuinely long articles so ad density
-  // remains proportional to the amount of editorial content.
-  const middleNodes = nodes.slice(p4EndIndex, p8EndIndex)
-  if (middleNodes.length > 0) {
-    bottomElements.push(...serializeLexical(middleNodes, 'bot-p5-p8'))
-  }
-
-  if (tertiaryWidgetId && paragraphCount >= LONG_ARTICLE_THRESHOLD) {
-    bottomElements.push(
-      <div key="ad-inarticle-3-wrap" className="my-4 w-full flex justify-center items-center">
-        <AdskeeperWidget
-          key="ad-inarticle-3"
-          widgetId={tertiaryWidgetId}
-          placement="article_inline_3"
-          className="!my-0"
-        />
-      </div>
-    )
-  }
-
-  const restNodes = nodes.slice(p8EndIndex)
-  if (restNodes.length > 0) {
-    bottomElements.push(...serializeLexical(restNodes, 'bot-rest'))
-  }
-
-
+  flush()
 
   // ─── Collapsed state: teaser preview + Continue Reading button ───
-  if (!isExpanded && bottomElements.length > 0) {
+  if (!fullyShown && bottomElements.length > 0) {
     const teaserElement = bottomElements[0]
 
     return (
@@ -221,12 +218,13 @@ export const RichText = ({
           <button
             onClick={() => {
               window.gtag?.('event', 'article_read_more_clicked', {
-                article_id: analyticsId || articleTitle || 'unknown',
+                article_id: articleId,
+                gate_variant: gateVariantParam(),
                 device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
               })
               setIsExpanded(true)
             }}
-            className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full cursor-pointer font-semibold text-sm text-white transition-all duration-200 active:scale-[0.98] shadow-md hover:shadow-lg hover:brightness-110"
+            className="group inline-flex items-center justify-center gap-2 px-6 py-3 cursor-pointer font-semibold text-sm text-white transition-colors duration-200 hover:bg-[var(--accent-red-dark)]"
             style={{
               background: 'var(--accent-red)',
             }}
@@ -249,7 +247,7 @@ export const RichText = ({
 
   // ─── Expanded state: full article with phased ads ───
   return (
-    <div ref={contentRef} className={`rich-text ${className || ''}`}>
+    <div ref={contentRef} className={`rich-text rich-text--complete ${className || ''}`}>
       {topElements}
       {bottomElements}
     </div>

@@ -34,17 +34,17 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.4 }}
-        className={`group flex gap-3 border rounded-lg p-3 cursor-pointer transition-all ${className || ''}`}
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+        className={`group flex gap-3 py-3 cursor-pointer ${className || ''}`}
+        style={{ borderBottom: '1px solid var(--border)' }}
       >
         <Link href={href} className="flex gap-3 w-full">
-          <div className="relative flex-shrink-0 overflow-hidden rounded" style={{ width: 100, height: 72 }}>
+          <div className="relative flex-shrink-0 overflow-hidden" style={{ width: 100, height: 72 }}>
             <Image
               src={imageUrl}
               alt={article.coverImage?.alt || article.title}
               fill
               sizes="100px"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
             />
           </div>
           <div className="flex flex-col justify-between min-w-0 py-0.5">
@@ -53,7 +53,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
                 <CategoryBadge name={translatedCategoryName} size="sm" className="mb-1.5 block" />
               )}
               <h3
-                className="font-card-title line-clamp-3 text-sm group-hover:text-[var(--accent-red)] transition-colors"
+                className="font-card-title line-clamp-3 text-sm group-hover:underline underline-offset-2"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {article.title}
@@ -75,8 +75,8 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.4 }}
-        className={`group border rounded-xl overflow-hidden cursor-pointer transition-all hover:border-[var(--accent-red)] ${className || ''}`}
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+        className={`group cursor-pointer ${className || ''}`}
+        style={{ borderBottom: '1px solid var(--border)' }}
       >
         <Link href={href}>
           <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/10' }}>
@@ -85,29 +85,22 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
               alt={article.coverImage?.alt || article.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover group-hover:scale-[1.03] transition-transform duration-700"
+              className="object-cover"
             />
-            <div
-              className="absolute inset-0"
-              style={{ background: 'linear-gradient(to top, rgba(10,10,10,0.95) 30%, rgba(10,10,10,0.2) 70%, transparent)' }}
-            />
-            <div className="absolute bottom-0 left-0 p-4 flex gap-2">
-              {article.category && (
-                <CategoryBadge name={translatedCategoryName} />
-              )}
-              {article.isBreaking && <BreakingBadge />}
-            </div>
           </div>
-          <div className="p-5">
+          <div className="pt-3 pb-5">
+            {article.category && (
+              <CategoryBadge name={translatedCategoryName} className="mb-2 block" />
+            )}
             <h2
-              className="font-card-title text-2xl mb-2 line-clamp-4 group-hover:text-[var(--accent-red)] transition-colors duration-200"
+              className="font-card-title text-2xl mb-2 line-clamp-4 group-hover:underline underline-offset-2"
               style={{ color: 'var(--text-primary)' }}
             >
               {article.title}
             </h2>
             <p
               className="text-sm leading-relaxed mb-4 line-clamp-3"
-              style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
+              style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}
             >
               {article.excerpt}
             </p>
@@ -124,8 +117,8 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className={`group border rounded-xl overflow-hidden cursor-pointer transition-all hover:border-[var(--accent-red)] ${className || ''}`}
-      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+      className={`group cursor-pointer ${className || ''}`}
+      style={{ borderBottom: '1px solid var(--border)' }}
     >
       <Link href={href}>
         <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
@@ -134,7 +127,7 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
             alt={article.coverImage?.alt || article.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-[1.03] transition-transform duration-700"
+            className="object-cover"
           />
           {article.isBreaking && (
             <div className="absolute top-3 left-3">
@@ -142,19 +135,19 @@ export function ArticleCard({ article, size = 'md', index = 0, className }: Arti
             </div>
           )}
         </div>
-        <div className="p-4">
+        <div className="pt-3 pb-4">
           {article.category && (
             <CategoryBadge name={translatedCategoryName} size="sm" className="mb-2 block" />
           )}
           <h3
-            className="font-card-title mb-2 line-clamp-3 group-hover:text-[var(--accent-red)] transition-colors duration-200"
+            className="font-card-title mb-2 line-clamp-3 group-hover:underline underline-offset-2"
             style={{ color: 'var(--text-primary)', fontSize: '17px' }}
           >
             {article.title}
           </h3>
           <p
             className="text-sm leading-relaxed mb-3 line-clamp-2"
-            style={{ color: 'var(--text-muted)', fontFamily: 'Syne, sans-serif' }}
+            style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}
           >
             {truncate(article.excerpt, 120)}
           </p>

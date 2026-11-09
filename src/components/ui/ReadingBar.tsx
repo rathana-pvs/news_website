@@ -26,7 +26,7 @@ export function ReadingBar() {
         top: 0,
         left: 0,
         height: '3px',
-        background: 'var(--accent-gold)',
+        background: 'var(--accent-red)',
         zIndex: 9999,
         transition: 'width 0.1s linear',
       }}

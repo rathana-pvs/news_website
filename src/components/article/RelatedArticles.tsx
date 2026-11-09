@@ -1,48 +1,47 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Article } from '@/types'
-import { CategoryBadge } from '@/components/ui/CategoryBadge'
-import { formatDistanceToNow, parseISO } from 'date-fns'
 
 interface RelatedArticlesProps {
   articles: Article[]
-  locale?: string
+  categoryName?: string
 }
 
-export function RelatedArticles({ articles, locale = 'en' }: RelatedArticlesProps) {
+/**
+ * Sits just above the bottom ad feed, which earns most of the revenue. On
+ * phones it is a short list of headlines (~200px) so the feed stays close;
+ * from `sm` up it becomes a row of image cards.
+ */
+export function RelatedArticles({ articles, categoryName }: RelatedArticlesProps) {
   if (!articles || articles.length === 0) return null
 
   return (
-    <div className="mt-4 mb-4 border-t border-[var(--border)] pt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-        <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
-          Suggested Reading
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">More News</span>
+    <section className="mt-10">
+      <div className="section-head !mb-2 sm:!mb-5">
+        <h2>{categoryName ? `More from ${categoryName}` : 'More stories'}</h2>
       </div>
-
-      {/* Text-Only Editorial Links */}
-      <ul className="divide-y divide-[var(--border)]">
-        {articles.slice(0, 3).map((article) => {
-          return (
-            <li key={article.id} className="py-2.5 first:pt-1 last:pb-1">
-              <Link
-                href={`/article/${article.slug}`}
-                className="group flex items-start justify-between gap-3 text-sm sm:text-base font-bold leading-snug text-[var(--text-primary)] hover:text-[var(--accent-red)] transition-colors"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              >
-                <span className="flex-1 line-clamp-2 group-hover:underline">
-                  {article.title}
-                </span>
-                <span className="font-mono text-[11px] text-[var(--accent-red)] font-bold flex-shrink-0 mt-0.5">
-                  →
-                </span>
-              </Link>
-            </li>
-          )
-        })}
+      <ul className="grid grid-cols-1 sm:grid-cols-3 sm:gap-6">
+        {articles.slice(0, 3).map((article, i) => (
+          <li
+            key={article.id}
+            className={`py-3 sm:py-0 ${i > 0 ? 'border-t sm:border-t-0' : ''}`}
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <Link href={`/article/${article.slug}`} className="group block">
+              <div className="hidden sm:block relative w-full mb-3" style={{ aspectRatio: '3 / 2', background: 'var(--bg-surface)' }}>
+                <Image
+                  src={article.coverImage?.url || 'https://picsum.photos/seed/related/600/400'}
+                  alt={article.coverImage?.alt || article.title}
+                  fill
+                  sizes="240px"
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="headline" style={{ fontSize: 17, lineHeight: 1.25 }}>{article.title}</h3>
+            </Link>
+          </li>
+        ))}
       </ul>
-    </div>
+    </section>
   )
 }

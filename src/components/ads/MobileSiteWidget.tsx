@@ -14,6 +14,7 @@ interface MobileSiteWidgetProps {
 export function MobileSiteWidget({ widgetId }: MobileSiteWidgetProps) {
   const pathname = usePathname()
   const [isMobile, setIsMobile] = useState(false)
+  const [armed, setArmed] = useState(false)
   const isArticlePage = pathname.startsWith('/article/')
 
   useEffect(() => {
@@ -25,8 +26,25 @@ export function MobileSiteWidget({ widgetId }: MobileSiteWidgetProps) {
     return () => mediaQuery.removeEventListener('change', updateDevice)
   }, [])
 
+  // Show the sticky unit only once the reader has scrolled about one screen,
+  // so it never covers the headline on arrival from Facebook. The slot is not
+  // in the DOM before then, so earlier `_mgc.load` calls cannot pick it up.
   useEffect(() => {
+    setArmed(false)
     if (!isArticlePage || !isMobile) return
+
+    const onScroll = () => {
+      if (window.scrollY < window.innerHeight * 0.9) return
+      setArmed(true)
+      window.removeEventListener('scroll', onScroll)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [isArticlePage, isMobile, pathname])
+
+  useEffect(() => {
+    if (!isArticlePage || !isMobile || !armed) return
 
     window._mgq = window._mgq || []
     window._mgq.push(['_mgc.load'])
@@ -35,9 +53,9 @@ export function MobileSiteWidget({ widgetId }: MobileSiteWidgetProps) {
       page_path: window.location.pathname,
       device_class: 'mobile',
     })
-  }, [isArticlePage, isMobile, pathname, widgetId])
+  }, [isArticlePage, isMobile, armed, pathname, widgetId])
 
-  if (!isArticlePage || !isMobile) return null
+  if (!isArticlePage || !isMobile || !armed) return null
 
   return (
     <div

@@ -1,37 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* ─── NYT Editorial Typography System ────────────────────────── */
-.article-title-nyt {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.25 !important;
-}
-
-.article-excerpt-nyt {
-  font-family: 'Source Serif 4', Georgia, serif !important;
-  font-style: italic !important;
-  line-height: 1.55 !important;
-  color: var(--text-secondary) !important;
-}
-
-.article-body {
-  font-family: 'Source Serif 4', Georgia, serif !important;
-  font-size: 18px !important;
-  line-height: 1.75 !important;
-}
-
-.article-body p {
-  font-family: 'Source Serif 4', Georgia, serif !important;
-  font-size: 18px !important;
-  line-height: 1.75 !important;
-  color: var(--text-primary) !important;
-  margin-bottom: 1.25rem !important;
-}
 
 /* ─── Seamless Native News Camouflage for AdsKeeper Widgets ───── */
 .mgbox,
@@ -41,7 +12,7 @@
   border-color: var(--border) !important;
 }
 
-/* Match AdsKeeper card titles to NYT Playfair Display Serif */
+/* Match AdsKeeper card titles to the site's headline serif */
 .mgbox .mgheader,
 ._mgwidget .mgheader,
 .mgline .mgtxt,
@@ -49,8 +20,8 @@
 ._mgwidget a.mgtxt,
 .mgbox .mc-title,
 ._mgwidget .mc-title {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  font-weight: 700 !important;
+  font-family: var(--font-serif) !important;
+  font-weight: 600 !important;
   color: var(--text-primary) !important;
   letter-spacing: -0.02em !important;
   line-height: 1.3 !important;
@@ -70,46 +41,38 @@
 .mgbox .mgbrand,
 ._mgwidget .mgbrand,
 .mgbox .mc-brand {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 10px !important;
   text-transform: uppercase !important;
   color: var(--text-muted) !important;
   letter-spacing: 0.08em !important;
 }
 
-/* ─── Design System Variables ─────────────────────────────────── */
+/* ─── Design System Variables (light only, Economist-inspired) ─ */
 :root {
-  /* Light Mode (Default for maximum native ad CTR) */
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', 'Helvetica Neue', Arial, system-ui, sans-serif;
+
   --bg-primary: #ffffff;
-  --bg-surface: #f7f7f7;
+  --bg-surface: #f5f4f2;
   --bg-card: #ffffff;
-  --bg-hover: #f0f0f0;
-  --text-primary: #0a0a0a;
+  --bg-hover: #efedea;
+  --bg-footer: #1a1a1a;
+  --text-primary: #0d0d0d;
   --text-secondary: #333333;
-  --text-muted: #555555;
-  --accent-red: #e8002d;
-  --accent-red-dim: rgba(232, 0, 45, 0.05);
+  --text-muted: #595959;
+  --accent-red: #e3120b;
+  --accent-red-dark: #b50d07;
+  --accent-red-dim: rgba(227, 18, 11, 0.08);
+  /* Legacy aliases still referenced by some components */
+  --accent-gold: var(--accent-red);
+  --accent-red-bright: var(--accent-red);
   --hero-overlay: #ffffff;
   --hero-overlay-rgba: 255, 255, 255;
-  --border: #e5e5e5;
-  --border-subtle: #f7f7f7;
-  --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
-}
-
-[data-theme="dark"] {
-  --bg-primary: #0a0a0a;
-  --bg-surface: #141414;
-  --bg-card: #1a1a1a;
-  --bg-hover: #1f1f1f;
-  --text-primary: #ffffff;
-  --text-secondary: #cccccc;
-  --text-muted: #888888;
-  --accent-red: #e8002d;
-  --accent-red-dim: rgba(232, 0, 45, 0.1);
-  --hero-overlay: #0a0a0a;
-  --hero-overlay-rgba: 10, 10, 10;
-  --border: #1f1f1f;
-  --border-subtle: #141414;
+  --border: #d9d9d9;
+  --border-strong: #0d0d0d;
+  --border-subtle: #ebebeb;
+  color-scheme: light;
 }
 
 /* ─── AdsKeeper / Native Ad Card Blending Rules ────────────────────── */
@@ -120,11 +83,20 @@
   transition: all 0.3s ease;
 }
 
-[data-theme="dark"] .mgbox,
-[data-theme="dark"] ._mgwidget,
-[data-theme="dark"] div[id*="M"] {
-  background-color: var(--bg-card) !important;
-  color: var(--text-primary) !important;
+
+/* Every ad unit carries a visible label, as ad networks and Facebook expect. */
+.ad-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--text-muted);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Reserve space while native widgets load to prevent content from jumping. */
@@ -160,12 +132,6 @@
   }
 }
 
-/* ─── Global Transitions ───────────────────────────────────────── */
-* {
-  transition: var(--theme-transition);
-}
-
-
 /* ─── Base Styles ─────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
@@ -175,153 +141,238 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--bg-primary);
 }
 
 body {
   background-color: var(--bg-primary);
-  /* Dot Matrix Texture */
-  background-image: radial-gradient(var(--border) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: 0 0;
   color: var(--text-primary);
-  /* Inter for body copy — superior legibility at all sizes */
-  font-family: 'Inter', 'Syne', system-ui, sans-serif;
-  font-size: clamp(15px, 1vw + 13px, 17px);
-  line-height: 1.65;
-  /* Professional typesetting */
-  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-  font-variant-numeric: oldstyle-nums;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  font-feature-settings: 'kern' 1, 'liga' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Dot Matrix Decorative Element */
-.dot-matrix {
-  background-image: radial-gradient(var(--accent-red) 1px, transparent 1px);
-  background-size: 8px 8px;
-  opacity: 0.2;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 /* ─── Typography ──────────────────────────────────────────────── */
-.font-display {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-feature-settings: 'kern' 1, 'liga' 1, 'dlig' 1;
-  /* Tighter tracking on large display sizes via CSS var */
-  letter-spacing: -0.03em;
+/* Headline serif. Class names kept so other pages pick up the new look. */
+.font-display,
+.font-card-title,
+.font-serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-optical-sizing: auto;
 }
 
 .font-card-title {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
-.font-body {
-  /* Inter for reading-heavy body copy */
-  font-family: 'Inter', system-ui, sans-serif;
-  font-feature-settings: 'kern' 1, 'liga' 1;
-}
-
-.font-ui {
-  /* Syne for UI elements, labels, nav */
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-}
-
+.font-body,
+.font-ui,
 .font-mono {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
-  font-feature-settings: 'kern' 0, 'liga' 0;
+  font-family: var(--font-sans);
 }
 
-/* label-caps: no forced color — let context set it */
 .label-caps {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.2;
 }
 
+/* Small red label that sits above a headline ("fly-title"). */
+.flytitle {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--accent-red);
+  margin-bottom: 6px;
+}
 
+.headline {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  font-optical-sizing: auto;
+}
+
+a:hover .headline,
+.headline a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.rubric {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Section header: thin red line on top, black sans title. */
+.section-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 10px;
+  margin-bottom: 20px;
+  border-top: 1px solid var(--border-strong);
+}
+
+.section-head::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 56px;
+  height: 4px;
+  background: var(--accent-red);
+}
+
+.section-head h2 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+}
+
+.section-head a {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.section-head a:hover {
+  color: var(--accent-red);
+}
 
 /* ─── Article Body Typography ─────────────────────────────────── */
 .article-body {
-  /* Inter for long-form reading — optimized legibility */
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: clamp(17px, 1vw + 14px, 19px);
-  line-height: 1.85;
-  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--text-primary);
   font-weight: 400;
-  /* Optical kerning for article body */
-  font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
-  text-rendering: optimizeLegibility;
-}
-
-.article-body h2 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 900;
-  color: var(--text-primary);
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin: 3rem 0 1.25rem;
-}
-
-.article-body h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(17px, 2vw, 22px);
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  margin: 2.5rem 0 1rem;
+  font-optical-sizing: auto;
+  font-feature-settings: 'kern' 1, 'liga' 1;
 }
 
 .article-body p {
-  margin-bottom: 1.75rem;
-  /* Hyphenation for long articles */
-  hyphens: auto;
-  word-spacing: 0.01em;
-}
-
-/* Drop Cap for first paragraph — editorial touch */
-.article-body > p:first-of-type::first-letter {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 4.5rem;
-  font-weight: 900;
-  color: var(--accent-red);
-  float: left;
-  line-height: 0.82;
-  margin-right: 0.1em;
-  margin-top: 0.08em;
-  /* Prevent orphan ligatures */
-  padding-right: 2px;
-}
-
-/* Pull Quotes */
-.article-body blockquote {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-style: italic;
-  font-size: 24px;
-  line-height: 1.4;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.6;
   color: var(--text-primary);
-  border-left: 6px solid var(--accent-red);
-  padding: 1.5rem 2.5rem;
-  margin: 3rem 0;
-  background: var(--bg-surface);
+  margin-bottom: 1.1em;
+  text-align: left !important;
+  hyphens: manual;
 }
 
-/* Image Captions */
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4 {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+}
+
+.article-body h1,
+.article-body h2 {
+  font-size: 22px !important;
+  margin: 2em 0 0.6em !important;
+}
+
+.article-body h3,
+.article-body h4 {
+  font-size: 18px !important;
+  margin: 1.6em 0 0.5em !important;
+}
+
+.article-body a {
+  color: var(--text-primary) !important;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-red);
+  text-underline-offset: 3px;
+}
+
+.article-body a:hover {
+  color: var(--accent-red) !important;
+}
+
+.article-body ul,
+.article-body ol {
+  color: var(--text-primary) !important;
+  font-size: 19px;
+}
+
+/* Drop cap on the first paragraph */
+.article-body .rich-text > p:first-of-type::first-letter {
+  font-family: var(--font-serif);
+  font-size: 4.1em;
+  font-weight: 600;
+  color: var(--text-primary);
+  float: left;
+  line-height: 0.8;
+  margin: 0.06em 0.08em 0 0;
+}
+
+/* End mark after the last paragraph */
+.article-body .rich-text--complete > p:last-of-type::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.3em;
+  background: var(--accent-red);
+}
+
+.article-body blockquote {
+  font-family: var(--font-serif) !important;
+  font-style: normal !important;
+  font-size: 22px !important;
+  line-height: 1.4 !important;
+  color: var(--text-primary) !important;
+  border-left: 3px solid var(--accent-red) !important;
+  padding: 0.25rem 0 0.25rem 1.25rem !important;
+  margin: 2rem 0 !important;
+  background: transparent;
+}
+
 .article-body figure figcaption {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+  font-size: 13px;
   color: var(--text-muted);
   margin-top: 0.5rem;
-  text-align: center;
+  text-align: left;
 }
 
 /* ─── Ticker Marquee Animation ────────────────────────────────── */
@@ -360,7 +411,7 @@ body {
 .skeleton {
   background: var(--bg-card);
   animation: skeleton-pulse 1.5s ease-in-out infinite;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 /* ─── Category Shimmer ────────────────────────────────────────── */

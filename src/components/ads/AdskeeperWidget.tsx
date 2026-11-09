@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { gateVariantParam } from '@/lib/experiments'
 
 interface AdskeeperWidgetProps {
   widgetId: string
@@ -74,6 +75,7 @@ function trackAdEvent(
     ad_type: adType || 'native',
     page_path: window.location.pathname,
     device_class: window.innerWidth < 1024 ? 'mobile' : 'desktop',
+    gate_variant: gateVariantParam(),
   })
 }
 
@@ -161,7 +163,10 @@ export default function AdskeeperWidget({
           })
         }
       },
-      { rootMargin: placement.endsWith('_bottom') ? '800px 0px' : '350px 0px' }
+      // In-article units load just ahead of the reader (they were already seen
+      // ~87% of the time at 350px); loading earlier mostly adds unseen loads.
+      // The long bottom feed starts earlier so it is ready when readers arrive.
+      { rootMargin: placement.endsWith('_bottom') ? '800px 0px' : '400px 0px' }
     )
     observer.observe(el)
     return () => {
@@ -317,7 +322,7 @@ export default function AdskeeperWidget({
                   {ad.title}
                 </h3>
                 <div className="font-mono flex items-center gap-1 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)' }}>
-                  <span className="text-[var(--accent-red)] font-bold">News</span>
+                  <span className="text-[var(--accent-red)] font-bold">Ad</span>
                   <span>·</span>
                   <span className="truncate">{ad.brand}</span>
                 </div>
@@ -330,7 +335,8 @@ export default function AdskeeperWidget({
 
     if (isInArticle) {
       return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
+        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] p-3 sm:p-4 my-3 sm:my-6 ${className}`}>
+          <span className="ad-label">Advertisement</span>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-2">
             [Local Test Mode] Adskeeper In-Article ({widgetId})
           </span>
@@ -346,7 +352,7 @@ export default function AdskeeperWidget({
                     <span className="underline-hover pb-[2px]">{ad.title}</span>
                   </h3>
                   <div className="font-mono flex items-center gap-2 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    <span className="uppercase text-[var(--accent-red)] font-bold">News Wire</span>
+                    <span className="uppercase text-[var(--accent-red)] font-bold">Ad</span>
                     <span>·</span>
                     <span className="truncate">{ad.brand}</span>
                   </div>
@@ -365,7 +371,7 @@ export default function AdskeeperWidget({
             <span className="label-caps !text-[var(--text-primary)] text-[10px] tracking-[0.25em]">
               Trending Around The Web
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Popular News</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest opacity-40">Sponsored</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {MOCK_ADS.slice(3, 7).map((ad, idx) => (
@@ -379,7 +385,7 @@ export default function AdskeeperWidget({
                     {ad.title}
                   </h3>
                   <div className="font-mono flex items-center gap-1.5 mt-auto pt-2 text-[9px] text-[var(--text-muted)] tracking-wider uppercase">
-                    <span className="text-[var(--accent-red)] font-bold">News</span>
+                    <span className="text-[var(--accent-red)] font-bold">Ad</span>
                     <span>·</span>
                     <span className="truncate max-w-[120px]">{idx % 2 === 0 ? '2 hours ago' : '4 hours ago'}</span>
                   </div>
@@ -393,6 +399,7 @@ export default function AdskeeperWidget({
 
     return (
       <div className={`ads-container ${className}`}>
+        <span className="ad-label">Advertisement</span>
         <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-30 block text-center mb-2">
           [Local Test Mode] Adskeeper Feed Widget ({widgetId})
         </span>
@@ -447,9 +454,10 @@ export default function AdskeeperWidget({
   return (
     <div
       ref={containerRef}
-      className={`adskeeper-widget-container ${filled === null ? 'adskeeper-widget-pending' : ''} my-3 sm:my-6 w-full flex justify-center ${className}`}
+      className={`adskeeper-widget-container ${filled === null ? 'adskeeper-widget-pending' : ''} my-3 sm:my-6 w-full flex flex-col items-stretch ${className}`}
       data-ad-placement={placement}
     >
+      <span className="ad-label">Advertisement</span>
       <div
         ref={slotRef}
         suppressHydrationWarning
