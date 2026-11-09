@@ -50,3 +50,5 @@ next-env.d.ts
 
 # Local Studio connection may contain CMS credentials.
 /reel-studio-connection.json
+
+.claude/
