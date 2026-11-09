@@ -165,6 +165,10 @@ export interface Article {
   credit?: string | null;
   category?: (number | null) | Category;
   author?: (number | null) | Author;
+  /**
+   * CMS user who created this article.
+   */
+  createdBy?: (number | null) | User;
   tags?:
     | {
         tag?: string | null;
@@ -478,6 +482,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   credit?: T;
   category?: T;
   author?: T;
+  createdBy?: T;
   tags?:
     | T
     | {
