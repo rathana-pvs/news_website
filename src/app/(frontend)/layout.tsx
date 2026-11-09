@@ -88,12 +88,6 @@ export default async function FrontendLayout({
             strategy="afterInteractive"
           />
         )}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6217525480433926"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </head>
       <body>
         <NavigationProgress />
