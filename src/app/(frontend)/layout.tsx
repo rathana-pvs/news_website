@@ -46,8 +46,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/logo.png',
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: 'Asian Dot Logo',
       },
     ],
@@ -60,9 +60,9 @@ export const metadata: Metadata = {
     images: ['/logo.png'],
   },
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: { url: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
+    shortcut: '/favicon-48.png',
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
   },
 }
 
@@ -126,7 +126,9 @@ export default async function FrontendLayout({
         <Script id="wau-init" strategy="afterInteractive">
           {`var _wau = _wau || []; _wau.push(["dynamic", "zzpbthitpu", "t8q", "c4302bffffff", "small"]);`}
         </Script>
-        <Script src="https://waust.at/d.js" strategy="afterInteractive" />
+        {/* Visitor counter: loaded once the page has finished loading, so its
+            ~18 requests don't compete with the article and ads on mobile data. */}
+        <Script src="https://waust.at/d.js" strategy="lazyOnload" />
       </body>
     </html>
   )

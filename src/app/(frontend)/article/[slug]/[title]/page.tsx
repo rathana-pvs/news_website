@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
+import { after } from 'next/server'
 import { sql } from '@payloadcms/db-postgres'
 import { getArticle, getRelatedArticles } from '@/lib/api-server'
 import { getPayloadClient } from '@/lib/payload'
@@ -77,12 +78,14 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   if (!article) notFound()
 
   // A tracking key must resolve to this article, including for crawler previews.
+  // Look it up together with the related articles instead of one after the other.
   const payload = await getPayloadClient()
-  const resolved = await payload.find({ collection: 'share-links' as any,
-    where: { and: [{ key: { equals: key } }, { article: { equals: article.id } }] }, limit: 1, depth: 0 })
+  const [resolved, relatedArticles] = await Promise.all([
+    payload.find({ collection: 'share-links' as any,
+      where: { and: [{ key: { equals: key } }, { article: { equals: article.id } }] }, limit: 1, depth: 0 }),
+    getRelatedArticles(article.id, article.category?.id, locale),
+  ])
   if (!resolved.docs.length) notFound()
-
-  const relatedArticles = await getRelatedArticles(article.id, article.category?.id, locale)
 
   // Track the click on the server side
   try {
@@ -98,10 +101,19 @@ export default async function DynamicArticlePage({ params }: PageProps) {
       /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|^whatsapp\/|vkshare|headless|lighthouse|curl|wget|python|go-http|java\/|okhttp|axios|node-fetch/i.test(userAgent)
 
     if (!isBot && !isPrefetch) {
+      // Count the click after the page has been sent, so the reader from
+      // Facebook doesn't wait for the database write.
       // Atomic increment, so simultaneous visits are all counted.
-      await (payload.db as any).drizzle.execute(
-        sql`UPDATE share_links SET clicks = COALESCE(clicks, 0) + 1, updated_at = now() WHERE id = ${resolved.docs[0].id}`
-      )
+      const linkId = resolved.docs[0].id
+      after(async () => {
+        try {
+          await (payload.db as any).drizzle.execute(
+            sql`UPDATE share_links SET clicks = COALESCE(clicks, 0) + 1, updated_at = now() WHERE id = ${linkId}`
+          )
+        } catch (e) {
+          console.error('Error tracking share link click:', e)
+        }
+      })
     }
   } catch (e) {
     console.error('Error tracking share link click:', e)
