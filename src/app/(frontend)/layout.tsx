@@ -66,12 +66,22 @@ export const metadata: Metadata = {
   },
 }
 
+function scriptOrigin(url: string | undefined): string | null {
+  if (!url) return null
+  try {
+    return new URL(url).origin
+  } catch {
+    return null
+  }
+}
+
 export default async function FrontendLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const locale = 'en'
+  const adskeeperOrigin = scriptOrigin(adskeeper.scriptUrl)
   const [categories, breakingArticles] = await Promise.all([
     getCategories(locale),
     getBreakingArticles(locale),
@@ -80,6 +90,14 @@ export default async function FrontendLayout({
   return (
     <html lang={locale}>
       <head>
+        {adskeeperOrigin && (
+          // Open the connection to the ad server while the page is still
+          // loading, so the first ad appears sooner on slow mobile networks.
+          <>
+            <link rel="preconnect" href={adskeeperOrigin} crossOrigin="" />
+            <link rel="dns-prefetch" href={adskeeperOrigin} />
+          </>
+        )}
         {adskeeper.scriptUrl && (
           // Widgets queue `_mgc.load` in window._mgq, which the script processes
           // when it arrives, so it doesn't need to block the first render.

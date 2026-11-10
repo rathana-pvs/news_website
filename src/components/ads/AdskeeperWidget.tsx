@@ -95,6 +95,7 @@ export default function AdskeeperWidget({
   const filledEventRef = useRef(false)
   const viewableEventRef = useRef(false)
   const reachedEventRef = useRef(false)
+  const timedOutRef = useRef(false)
 
   useEffect(() => {
     if (!onlyShowOn) {
@@ -122,13 +123,19 @@ export default function AdskeeperWidget({
     const el = containerRef.current
     const slotEl = slotRef.current
 
+    let unfilledTimer: ReturnType<typeof setTimeout> | null = null
     const resizeObs = new ResizeObserver(() => {
       const h = slotEl.offsetHeight
       if (h > 0) {
         setFilled(true)
         if (!filledEventRef.current) {
           filledEventRef.current = true
-          trackAdEvent('adskeeper_slot_filled', widgetId, placement, adType)
+          trackAdEvent(
+            timedOutRef.current ? 'adskeeper_slot_late_fill' : 'adskeeper_slot_filled',
+            widgetId,
+            placement,
+            adType
+          )
         }
         resizeObs.disconnect()
       }
@@ -150,15 +157,14 @@ export default function AdskeeperWidget({
             } catch (e) {
               console.error('Adskeeper load error:', e)
             }
-            setTimeout(() => {
-              setFilled((prev) => {
-                if (prev === null) {
-                  resizeObs.disconnect()
-                  trackAdEvent('adskeeper_slot_unfilled', widgetId, placement, adType)
-                  return false // unfilled -> hide
-                }
-                return prev
-              })
+            // After 8s without an ad, collapse the reserved space so the page
+            // doesn't show a gap, but keep the slot in the page and keep
+            // watching it: on slow mobile networks the ad often arrives later.
+            unfilledTimer = setTimeout(() => {
+              if (filledEventRef.current) return
+              timedOutRef.current = true
+              setFilled((prev) => (prev === null ? false : prev))
+              trackAdEvent('adskeeper_slot_unfilled', widgetId, placement, adType)
             }, 8000)
           })
         }
@@ -172,6 +178,7 @@ export default function AdskeeperWidget({
     return () => {
       observer.disconnect()
       resizeObs.disconnect()
+      if (unfilledTimer) clearTimeout(unfilledTimer)
     }
   }, [widgetId, isDev, isMatch, placement, adType])
 
@@ -449,15 +456,22 @@ export default function AdskeeperWidget({
     )
   }
 
-  if (filled === false) return null
+  // An unfilled slot stays mounted (collapsed, no label or margin) so a late
+  // ad can still render into it; the ResizeObserver then shows it.
+  const stateClass =
+    filled === null
+      ? 'adskeeper-widget-pending my-3 sm:my-6'
+      : filled
+        ? 'my-3 sm:my-6'
+        : 'adskeeper-widget-collapsed'
 
   return (
     <div
       ref={containerRef}
-      className={`adskeeper-widget-container ${filled === null ? 'adskeeper-widget-pending' : ''} my-3 sm:my-6 w-full flex flex-col items-stretch ${className}`}
+      className={`adskeeper-widget-container ${stateClass} w-full flex flex-col items-stretch ${filled === false ? '' : className}`}
       data-ad-placement={placement}
     >
-      <span className="ad-label">Advertisement</span>
+      {filled !== false && <span className="ad-label">Advertisement</span>}
       <div
         ref={slotRef}
         suppressHydrationWarning

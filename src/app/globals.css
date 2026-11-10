@@ -104,6 +104,12 @@
   min-height: 180px;
 }
 
+/* No ad after 8s: take no space, but stay in the page for a late fill. */
+.adskeeper-widget-collapsed {
+  margin: 0;
+  min-height: 0;
+}
+
 .adskeeper-widget-pending[data-ad-placement="article_bottom"],
 .adskeeper-widget-pending[data-ad-placement="home_feed"],
 .adskeeper-widget-pending[data-ad-placement="home_bottom"],
