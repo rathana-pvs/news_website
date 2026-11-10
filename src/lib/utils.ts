@@ -54,3 +54,37 @@ export function jsonLdString(data: unknown): string {
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029')
 }
+
+export interface OgImage {
+  url: string
+  width?: number
+  height?: number
+}
+
+/**
+ * Turn a Payload media value (object or URL string) into an Open Graph image.
+ * Width and height are included only when they look real: Facebook uses them
+ * to show the large preview on the first share, and a wrong size (some
+ * imported media store 1x1) is worse than none.
+ */
+export function toOgImage(image: unknown, siteUrl: string): OgImage | null {
+  if (!image) return null
+  let url = ''
+  let width: unknown
+  let height: unknown
+  if (typeof image === 'string') {
+    url = image
+  } else if (typeof image === 'object' && typeof (image as any).url === 'string') {
+    url = (image as any).url
+    width = (image as any).width
+    height = (image as any).height
+  } else {
+    return null
+  }
+  if (!url) return null
+  if (url.startsWith('/')) url = `${siteUrl}${url}`
+
+  const hasRealSize =
+    typeof width === 'number' && typeof height === 'number' && width >= 200 && height >= 200
+  return hasRealSize ? { url, width: width as number, height: height as number } : { url }
+}

@@ -6,6 +6,7 @@ import { sql } from '@payloadcms/db-postgres'
 import { getArticle, getRelatedArticles } from '@/lib/api-server'
 import { getPayloadClient } from '@/lib/payload'
 import { ArticleView } from '@/components/article/ArticleView'
+import { toOgImage } from '@/lib/utils'
 
 interface PageProps {
   params: Promise<{ slug: string; title: string }>
@@ -24,27 +25,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://asiandot.com'
 
-  const getImageUrl = (image: any) => {
-    if (!image) return null
-    let url = ''
-    if (typeof image === 'string') {
-      url = image
-    } else if (image && typeof image === 'object' && 'url' in image && typeof image.url === 'string') {
-      url = image.url
-    } else {
-      return null
-    }
-    if (url.startsWith('/')) {
-      return `${siteUrl}${url}`
-    }
-    return url
-  }
-
   const seoTitle = article.og?.metaTitle || article.meta?.title || article.title
   const seoDescription = article.og?.metaDescription || article.meta?.description || article.excerpt
-  const ogImageUrl = getImageUrl(article.og?.ogImage) ||
-                     getImageUrl(article.meta?.image) ||
-                     getImageUrl(article.coverImage)
+  const ogImage = toOgImage(article.og?.ogImage, siteUrl) ||
+                  toOgImage(article.meta?.image, siteUrl) ||
+                  toOgImage(article.coverImage, siteUrl)
 
   return {
     title: seoTitle,
@@ -53,9 +38,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `/article/${slug}`,
     },
     openGraph: {
+      siteName: 'Asian Dot',
       title: seoTitle,
       description: seoDescription,
-      images: ogImageUrl ? [ogImageUrl] : [],
+      images: ogImage ? [ogImage] : [],
       type: 'article',
       url: `${siteUrl}/article/${slug}`,
       publishedTime: article.publishedAt,
@@ -65,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: seoTitle,
       description: seoDescription,
-      images: ogImageUrl ? [ogImageUrl] : [],
+      images: ogImage ? [ogImage] : [],
     },
   }
 }
