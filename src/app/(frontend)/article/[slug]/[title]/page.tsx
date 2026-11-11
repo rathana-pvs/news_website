@@ -43,7 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: seoDescription,
       images: ogImage ? [ogImage] : [],
       type: 'article',
-      url: `${siteUrl}/article/${slug}`,
+      // Facebook keeps one preview per og:url. Each tracking link names itself, so its preview is read
+      // fresh when it is first shared and is never an older copy saved for the article or another link.
+      // Search engines still see one article through the canonical above.
+      url: `${siteUrl}/article/${key}/${slug}`,
       publishedTime: article.publishedAt,
       authors: [article.author?.name || 'Asian Dot Staff'],
     },
